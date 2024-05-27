@@ -1,7 +1,6 @@
 // rethink error handling, how to pass it on to the client
 // rethink alarms usage
 // rethink oBC/oBR
-// todo: connection.setState
 // push for durable.setState (in addition to connection.setState)
 
 import { DurableObject } from "cloudflare:workers";
