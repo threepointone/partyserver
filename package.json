@@ -1,0 +1,22 @@
+{
+  "name": "@partykit/partyflare",
+  "version": "0.0.0",
+  "private": true,
+  "description": "PartyKit, but for Cloudflare",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "tsup": "^8.0.2"
+  }
+}

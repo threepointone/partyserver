@@ -1,0 +1,27 @@
+{
+  "name": "@partykit/example-partyflare",
+  "version": "0.0.0",
+  "private": true,
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "client": "esbuild client/index.tsx --bundle --format=esm --platform=browser --outdir=public/dist --watch",
+    "server": "wrangler dev",
+    "dev": "concurrently \"npm run server\" \"npm run client\" --kill-others-on-fail"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "partysocket": "^1.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "valibot": "^0.30.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "concurrently": "^8.2.2",
+    "wrangler": "^3.57.1"
+  }
+}

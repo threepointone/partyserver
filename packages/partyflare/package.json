@@ -1,0 +1,28 @@
+{
+  "name": "partyflare",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsup"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.2.12",
+    "@cloudflare/workers-types": "^4.20240512.0",
+    "@vitest/runner": "1.5.0",
+    "@vitest/snapshot": "1.5.0",
+    "nanoid": "^5.0.7",
+    "vitest": "1.5.0"
+  }
+}
