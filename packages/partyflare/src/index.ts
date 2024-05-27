@@ -77,6 +77,7 @@ export class Party<Env> extends DurableObject<Env> {
     const map: Record<string, DurableObjectNamespace> =
       partyMap ||
       Object.entries(env).reduce((acc, [k, v]) => {
+        // @ts-expect-error - we're checking for the existence of idFromName
         if (typeof v.idFromName === "function") {
           return { ...acc, [k.toLowerCase()]: v };
         }

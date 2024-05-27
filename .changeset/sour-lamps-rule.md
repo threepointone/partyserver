@@ -1,0 +1,5 @@
+---
+"partyflare": patch
+---
+
+fix builds

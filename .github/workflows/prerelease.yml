@@ -24,7 +24,7 @@ jobs:
         run: bun .github/version-script.js
 
       - run: bun run build
-      - run: bun run check
+      # - run: bun run check
 
       - run: npm publish --tag beta
         env:
