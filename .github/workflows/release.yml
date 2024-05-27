@@ -19,19 +19,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: "npm"
+      - uses: oven-sh/setup-bun@v1
 
-      - run: npm ci
+      - run: bun install
 
-      - run: npm run build
+      - run: bun run build
 
       - id: changesets
         uses: changesets/action@v1
         with:
-          version: node .github/changeset-version.js
+          version: bun .github/changeset-version.js
           publish: npx changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.PARTYFLARE_GITHUB_TOKEN }}

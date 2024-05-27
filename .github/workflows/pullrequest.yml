@@ -18,12 +18,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: "npm"
+      - uses: oven-sh/setup-bun@v1
 
-      - run: npm ci
+      - run: bun install
 
-      - run: npm run build
-      - run: npm run check
+      - run: bun run build
+      - run: bun run check
