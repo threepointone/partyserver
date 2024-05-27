@@ -2,13 +2,13 @@
   "name": "@partykit/partyflare",
   "version": "0.0.0",
   "private": true,
-  "description": "PartyKit, but for Cloudflare",
+  "description": "PartyKit, for Workers",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Sunil Pai <threepointone@gmail.com>",
   "license": "ISC",
   "workspaces": [
     "packages/*"
