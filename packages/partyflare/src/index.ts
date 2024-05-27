@@ -36,10 +36,15 @@ function getRoomAndPartyNameFromUrl(url: URL) {
   if (parts[0] === "parties" && parts.length < 3) {
     return null;
   }
-  return {
-    room: parts[3],
-    party: parts[2]
-  };
+  const room = parts[3],
+    party = parts[2];
+  if (room && party) {
+    return {
+      room,
+      party
+    };
+  }
+  return null;
 }
 
 export class Party<Env> extends DurableObject<Env> {
@@ -78,7 +83,7 @@ export class Party<Env> extends DurableObject<Env> {
       partyMap ||
       Object.entries(env).reduce((acc, [k, v]) => {
         // @ts-expect-error - we're checking for the existence of idFromName
-        if (typeof v.idFromName === "function") {
+        if ("idFromName" in v && typeof v.idFromName === "function") {
           return { ...acc, [k.toLowerCase()]: v };
         }
         return acc;

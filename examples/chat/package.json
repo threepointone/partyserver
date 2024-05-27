@@ -5,9 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "client": "esbuild client/index.tsx --bundle --format=esm --platform=browser --outdir=public/dist --watch",
-    "server": "wrangler dev",
-    "dev": "concurrently \"npm run server\" \"npm run client\" --kill-others-on-fail"
+    "dev": "wrangler dev"
   },
   "keywords": [],
   "author": "",
