@@ -7,5 +7,5 @@ export default defineConfig({
   clean: true,
   external: ["cloudflare:workers"],
   format: "esm",
-  dts: true,
+  dts: true
 });

@@ -2,5 +2,6 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "types": ["@cloudflare/workers-types/experimental"]
-  }
+  },
+  "exclude": ["src/tests"]
 }

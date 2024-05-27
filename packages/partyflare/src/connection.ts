@@ -4,7 +4,7 @@
 import type {
   Connection,
   ConnectionSetStateFn,
-  ConnectionState,
+  ConnectionState
 } from "./types";
 
 // implementations (e.g. PartySocket)
@@ -13,7 +13,7 @@ if (!("OPEN" in WebSocket)) {
     CONNECTING: WebSocket.READY_STATE_CONNECTING,
     OPEN: WebSocket.READY_STATE_OPEN,
     CLOSING: WebSocket.READY_STATE_CLOSING,
-    CLOSED: WebSocket.READY_STATE_CLOSED,
+    CLOSED: WebSocket.READY_STATE_CLOSED
   };
 
   Object.assign(WebSocket, WebSocketStatus);
@@ -46,7 +46,7 @@ class AttachmentCache {
         this.#cache.set(ws, attachment);
       } else {
         throw new Error(
-          "Missing websocket attachment. This is most likely an issue in PartyKit, please open an issue at https://github.com/partykit/partykit/issues"
+          "Missing websocket attachment. This is most likely an issue in PartyFlare, please open an issue at https://github.com/threepointone/partyflare/issues"
         );
       }
     }
@@ -89,7 +89,7 @@ export const createLazyConnection = (
     id: {
       get() {
         return attachments.get(ws).__pk.id;
-      },
+      }
     },
     // uri: {
     //   get() {
@@ -99,17 +99,17 @@ export const createLazyConnection = (
     room: {
       get() {
         return attachments.get(ws).__pk.room;
-      },
+      }
     },
     socket: {
       get() {
         return ws;
-      },
+      }
     },
     state: {
       get() {
         return this.deserializeAttachment() as ConnectionState<unknown>;
-      },
+      }
     },
     setState: {
       value: function setState<T>(setState: T | ConnectionSetStateFn<T>) {
@@ -122,26 +122,26 @@ export const createLazyConnection = (
 
         this.serializeAttachment(state);
         return state as ConnectionState<T>;
-      },
+      }
     },
 
     deserializeAttachment: {
       value: function deserializeAttachment<T = unknown>() {
         const attachment = attachments.get(ws);
         return (attachment.__user ?? null) as T;
-      },
+      }
     },
 
     serializeAttachment: {
       value: function serializeAttachment<T = unknown>(attachment: T) {
         const setting = {
           ...attachments.get(ws),
-          __user: attachment ?? null,
+          __user: attachment ?? null
         };
 
         attachments.set(ws, setting);
-      },
-    },
+      }
+    }
   }) as Connection;
 
   if (initialState) {
@@ -157,7 +157,10 @@ class HibernatingConnectionIterator<T>
 {
   private index: number = 0;
   private sockets: WebSocket[] | undefined;
-  constructor(private state: DurableObjectState, private tag?: string) {}
+  constructor(
+    private state: DurableObjectState,
+    private tag?: string
+  ) {}
 
   [Symbol.iterator](): IterableIterator<Connection<T>> {
     return this;
@@ -235,7 +238,7 @@ export class InMemoryConnectionManager<TState> implements ConnectionManager {
     this.tags.set(connection, [
       // make sure we have id tag
       connection.id,
-      ...options.tags.filter((t) => t !== connection.id),
+      ...options.tags.filter((t) => t !== connection.id)
     ]);
 
     const removeConnection = () => {
@@ -288,7 +291,7 @@ export class HibernatingConnectionManager<TState> implements ConnectionManager {
     // dedupe tags in case user already provided id tag
     const tags = [
       connection.id,
-      ...options.tags.filter((t) => t !== connection.id),
+      ...options.tags.filter((t) => t !== connection.id)
     ];
 
     // validate tags against documented restrictions
@@ -316,9 +319,9 @@ export class HibernatingConnectionManager<TState> implements ConnectionManager {
       __pk: {
         id: connection.id,
         // uri: connection.uri,
-        room: options.room,
+        room: options.room
       },
-      __user: null,
+      __user: null
     });
 
     return createLazyConnection(connection);

@@ -4,23 +4,23 @@
 // push for durable.setState (in addition to connection.setState)
 
 import { DurableObject } from "cloudflare:workers";
+import { nanoid } from "nanoid";
 
+import {
+  createLazyConnection,
+  HibernatingConnectionManager,
+  InMemoryConnectionManager
+} from "./connection";
+
+import type { ConnectionManager } from "./connection";
 import type {
   Connection,
   ConnectionContext,
   ConnectionSetStateFn,
-  ConnectionState,
+  ConnectionState
 } from "./types";
-import {
-  HibernatingConnectionManager,
-  InMemoryConnectionManager,
-  createLazyConnection,
-  type ConnectionManager,
-} from "./connection";
 
 export * from "./types";
-
-import { nanoid } from "nanoid";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {
@@ -38,23 +38,23 @@ function getRoomAndPartyNameFromUrl(url: URL) {
   }
   return {
     room: parts[3],
-    party: parts[2],
+    party: parts[2]
   };
 }
 
 export class Party<Env> extends DurableObject<Env> {
   #initialized = false;
   static options = {
-    hibernate: false,
+    hibernate: false
   };
   static async match(
     req: Request,
-    env: Record<string, any>,
+    env: Record<string, unknown>,
     partyMap?:
       | Record<string, DurableObjectNamespace>
       | ((
           req: Request,
-          env: Record<string, any>
+          env: Record<string, unknown>
         ) => { room: string; party: DurableObjectNamespace } | null)
   ): Promise<Response | null> {
     if (typeof partyMap === "function") {
@@ -69,7 +69,7 @@ export class Party<Env> extends DurableObject<Env> {
         const headers = new Headers(req.headers);
         headers.set("x-partyflare-room", room);
         return stub.fetch(req, {
-          headers,
+          headers
         });
       }
     }
@@ -94,7 +94,7 @@ export class Party<Env> extends DurableObject<Env> {
       const headers = new Headers(req.headers);
       headers.set("x-partyflare-room", room);
       return stub.fetch(req, {
-        headers,
+        headers
       });
     }
   }
@@ -162,7 +162,7 @@ export class Party<Env> extends DurableObject<Env> {
           // TODO: deepFreeze object?
           this.state = state as ConnectionState<T>;
           return this.state;
-        },
+        }
       });
 
       const ctx = { request };
@@ -172,7 +172,7 @@ export class Party<Env> extends DurableObject<Env> {
       // Accept the websocket connection
       connection = this.connectionManager.accept(connection, {
         tags,
-        room: this.id,
+        room: this.id
       });
 
       if (!this.ParentClass.options.hibernate) {

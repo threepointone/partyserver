@@ -1,4 +1,6 @@
-import { Party, type Connection, type ConnectionContext } from "../index";
+import { Party } from "../index";
+
+import type { Connection, ConnectionContext } from "../index";
 
 export type Env = {
   Stateful: DurableObjectNamespace;
@@ -6,7 +8,7 @@ export type Env = {
 
 export class Stateful extends Party<Env> {
   static options = {
-    hibernate: true,
+    hibernate: true
   };
   // onMessage(connection: Connection, message: WSMessage) {
   //   this.broadcast(message);
@@ -17,7 +19,7 @@ export class Stateful extends Party<Env> {
   ): void | Promise<void> {
     connection.send(
       JSON.stringify({
-        id: this.id,
+        id: this.id
       })
     );
   }
@@ -25,7 +27,7 @@ export class Stateful extends Party<Env> {
     request: Request<unknown, CfProperties<unknown>>
   ): Response | Promise<Response> {
     return Response.json({
-      id: this.id,
+      id: this.id
     });
   }
 }
@@ -36,5 +38,5 @@ export default {
       (await Party.match(request, env)) ||
       new Response("Not Found", { status: 404 })
     );
-  },
+  }
 };

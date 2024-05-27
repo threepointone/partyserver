@@ -18,6 +18,6 @@ export class MyParty extends Party {
 export default {
   fetch(req: Request, env) {
     return Party.match(req, env) || new Response("Not Found", { status: 404 });
-  },
+  }
 };
 ```

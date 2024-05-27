@@ -1,8 +1,9 @@
-import { createRoot } from "react-dom/client";
-import { usePartySocket } from "partysocket/react";
 import { useRef, useState } from "react";
-import type { ChatMessage } from "../src/chat-types";
+import { createRoot } from "react-dom/client";
 import { nanoid } from "nanoid";
+import { usePartySocket } from "partysocket/react";
+
+import type { ChatMessage } from "../src/chat-types";
 
 const randomNames = [
   "Alice",
@@ -19,7 +20,7 @@ const randomNames = [
   "Oscar",
   "Peggy",
   "Trent",
-  "Wendy",
+  "Wendy"
 ];
 
 const me =
@@ -39,7 +40,7 @@ function App() {
       console.log("Received a message:", evt.data);
       const message = JSON.parse(evt.data as string) as ChatMessage;
       setMessages((prevMessages) => [...prevMessages, message]);
-    },
+    }
   });
   return (
     <>
@@ -60,7 +61,7 @@ function App() {
                 id: nanoid(),
                 type: "chat-message",
                 content: inputRef.current.value as string,
-                sender: me,
+                sender: me
               } satisfies ChatMessage)
             );
             inputRef.current.value = "";
@@ -73,6 +74,6 @@ function App() {
   );
 }
 
-const root = createRoot(document.getElementById("root")!);
+const root = createRoot(document.getElementById("root") as HTMLElement);
 
 root.render(<App />);

@@ -1,0 +1,29 @@
+name: Pull Request
+
+on: pull_request
+
+jobs:
+  check:
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        os: [
+            ubuntu-latest
+            # windows-latest,
+            # macos-latest,
+          ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: "npm"
+
+      - run: npm ci
+
+      - run: npm run build
+      - run: npm run check

@@ -1,12 +1,14 @@
 import {
-  env,
   createExecutionContext,
-  waitOnExecutionContext,
+  env,
+  waitOnExecutionContext
 } from "cloudflare:test";
-import type { Env } from "./worker";
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 // Could import any other source file/function here
 import worker from "./worker";
+
+import type { Env } from "./worker";
 
 declare module "cloudflare:test" {
   // ...or if you have an existing `Env` type...
@@ -17,8 +19,8 @@ it("can websocket", async () => {
   const ctx = createExecutionContext();
   const request = new Request("http://example.com/ws", {
     headers: {
-      Upgrade: "websocket",
-    },
+      Upgrade: "websocket"
+    }
   });
   const response = await worker.fetch(request, env, ctx);
 
@@ -45,7 +47,7 @@ describe("party", () => {
     const response = await worker.fetch(request, env, ctx);
     expect(await response.json()).toEqual({
       id: "123",
-      party: "chat",
+      party: "chat"
     });
   });
 
@@ -53,8 +55,8 @@ describe("party", () => {
     const ctx = createExecutionContext();
     const request = new Request("http://example.com/chat/123", {
       headers: {
-        Upgrade: "websocket",
-      },
+        Upgrade: "websocket"
+      }
     });
     const response = await worker.fetch(request, env, ctx);
 
@@ -65,7 +67,7 @@ describe("party", () => {
         try {
           expect(JSON.parse(message.data as string)).toEqual({
             id: "123",
-            party: "chat",
+            party: "chat"
           });
           ws.close();
           resolve();

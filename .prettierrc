@@ -1,0 +1,15 @@
+{
+  "singleQuote": false,
+  "trailingComma": "none",
+  "plugins": ["@ianvs/prettier-plugin-sort-imports"],
+  "importOrder": [
+    "<BUILTIN_MODULES>",
+    "",
+    "^react",
+    "<THIRD_PARTY_MODULES>",
+    "",
+    "^[.]",
+    "",
+    "<TYPES>"
+  ]
+}

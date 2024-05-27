@@ -1,6 +1,7 @@
-import type { Connection, WSMessage } from "partyflare";
-import { Party } from "partyflare";
 import { WorkerEntrypoint } from "cloudflare:workers";
+import { Party } from "partyflare";
+
+import type { Connection, WSMessage } from "partyflare";
 
 type Env = {
   Chat: DurableObjectNamespace<Chat>;
@@ -8,7 +9,7 @@ type Env = {
 
 export class Chat extends Party<Env> {
   static options = {
-    hibernate: true,
+    hibernate: true
   };
   onMessage(connection: Connection, message: WSMessage) {
     this.broadcast(message);
