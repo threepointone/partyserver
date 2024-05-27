@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "check": "concurrently \"npm run repocheck\" \"npm run lint\" \"npm run typecheck\" --kill-others-on-fail",
-    "lint": "npx eslint \"**/*.[tj]s?(x)\" --max-warnings=0 --report-unused-disable-directives",
+    "lint": "eslint \"**/*.[tj]s?(x)\" --max-warnings=0 --report-unused-disable-directives",
     "repocheck": "manypkg check",
     "test": "echo \"Error: no test specified\" && exit 1",
     "typecheck": "npm exec tsc --workspaces"
