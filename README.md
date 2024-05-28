@@ -50,6 +50,19 @@ You can override the following methods on `Party` to add custom behavior:
 - `onRequest(request): Response` - when a request is received from the fetch handler
 - `getConnectionTags(connection, connContext)` - return an array of tags for a connection
 
+#### Party.options.hibernate
+
+You can enable [hibernation](https://developers.cloudflare.com/durable-objects/reference/websockets/#websocket-hibernation) by passing a static `options` property on your party class. This will allow the party to be hibernated when it is not in use, and woken up when a new connection is established. All your lifecycle hooks will be called as expected when the party is woken up.
+
+```ts
+export class MyParty extends Party {
+  static options = {
+    hibernate: true
+  };
+  // ...
+}
+```
+
 ## `Party.match(request, env)`
 
 This is a static method on `Party` that will return a `Response` if the request matches a party, or `null` if no party matches. This is useful for defining multiple parties in a single script.
