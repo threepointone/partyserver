@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.12
+
+### Patch Changes
+
+- [`6f52478`](https://github.com/threepointone/partyflare/commit/6f52478d1f52e2c904663324457a36482a21c1fe) Thanks [@threepointone](https://github.com/threepointone)! - call onStart only once
+
 ## 0.0.11
 
 ### Patch Changes
