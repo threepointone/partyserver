@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.6
+
+### Patch Changes
+
+- [`64be210`](https://github.com/threepointone/partyflare/commit/64be210f388866ec6bb63920c05fda4507dab7a9) Thanks [@threepointone](https://github.com/threepointone)! - Add a note about hibernation
+
 ## 0.0.5
 
 ### Patch Changes
