@@ -11,40 +11,29 @@ type Env = {
 
 export class Tldraw extends Party<Env> {
   records: Record<string, TLRecord> = {};
-
-  readonly initResult: Promise<void>;
   readonly schema = createTLSchema();
-  constructor(ctx: DurableObjectState, env: Env) {
-    super(ctx, env);
-    this.initResult = (async () => {
-      const snapshot = (await this.ctx.storage.get(
-        "snapshot"
-      )) as TLStoreSnapshot;
-      if (!snapshot) return;
 
-      const migrationResult = this.schema.migrateStoreSnapshot(snapshot);
-      if (migrationResult.type === "error") {
-        throw new Error(migrationResult.reason);
-      }
+  async onStart(): Promise<void> {
+    // need to make sure we've loaded the snapshot before we can let clients connect
+    const snapshot = await this.ctx.storage.get<TLStoreSnapshot>("snapshot");
+    if (!snapshot) return;
 
-      this.records = migrationResult.value;
-    })();
+    const migrationResult = this.schema.migrateStoreSnapshot(snapshot);
+    if (migrationResult.type === "error") {
+      throw new Error(migrationResult.reason);
+    }
+
+    this.records = migrationResult.value;
   }
 
   persist = throttle(async () => {
-    this.ctx.storage
-      .put("snapshot", {
-        store: this.records,
-        schema: this.schema.serialize()
-      })
-      .catch((err) => {
-        console.error("Failed to save snapshot:", err);
-      });
+    await this.ctx.storage.put("snapshot", {
+      store: this.records,
+      schema: this.schema.serialize()
+    });
   }, 1000);
 
   async onConnect(connection: Connection<unknown>) {
-    // need to make sure we've loaded the snapshot before we can let clients connect
-    await this.initResult;
     connection.send(
       JSON.stringify({
         type: "init",
@@ -53,7 +42,7 @@ export class Tldraw extends Party<Env> {
     );
   }
 
-  onMessage(sender: Connection<unknown>, message: string): void {
+  async onMessage(sender: Connection<unknown>, message: string): Promise<void> {
     const msg = JSON.parse(message);
     const schema = createTLSchema().serialize();
     switch (msg.type) {
@@ -77,9 +66,7 @@ export class Tldraw extends Party<Env> {
           // If it works, broadcast the update to all other clients
           this.broadcast(message, [sender.id]);
           // and update the storage layer
-          this.persist().catch((err) => {
-            console.error("Failed to save snapshot:", err);
-          });
+          await this.persist();
         } catch (err) {
           // If we have a problem merging the update, we need to send a snapshot
           // of the current state to the client so they can get back in sync.

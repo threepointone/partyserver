@@ -11,6 +11,7 @@ export class Chat extends Party<Env> {
   static options = {
     hibernate: true
   };
+
   onMessage(connection: Connection, message: WSMessage) {
     this.broadcast(message);
   }

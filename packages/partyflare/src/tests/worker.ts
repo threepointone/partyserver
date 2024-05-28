@@ -10,9 +10,7 @@ export class Stateful extends Party<Env> {
   static options = {
     hibernate: true
   };
-  // onMessage(connection: Connection, message: WSMessage) {
-  //   this.broadcast(message);
-  // }
+
   onConnect(
     connection: Connection,
     _ctx: ConnectionContext
@@ -23,6 +21,7 @@ export class Stateful extends Party<Env> {
       })
     );
   }
+
   onRequest(
     _request: Request<unknown, CfProperties<unknown>>
   ): Response | Promise<Response> {
