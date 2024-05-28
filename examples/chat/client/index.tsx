@@ -60,7 +60,7 @@ function App() {
               JSON.stringify({
                 id: nanoid(),
                 type: "chat-message",
-                content: inputRef.current.value as string,
+                content: inputRef.current.value,
                 sender: me
               } satisfies ChatMessage)
             );
@@ -74,6 +74,6 @@ function App() {
   );
 }
 
-const root = createRoot(document.getElementById("root") as HTMLElement);
+const root = createRoot(document.getElementById("root")!);
 
 root.render(<App />);

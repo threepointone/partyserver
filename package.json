@@ -9,7 +9,7 @@
     "lint": "eslint \"**/*.[tj]s?(x)\" --max-warnings=0 --report-unused-disable-directives",
     "repocheck": "manypkg check",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "typecheck": "npm exec tsc --workspaces"
+    "typecheck": "find . -name 'tsconfig.json' -not -path '*/node_modules/*' -exec bash -c 'echo \"npx tsc --project $(dirname \"$1\")/$1\"; npx tsc --project \"$1\"' sh {} \\;"
   },
   "keywords": [],
   "author": "Sunil Pai <threepointone@gmail.com>",

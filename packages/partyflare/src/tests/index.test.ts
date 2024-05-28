@@ -1,7 +1,7 @@
 import {
   createExecutionContext,
-  env,
-  waitOnExecutionContext
+  env
+  // waitOnExecutionContext
 } from "cloudflare:test";
 import { describe, expect, it } from "vitest";
 

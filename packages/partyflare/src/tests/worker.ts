@@ -15,7 +15,7 @@ export class Stateful extends Party<Env> {
   // }
   onConnect(
     connection: Connection,
-    ctx: ConnectionContext
+    _ctx: ConnectionContext
   ): void | Promise<void> {
     connection.send(
       JSON.stringify({
@@ -24,7 +24,7 @@ export class Stateful extends Party<Env> {
     );
   }
   onRequest(
-    request: Request<unknown, CfProperties<unknown>>
+    _request: Request<unknown, CfProperties<unknown>>
   ): Response | Promise<Response> {
     return Response.json({
       id: this.id
@@ -33,7 +33,7 @@ export class Stateful extends Party<Env> {
 }
 
 export default {
-  async fetch(request: Request, env: Env, ctx: ExecutionContext) {
+  async fetch(request: Request, env: Env, _ctx: ExecutionContext) {
     return (
       (await Party.match(request, env)) ||
       new Response("Not Found", { status: 404 })

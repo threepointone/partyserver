@@ -136,7 +136,7 @@ export class Party<Env> extends DurableObject<Env> {
     }
 
     if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") {
-      return await this.onRequest(request);
+      return this.onRequest(request);
     } else {
       if (
         this.onConnect === Party.prototype.onConnect &&
@@ -310,7 +310,9 @@ export class Party<Env> extends DurableObject<Env> {
    * Each connection supports up to 9 tags, each tag max length is 256 characters.
    */
   getConnectionTags(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     connection: Connection,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     context: ConnectionContext
   ): string[] | Promise<string[]> {
     return [];
@@ -319,17 +321,26 @@ export class Party<Env> extends DurableObject<Env> {
   // implemented by the user
   onStart(): void | Promise<void> {}
   onConnect(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     connection: Connection,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ctx: ConnectionContext
   ): void | Promise<void> {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onMessage(connection: Connection, message: WSMessage): void | Promise<void> {}
   onClose(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     connection: Connection,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     code: number,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     reason: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     wasClean: boolean
   ): void | Promise<void> {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onError(connection: Connection, error: unknown): void | Promise<void> {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onRequest(request: Request): Response | Promise<Response> {
     // default to 404
     return new Response("Not Found", { status: 404 });
