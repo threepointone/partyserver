@@ -2,6 +2,10 @@
   "name": "@partykit/partyflare-root",
   "version": "0.0.0",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/threepointone/partyflare/"
+  },
   "description": "PartyKit, for Workers",
   "scripts": {
     "build": "npm run build -w partyflare",
