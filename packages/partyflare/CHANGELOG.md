@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.11
+
+### Patch Changes
+
+- [`c6f3dfe`](https://github.com/threepointone/partyflare/commit/c6f3dfefaf58bd4938ab3eab9400c9ae66576260) Thanks [@threepointone](https://github.com/threepointone)! - actually share repo url
+
 ## 0.0.10
 
 ### Patch Changes
