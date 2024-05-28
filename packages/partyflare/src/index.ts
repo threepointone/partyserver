@@ -278,8 +278,8 @@ export class Party<Env> extends DurableObject<Env> {
 
   async #attachSocketEventHandlers(connection: Connection) {
     const handleMessageFromClient = (event: MessageEvent) => {
-      this.onMessage(connection, event.data)?.catch((e) => {
-        console.error(e);
+      this.onMessage(connection, event.data)?.catch<void>((e) => {
+        console.error("onMessage error:", e);
       });
     };
 
@@ -288,7 +288,7 @@ export class Party<Env> extends DurableObject<Env> {
       connection.removeEventListener("close", handleCloseFromClient);
       this.onClose(connection, event.code, event.reason, event.wasClean)?.catch(
         (e) => {
-          console.error(e);
+          console.error("onClose error:", e);
         }
       );
     };
@@ -297,7 +297,7 @@ export class Party<Env> extends DurableObject<Env> {
       connection.removeEventListener("message", handleMessageFromClient);
       connection.removeEventListener("error", handleErrorFromClient);
       this.onError(connection, e.error)?.catch((e) => {
-        console.error(e);
+        console.error("onError error:", e);
       });
     };
 
