@@ -33,17 +33,30 @@ export type WSMessage = ArrayBuffer | ArrayBufferView | string;
 function getPartyAndRoomFromUrl(url: URL) {
   // /parties/:party/:name
   const parts = url.pathname.split("/");
-  if (parts[0] === "parties" && parts.length < 3) {
+  if (parts[1] === "parties" && parts.length < 4) {
     return null;
   }
   const room = parts[3],
     party = parts[2];
-  if (room && party) {
+  if (parts[1] === "parties" && room && party) {
     return {
       room,
       party
     };
   }
+
+  if (parts[1] === "party" && parts.length < 3) {
+    return null;
+  }
+  const room2 = parts[2],
+    party2 = "main";
+  if (parts[1] === "party" && room2 && party2) {
+    return {
+      room: room2,
+      party: party2
+    };
+  }
+
   return null;
 }
 
@@ -83,7 +96,7 @@ export class Party<Env> extends DurableObject<Env> {
       partyMap ||
       Object.entries(env).reduce((acc, [k, v]) => {
         // @ts-expect-error - we're checking for the existence of idFromName
-        if ("idFromName" in v && typeof v.idFromName === "function") {
+        if (v && "idFromName" in v && typeof v.idFromName === "function") {
           return { ...acc, [k.toLowerCase()]: v };
         }
         return acc;
