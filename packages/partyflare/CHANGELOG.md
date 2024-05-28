@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.10
+
+### Patch Changes
+
+- [`4189013`](https://github.com/threepointone/partyflare/commit/4189013b2151354fbe99dced3c853e2a41437098) Thanks [@threepointone](https://github.com/threepointone)! - Fix default URL parsing
+
 ## 0.0.9
 
 ### Patch Changes
