@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.8
+
+### Patch Changes
+
+- [`c1b8460`](https://github.com/threepointone/partyflare/commit/c1b846009e5f41caa9a00b4f16c36b96bc8ed9b8) Thanks [@threepointone](https://github.com/threepointone)! - Add proper repo to package.json
+
 ## 0.0.7
 
 ### Patch Changes
