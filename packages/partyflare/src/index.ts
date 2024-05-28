@@ -126,6 +126,10 @@ export class Party<Env> extends DurableObject<Env> {
     this.connectionManager = this.ParentClass.options.hibernate
       ? new HibernatingConnectionManager(ctx)
       : new InMemoryConnectionManager();
+
+    // TODO: throw error if any of
+    // broadcast/getConnection/getConnections/getConnectionTags
+    // have been overridden
   }
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
@@ -337,10 +341,12 @@ export class Party<Env> extends DurableObject<Env> {
   ): void | Promise<void> {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onError(connection: Connection, error: unknown): void | Promise<void> {}
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onRequest(request: Request): Response | Promise<Response> {
     // default to 404
-    return new Response("Not Found", { status: 404 });
+    return new Response(
+      `onRequest hasn't been implemented on the Durable Object responding to ${request.url}`,
+      { status: 404 }
+    );
   }
 
   #getRoomFromRequest(req: Request): string {
@@ -356,6 +362,10 @@ export class Party<Env> extends DurableObject<Env> {
     return room;
   }
   #getRoomFromConnection(connection: Connection): string {
-    return connection.room;
+    const { room } = connection;
+    if (!room) {
+      throw new Error("Room not found in connection");
+    }
+    return room;
   }
 }
