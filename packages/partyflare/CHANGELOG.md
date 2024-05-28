@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.9
+
+### Patch Changes
+
+- [`5c97caf`](https://github.com/threepointone/partyflare/commit/5c97cafd88004b20d44b07118fa8616cc9d7a8fe) Thanks [@threepointone](https://github.com/threepointone)! - Better errors when onRequest hasn't been implemented or connection.room isn't available
+
 ## 0.0.8
 
 ### Patch Changes
