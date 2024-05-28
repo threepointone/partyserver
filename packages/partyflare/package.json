@@ -6,7 +6,8 @@
   "types": "dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "check:test": "vitest -r src/tests --watch false",
+    "test": "vitest -r src/tests",
     "build": "tsup"
   },
   "files": [
@@ -18,11 +19,11 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@cloudflare/workers-types": "^4.20240512.0",
+    "@cloudflare/workers-types": "^4.20240524.0",
     "nanoid": "^5.0.7"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.2.12",
+    "@cloudflare/vitest-pool-workers": "^0.3.0",
     "@vitest/runner": "1.5.0",
     "@vitest/snapshot": "1.5.0",
     "vitest": "1.5.0"

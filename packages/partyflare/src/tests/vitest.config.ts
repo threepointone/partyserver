@@ -4,6 +4,7 @@ export default defineWorkersConfig({
   test: {
     poolOptions: {
       workers: {
+        isolatedStorage: false,
         wrangler: {
           configPath: "./wrangler.toml"
         }

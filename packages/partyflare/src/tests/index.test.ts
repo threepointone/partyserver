@@ -15,45 +15,19 @@ declare module "cloudflare:test" {
   interface ProvidedEnv extends Env {}
 }
 
-it("can websocket", async () => {
-  const ctx = createExecutionContext();
-  const request = new Request("http://example.com/ws", {
-    headers: {
-      Upgrade: "websocket"
-    }
-  });
-  const response = await worker.fetch(request, env, ctx);
-
-  await new Promise<void>((resolve, reject) => {
-    const ws = response.webSocket!;
-    ws.accept();
-    ws.addEventListener("message", (message) => {
-      try {
-        expect(message.data).toEqual("some message");
-        ws.close();
-        resolve();
-      } catch (e) {
-        ws.close();
-        reject(e);
-      }
-    });
-  });
-});
-
 describe("party", () => {
-  it.only("can be connected with a url", async () => {
+  it("can be connected with a url", async () => {
     const ctx = createExecutionContext();
-    const request = new Request("http://example.com/chat/123");
+    const request = new Request("http://example.com/parties/stateful/123");
     const response = await worker.fetch(request, env, ctx);
     expect(await response.json()).toEqual({
-      id: "123",
-      party: "chat"
+      room: "123"
     });
   });
 
   it("can be connected with a websocket", async () => {
     const ctx = createExecutionContext();
-    const request = new Request("http://example.com/chat/123", {
+    const request = new Request("http://example.com/parties/stateful/123", {
       headers: {
         Upgrade: "websocket"
       }
@@ -66,8 +40,7 @@ describe("party", () => {
       ws.addEventListener("message", (message) => {
         try {
           expect(JSON.parse(message.data as string)).toEqual({
-            id: "123",
-            party: "chat"
+            room: "123"
           });
           ws.close();
           resolve();
@@ -77,12 +50,6 @@ describe("party", () => {
         }
       });
     });
-
-    // const response = await worker.fetch(request, env, ctx);
-    // expect(await response.json()).toEqual({
-    //   id: "123",
-    //   party: "chat",
-    // });
   });
   // it("can be connected with a query parameter");
   // it("can be connected with a header");

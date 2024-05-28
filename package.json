@@ -6,13 +6,14 @@
   "description": "PartyKit, for Workers",
   "scripts": {
     "build": "npm run build -w partyflare",
-    "check": "concurrently \"npm run check:repo\" \"npm run check:format\" \"npm run check:lint\" \"npm run check:type\" --kill-others-on-fail",
+    "check": "concurrently \"npm run check:repo\" \"npm run check:format\" \"npm run check:lint\" \"npm run check:type\" \"npm run check:test\" --kill-others-on-fail",
     "check:format": "prettier . --check --ignore-unknown",
     "check:lint": "eslint \"**/*.[tj]s?(x)\" --max-warnings=0 --report-unused-disable-directives",
     "check:repo": "manypkg check",
+    "check:test": "npm run check:test -w partyflare",
     "check:type": "find . -name 'tsconfig.json' -not -path '*/node_modules/*' -print0 | xargs -0 -I {} bash -c 'echo \"tsc --project {}\"; tsc --project {} || exit 255' || exit 1",
     "copy-readme": "cp README.md packages/partyflare/README.md",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run test -w partyflare",
     "postinstall": "sh -c '[ -f package-lock.json ] && echo \"Error: package-lock.json exists\" && exit 1 || exit 0'"
   },
   "keywords": [],
@@ -37,7 +38,7 @@
     "prettier": "^3.2.5",
     "tsup": "^8.0.2",
     "typescript": "^5.4.5",
-    "wrangler": "^3.57.1"
+    "wrangler": "^3.57.2"
   },
   "trustedDependencies": [
     "core-js",
