@@ -61,7 +61,6 @@ function getPartyAndRoomFromUrl(url: URL) {
 }
 
 export class Party<Env> extends DurableObject<Env> {
-  #initialized = false;
   static options = {
     hibernate: false
   };
@@ -118,6 +117,10 @@ export class Party<Env> extends DurableObject<Env> {
     }
   }
 
+  #status: "zero" | "starting" | "started" = "zero";
+
+  onStartPromise: Promise<void> | null = null;
+
   connectionManager: ConnectionManager;
   ParentClass: typeof Party;
 
@@ -147,7 +150,7 @@ export class Party<Env> extends DurableObject<Env> {
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
 
-    if (!this.#initialized) {
+    if (this.#status !== "started") {
       await this.#initializeFromRequest(request);
     }
 
@@ -207,7 +210,7 @@ export class Party<Env> extends DurableObject<Env> {
   }
   async webSocketMessage(ws: WebSocket, message: WSMessage): Promise<void> {
     const connection = createLazyConnection(ws);
-    if (!this.#initialized) {
+    if (this.#status !== "started") {
       // This means the room "woke up" after hibernation
       // so we need to hydrate this.room again
       // assert(connection.uri, "No uri found in connection");
@@ -223,7 +226,7 @@ export class Party<Env> extends DurableObject<Env> {
     wasClean: boolean
   ): Promise<void> {
     const connection = createLazyConnection(ws);
-    if (!this.#initialized) {
+    if (this.#status !== "started") {
       // This means the room "woke up" after hibernation
       // so we need to hydrate this.room again
       // assert(connection.uri, "No uri found in connection");
@@ -234,7 +237,7 @@ export class Party<Env> extends DurableObject<Env> {
 
   async webSocketError(ws: WebSocket, error: unknown): Promise<void> {
     const connection = createLazyConnection(ws);
-    if (!this.#initialized) {
+    if (this.#status !== "started") {
       // This means the room "woke up" after hibernation
       // so we need to hydrate this.room again
       // assert(connection.uri, "No uri found in connection");
@@ -243,23 +246,38 @@ export class Party<Env> extends DurableObject<Env> {
     return this.onError(connection, error);
   }
 
+  async #initialize(): Promise<void> {
+    switch (this.#status) {
+      case "zero": {
+        this.#status = "starting";
+        const maybeOnStartPromise = this.onStart();
+        if (maybeOnStartPromise instanceof Promise) {
+          this.onStartPromise = maybeOnStartPromise;
+          await this.onStartPromise;
+        }
+        this.#status = "started";
+        break;
+      }
+      case "starting":
+        await this.onStartPromise;
+        break;
+      case "started":
+        break;
+    }
+  }
+
   async #initializeFromRequest(req: Request) {
     const room = this.#getRoomFromRequest(req);
-
     assert(room, "No room details found in request");
-
     this.room = room;
-    this.#initialized = true;
-    await this.onStart();
+    await this.#initialize();
   }
 
   async #initializeFromConnection(connection: Connection) {
     const room = this.#getRoomFromConnection(connection);
-    assert(room, "No room details found in request");
-
+    assert(room, "No room details found in connection");
     this.room = room;
-    this.#initialized = true;
-    await this.onStart();
+    await this.#initialize();
   }
 
   async #attachSocketEventHandlers(connection: Connection) {

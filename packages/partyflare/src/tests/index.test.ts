@@ -32,9 +32,9 @@ describe("party", () => {
       }
     });
     const response = await worker.fetch(request, env, ctx);
+    const ws = response.webSocket!;
 
     await new Promise<void>((resolve, reject) => {
-      const ws = response.webSocket!;
       ws.accept();
       ws.addEventListener("message", (message) => {
         try {
@@ -49,6 +49,44 @@ describe("party", () => {
         }
       });
     });
+  });
+
+  it("calls onStart only once, and does not process messages or requests until it is resolved", async () => {
+    const ctx = createExecutionContext();
+
+    function makeConnection() {
+      return new Promise<void>((resolve, reject) => {
+        const request = new Request(
+          "http://example.com/parties/onstartparty/123",
+          {
+            headers: {
+              Upgrade: "websocket"
+            }
+          }
+        );
+        worker
+          .fetch(request, env, ctx)
+          .then<void>((response) => {
+            const ws = response.webSocket!;
+            ws.accept();
+            ws.addEventListener("message", (message) => {
+              try {
+                expect(message.data).toEqual("1");
+                ws.close();
+                resolve();
+              } catch (e) {
+                ws.close();
+                reject(e);
+              }
+            });
+          })
+          .catch((e) => {
+            reject(e);
+          });
+      });
+    }
+
+    await Promise.all([makeConnection(), makeConnection()]);
   });
   // it("can be connected with a query parameter");
   // it("can be connected with a header");

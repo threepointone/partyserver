@@ -31,6 +31,21 @@ export class Stateful extends Party<Env> {
   }
 }
 
+export class OnStartParty extends Party<Env> {
+  counter = 0;
+  async onStart() {
+    await new Promise<void>((resolve) => {
+      setTimeout(() => {
+        this.counter++;
+        resolve();
+      }, 1000);
+    });
+  }
+  onConnect(connection: Connection) {
+    connection.send(this.counter.toString());
+  }
+}
+
 export default {
   async fetch(request: Request, env: Env, _ctx: ExecutionContext) {
     return (

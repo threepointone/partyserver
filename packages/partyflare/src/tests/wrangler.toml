@@ -6,6 +6,10 @@ compatibility_flags = ["nodejs_compat"]
 name = "Stateful"
 class_name = "Stateful"
 
+[[durable_objects.bindings]]
+name = "OnStartParty"
+class_name = "OnStartParty"
+
  [[migrations]]
 tag = "v1" # Should be unique for each entry
-new_classes = ["Stateful"]
+new_classes = ["Stateful", "OnStartParty"]
