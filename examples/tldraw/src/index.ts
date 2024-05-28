@@ -33,7 +33,7 @@ export class Tldraw extends Party<Env> {
     });
   }, 1000);
 
-  async onConnect(connection: Connection<unknown>) {
+  onConnect(connection: Connection<unknown>) {
     connection.send(
       JSON.stringify({
         type: "init",
@@ -43,7 +43,14 @@ export class Tldraw extends Party<Env> {
   }
 
   async onMessage(sender: Connection<unknown>, message: string): Promise<void> {
-    const msg = JSON.parse(message);
+    const msg = JSON.parse(message) as
+      | {
+          type: "update";
+          updates: HistoryEntry<TLRecord>[];
+        }
+      | {
+          type: "recovery";
+        };
     const schema = createTLSchema().serialize();
     switch (msg.type) {
       case "update": {
@@ -51,7 +58,7 @@ export class Tldraw extends Party<Env> {
           for (const update of msg.updates) {
             const {
               changes: { added, updated, removed }
-            } = update as HistoryEntry<TLRecord>;
+            } = update;
             // Try to merge the update into our local store
             for (const record of Object.values(added)) {
               this.records[record.id] = record;

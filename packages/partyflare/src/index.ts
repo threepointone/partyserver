@@ -137,6 +137,8 @@ export class Party<Env> extends DurableObject<Env> {
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
 
+    // TODO: fix this any type
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     this.ParentClass = Object.getPrototypeOf(this).constructor;
     this.connectionManager = this.ParentClass.options.hibernate
       ? new HibernatingConnectionManager(ctx)
@@ -200,7 +202,7 @@ export class Party<Env> extends DurableObject<Env> {
       });
 
       if (!this.ParentClass.options.hibernate) {
-        await this.#attachSocketEventHandlers(connection);
+        this.#attachSocketEventHandlers(connection);
       }
       await this.onConnect(connection, ctx);
 
@@ -276,7 +278,7 @@ export class Party<Env> extends DurableObject<Env> {
     await this.#initialize();
   }
 
-  async #attachSocketEventHandlers(connection: Connection) {
+  #attachSocketEventHandlers(connection: Connection) {
     const handleMessageFromClient = (event: MessageEvent) => {
       this.onMessage(connection, event.data)?.catch<void>((e) => {
         console.error("onMessage error:", e);

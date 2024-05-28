@@ -5,6 +5,7 @@ import { createTLStore, defaultShapeUtils, throttle, uniqueId } from "tldraw";
 import type {
   HistoryEntry,
   StoreListener,
+  StoreSnapshot,
   TLRecord,
   TLStoreWithStatus
 } from "tldraw";
@@ -70,7 +71,18 @@ export function useSyncStore({
 
     const handleMessage = (message: MessageEvent<string>) => {
       try {
-        const data = JSON.parse(message.data);
+        const data = JSON.parse(message.data) as
+          | {
+              clientId: string;
+              type: "init" | "recovery";
+              snapshot: StoreSnapshot<TLRecord>;
+            }
+          | {
+              clientId: string;
+              type: "update";
+              updates: HistoryEntry<TLRecord>[];
+            };
+
         if (data.clientId === clientId) {
           return;
         }
@@ -90,7 +102,7 @@ export function useSyncStore({
                 store.mergeRemoteChanges(() => {
                   const {
                     changes: { added, updated, removed }
-                  } = update as HistoryEntry<TLRecord>;
+                  } = update;
 
                   for (const record of Object.values(added)) {
                     store.put([record]);

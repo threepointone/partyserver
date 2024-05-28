@@ -41,7 +41,9 @@ class AttachmentCache {
   get(ws: WebSocket): ConnectionAttachments {
     let attachment = this.#cache.get(ws);
     if (!attachment) {
-      attachment = WebSocket.prototype.deserializeAttachment.call(ws);
+      attachment = WebSocket.prototype.deserializeAttachment.call(
+        ws
+      ) as ConnectionAttachments;
       if (attachment !== undefined) {
         this.#cache.set(ws, attachment);
       } else {
@@ -108,7 +110,7 @@ export const createLazyConnection = (
     },
     state: {
       get() {
-        return this.deserializeAttachment() as ConnectionState<unknown>;
+        return ws.deserializeAttachment() as ConnectionState<unknown>;
       }
     },
     setState: {
@@ -120,7 +122,7 @@ export const createLazyConnection = (
           state = setState;
         }
 
-        this.serializeAttachment(state);
+        ws.serializeAttachment(state);
         return state as ConnectionState<T>;
       }
     },
@@ -304,6 +306,7 @@ export class HibernatingConnectionManager<TState> implements ConnectionManager {
 
     for (const tag of tags) {
       if (typeof tag !== "string") {
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         throw new Error(`A connection tag must be a string. Received: ${tag}`);
       }
       if (tag === "") {
