@@ -118,7 +118,6 @@ export class Party<Env> extends DurableObject<Env> {
   }
 
   #status: "zero" | "starting" | "started" = "zero";
-
   onStartPromise: Promise<void> | null = null;
 
   connectionManager: ConnectionManager;
@@ -213,7 +212,6 @@ export class Party<Env> extends DurableObject<Env> {
     if (this.#status !== "started") {
       // This means the room "woke up" after hibernation
       // so we need to hydrate this.room again
-      // assert(connection.uri, "No uri found in connection");
       await this.#initializeFromConnection(connection);
     }
 
@@ -229,7 +227,6 @@ export class Party<Env> extends DurableObject<Env> {
     if (this.#status !== "started") {
       // This means the room "woke up" after hibernation
       // so we need to hydrate this.room again
-      // assert(connection.uri, "No uri found in connection");
       await this.#initializeFromConnection(connection);
     }
     return this.onClose(connection, code, reason, wasClean);
@@ -240,7 +237,6 @@ export class Party<Env> extends DurableObject<Env> {
     if (this.#status !== "started") {
       // This means the room "woke up" after hibernation
       // so we need to hydrate this.room again
-      // assert(connection.uri, "No uri found in connection");
       await this.#initializeFromConnection(connection);
     }
     return this.onError(connection, error);
@@ -281,8 +277,6 @@ export class Party<Env> extends DurableObject<Env> {
   }
 
   async #attachSocketEventHandlers(connection: Connection) {
-    // assert(this.worker, "[onConnect] Worker not initialized.");
-
     const handleMessageFromClient = (event: MessageEvent) => {
       this.onMessage(connection, event.data)?.catch((e) => {
         console.error(e);
