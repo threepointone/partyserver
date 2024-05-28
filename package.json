@@ -5,11 +5,12 @@
   "description": "PartyKit, for Workers",
   "scripts": {
     "build": "npm run build -w partyflare",
-    "check": "concurrently \"npm run repocheck\" \"npm run lint\" \"npm run typecheck\" --kill-others-on-fail",
-    "lint": "eslint \"**/*.[tj]s?(x)\" --max-warnings=0 --report-unused-disable-directives",
-    "repocheck": "manypkg check",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "typecheck": "find . -name 'tsconfig.json' -not -path '*/node_modules/*' -exec bash -c 'echo \"npx tsc --project $(dirname \"$1\")/$1\"; npx tsc --project \"$1\"' sh {} \\;"
+    "check": "concurrently \"npm run check:repo\" \"npm run check:format\" \"npm run check:lint\" \"npm run check:type2\" --kill-others-on-fail",
+    "check:format": "prettier . --check --ignore-unknown",
+    "check:lint": "eslint \"**/*.[tj]s?(x)\" --max-warnings=0 --report-unused-disable-directives",
+    "check:repo": "manypkg check",
+    "check:type": "find . -name 'tsconfig.json' -not -path '*/node_modules/*' -print0 | xargs -0 -I {} bash -c 'echo \"tsc --project {}\"; tsc --project {} || exit 255' || exit 1",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "Sunil Pai <threepointone@gmail.com>",
