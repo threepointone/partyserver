@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "description": "PartyKit, for Workers",
-  "main": "index.js",
   "scripts": {
     "build": "npm run build -w partyflare",
     "check": "concurrently \"npm run repocheck\" \"npm run lint\" \"npm run typecheck\" --kill-others-on-fail",
