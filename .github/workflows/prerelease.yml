@@ -23,7 +23,10 @@ jobs:
       - name: Modify package.json version
         run: bun .github/version-script.js
 
+      - run: bun run copy-readme
+
       - run: bun run build
+
       - run: bun run check
 
       - run: npm publish --tag beta

@@ -23,6 +23,8 @@ jobs:
 
       - run: bun install
 
+      - run: bun run copy-readme
+
       - run: bun run build
 
       - id: changesets

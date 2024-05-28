@@ -10,6 +10,7 @@
     "check:lint": "eslint \"**/*.[tj]s?(x)\" --max-warnings=0 --report-unused-disable-directives",
     "check:repo": "manypkg check",
     "check:type": "find . -name 'tsconfig.json' -not -path '*/node_modules/*' -print0 | xargs -0 -I {} bash -c 'echo \"tsc --project {}\"; tsc --project {} || exit 255' || exit 1",
+    "copy-readme": "cp README.md packages/partyflare/README.md",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

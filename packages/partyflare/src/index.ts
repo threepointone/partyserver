@@ -30,8 +30,8 @@ function assert(condition: unknown, message: string): asserts condition {
 
 export type WSMessage = ArrayBuffer | ArrayBufferView | string;
 
-function getRoomAndPartyNameFromUrl(url: URL) {
-  // /parties/:name/:id
+function getPartyAndRoomFromUrl(url: URL) {
+  // /parties/:party/:name
   const parts = url.pathname.split("/");
   if (parts[0] === "parties" && parts.length < 3) {
     return null;
@@ -89,7 +89,7 @@ export class Party<Env> extends DurableObject<Env> {
         return acc;
       }, {});
 
-    const roomDetails = getRoomAndPartyNameFromUrl(new URL(req.url));
+    const roomDetails = getPartyAndRoomFromUrl(new URL(req.url));
     if (!roomDetails) {
       return null;
     } else {
@@ -108,15 +108,15 @@ export class Party<Env> extends DurableObject<Env> {
   connectionManager: ConnectionManager;
   ParentClass: typeof Party;
 
-  #_id: string | undefined;
-  get id(): string {
-    if (!this.#_id) {
+  #_room: string | undefined;
+  get room(): string {
+    if (!this.#_room) {
       throw new Error("This party has not been initialised yet.");
     }
-    return this.#_id;
+    return this.#_room;
   }
-  set id(id: string) {
-    this.#_id = id;
+  set room(room: string) {
+    this.#_room = room;
   }
 
   constructor(ctx: DurableObjectState, env: Env) {
@@ -127,7 +127,6 @@ export class Party<Env> extends DurableObject<Env> {
       ? new HibernatingConnectionManager(ctx)
       : new InMemoryConnectionManager();
   }
-  // implemented
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
 
@@ -155,7 +154,7 @@ export class Party<Env> extends DurableObject<Env> {
 
       let connection: Connection = Object.assign(serverWebSocket, {
         id: connectionId,
-        room: this.id,
+        room: this.room,
         state: null as unknown as ConnectionState<unknown>,
         setState<T = unknown>(setState: T | ConnectionSetStateFn<T>) {
           let state: T;
@@ -178,7 +177,7 @@ export class Party<Env> extends DurableObject<Env> {
       // Accept the websocket connection
       connection = this.connectionManager.accept(connection, {
         tags,
-        room: this.id
+        room: this.room
       });
 
       if (!this.ParentClass.options.hibernate) {
@@ -227,23 +226,21 @@ export class Party<Env> extends DurableObject<Env> {
     return this.onError(connection, error);
   }
 
-  // async alarm(): void | Promise<void> {}
-
   async #initializeFromRequest(req: Request) {
-    const roomId = this.getRoomFromRequest(req);
+    const room = this.#getRoomFromRequest(req);
 
-    assert(roomId, "No room details found in request");
+    assert(room, "No room details found in request");
 
-    this.id = roomId;
+    this.room = room;
     this.#initialized = true;
     await this.onStart();
   }
 
   async #initializeFromConnection(connection: Connection) {
-    const roomId = this.getRoomFromConnection(connection);
-    assert(roomId, "No room details found in request");
+    const room = this.#getRoomFromConnection(connection);
+    assert(room, "No room details found in request");
 
-    this.id = roomId;
+    this.room = room;
     this.#initialized = true;
     await this.onStart();
   }
@@ -346,7 +343,7 @@ export class Party<Env> extends DurableObject<Env> {
     return new Response("Not Found", { status: 404 });
   }
 
-  getRoomFromRequest(req: Request): string {
+  #getRoomFromRequest(req: Request): string {
     // get the room from the request
     // headers: x-partyflare-room
 
@@ -358,7 +355,7 @@ export class Party<Env> extends DurableObject<Env> {
 
     return room;
   }
-  getRoomFromConnection(connection: Connection): string {
+  #getRoomFromConnection(connection: Connection): string {
     return connection.room;
   }
 }

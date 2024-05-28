@@ -19,7 +19,7 @@ export class Stateful extends Party<Env> {
   ): void | Promise<void> {
     connection.send(
       JSON.stringify({
-        id: this.id
+        room: this.room
       })
     );
   }
@@ -27,7 +27,7 @@ export class Stateful extends Party<Env> {
     _request: Request<unknown, CfProperties<unknown>>
   ): Response | Promise<Response> {
     return Response.json({
-      id: this.id
+      room: this.room
     });
   }
 }
