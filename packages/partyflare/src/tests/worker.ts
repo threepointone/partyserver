@@ -55,7 +55,7 @@ export class OnStartParty extends Party<Env> {
 export default {
   async fetch(request: Request, env: Env, _ctx: ExecutionContext) {
     return (
-      (await Party.match(request, env)) ||
+      (await Party.fetchRoomForRequest(request, env)) ||
       new Response("Not Found", { status: 404 })
     );
   }

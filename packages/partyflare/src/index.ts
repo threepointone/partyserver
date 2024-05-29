@@ -57,7 +57,7 @@ export class Party<Env> extends DurableObject<Env> {
   /**
    * A utility function for PartyKit style routing.
    */
-  static async match<Env, T extends Party<Env>>(
+  static async fetchRoomForRequest<Env, T extends Party<Env>>(
     req: Request,
     env: Record<string, unknown>
   ): Promise<Response | null> {

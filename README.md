@@ -31,7 +31,10 @@ export class MyParty extends Party {
 export default {
   // setup your fetch handler to use configured parties
   fetch(request, env) {
-    return Party.match(req, env) || new Response("Not Found", { status: 404 });
+    return (
+      Party.fetchRoomForRequest(req, env) ||
+      new Response("Not Found", { status: 404 })
+    );
   }
 };
 ```
@@ -58,7 +61,7 @@ You can override the following methods on `Party` to add custom behavior:
 
 ### Party::room
 
-The `room` property is automatically set to the room name, determined by `Party.withRoom()`/`Party.match()`.
+The `room` property is automatically set to the room name, determined by `Party.withRoom()`/`Party.fetchRoomForRequest()`.
 
 ### Party.options.hibernate
 
@@ -77,6 +80,6 @@ export class MyParty extends Party {
 
 This is a utility method to create a new party class with a specific room name. It returns a DurableObjectStub that you can call further methods on, including `.fetch()`.
 
-### `Party.match(request, env)`
+### `Party.fetchRoomForRequest(request, env)`
 
 This is a utility method to match a request to a party class like PartyKit. It takes a url of form `/parties/:party/:room` and matches it with a namespace named Party (case insensitive) with a room name of `:room`.
