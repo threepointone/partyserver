@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.18
+
+### Patch Changes
+
+- [`b519e51`](https://github.com/threepointone/partyflare/commit/b519e51d747bad1925db28c27709ebb9e30f9e77) Thanks [@threepointone](https://github.com/threepointone)! - s/ Party.match/Party.fetchRoomForRequest
+
 ## 0.0.17
 
 ### Patch Changes
