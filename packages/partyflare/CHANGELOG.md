@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.15
+
+### Patch Changes
+
+- [`fdbf419`](https://github.com/threepointone/partyflare/commit/fdbf4196e5e36e249480f337c32ce89fe672cfda) Thanks [@threepointone](https://github.com/threepointone)! - mark public/private methods, add some inline docs
+
 ## 0.0.14
 
 ### Patch Changes
