@@ -22,100 +22,74 @@ import type {
 
 export * from "./types";
 
-function assert(condition: unknown, message: string): asserts condition {
-  if (!condition) {
-    throw new Error(message);
-  }
-}
-
 export type WSMessage = ArrayBuffer | ArrayBufferView | string;
 
-function getPartyAndRoomFromUrl(url: URL) {
-  // /parties/:party/:name
-  const parts = url.pathname.split("/");
-  if (parts[1] === "parties" && parts.length < 4) {
-    return null;
-  }
-  const room = parts[3],
-    party = parts[2];
-  if (parts[1] === "parties" && room && party) {
-    return {
-      room,
-      party
-    };
-  }
-
-  // /party/:name
-  if (parts[1] === "party" && parts.length < 3) {
-    return null;
-  }
-  const room2 = parts[2],
-    party2 = "main";
-  if (parts[1] === "party" && room2 && party2) {
-    return {
-      room: room2,
-      party: party2
-    };
-  }
-
-  return null;
-}
+// Let's cache the party namespace map
+// so we don't call it on every request
+const partyMapCache = new WeakMap<
+  Record<string, unknown>,
+  Record<string, DurableObjectNamespace>
+>();
 
 export class Party<Env> extends DurableObject<Env> {
   static options = {
     hibernate: false
   };
 
-  static async match(
+  /**
+   * For a given party namespace, create a stub with a room name.
+   */
+  static withRoom<Env, T extends Party<Env>>(
+    partyNamespace: DurableObjectNamespace<T>,
+    room: string
+  ): DurableObjectStub<T> {
+    const docId = partyNamespace.idFromName(room).toString();
+    const id = partyNamespace.idFromString(docId);
+    const stub = partyNamespace.get(id);
+
+    // TODO: is this safe?
+    stub.withRoom(room).catch((e) => {
+      console.error("Could not set room name:", e);
+    });
+    return stub;
+  }
+
+  /**
+   * A utility function for PartyKit style routing.
+   */
+  static async match<Env, T extends Party<Env>>(
     req: Request,
-    env: Record<string, unknown>,
-    partyMap?:
-      | Record<string, DurableObjectNamespace>
-      | ((
-          req: Request,
-          env: Record<string, unknown>
-        ) => { room: string; party: DurableObjectNamespace } | null)
+    env: Record<string, unknown>
   ): Promise<Response | null> {
-    if (typeof partyMap === "function") {
-      const roomDetails = partyMap(req, env);
-      if (!roomDetails) {
-        return null;
-      } else {
-        const { room, party } = roomDetails;
-        const docId = party.idFromName(room).toString();
-        const id = party.idFromString(docId);
-        const stub = party.get(id);
-        const headers = new Headers(req.headers);
-        headers.set("x-partyflare-room", room);
-        return stub.fetch(req, {
-          headers
-        });
-      }
+    if (!partyMapCache.has(env)) {
+      partyMapCache.set(
+        env,
+        Object.entries(env).reduce((acc, [k, v]) => {
+          // @ts-expect-error - we're checking for the existence of idFromName
+          if (v && "idFromName" in v && typeof v.idFromName === "function") {
+            return { ...acc, [k.toLowerCase()]: v };
+          }
+          return acc;
+        }, {})
+      );
     }
+    const map = partyMapCache.get(env) as Record<
+      string,
+      DurableObjectNamespace<T>
+    >;
 
-    const map: Record<string, DurableObjectNamespace> =
-      partyMap ||
-      Object.entries(env).reduce((acc, [k, v]) => {
-        // @ts-expect-error - we're checking for the existence of idFromName
-        if (v && "idFromName" in v && typeof v.idFromName === "function") {
-          return { ...acc, [k.toLowerCase()]: v };
-        }
-        return acc;
-      }, {});
+    const url = new URL(req.url);
 
-    const roomDetails = getPartyAndRoomFromUrl(new URL(req.url));
-    if (!roomDetails) {
+    const parts = url.pathname.split("/");
+    if (parts[1] === "parties" && parts.length < 4) {
       return null;
+    }
+    const room = parts[3],
+      party = parts[2];
+    if (parts[1] === "parties" && room && party) {
+      return Party.withRoom(map[party], room).fetch(req);
     } else {
-      const { room, party } = roomDetails;
-      const docId = map[party].idFromName(room).toString();
-      const id = map[party].idFromString(docId);
-      const stub = map[party].get(id);
-      const headers = new Headers(req.headers);
-      headers.set("x-partyflare-room", room);
-      return stub.fetch(req, {
-        headers
-      });
+      return null;
     }
   }
 
@@ -145,7 +119,7 @@ export class Party<Env> extends DurableObject<Env> {
     const url = new URL(request.url);
 
     if (this.#status !== "started") {
-      await this.#initializeFromRequest(request);
+      await this.#initialize();
     }
 
     if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") {
@@ -208,7 +182,7 @@ export class Party<Env> extends DurableObject<Env> {
     if (this.#status !== "started") {
       // This means the room "woke up" after hibernation
       // so we need to hydrate this.room again
-      await this.#initializeFromConnection(connection);
+      await this.#initialize();
     }
 
     return this.onMessage(connection, message);
@@ -224,7 +198,7 @@ export class Party<Env> extends DurableObject<Env> {
     if (this.#status !== "started") {
       // This means the room "woke up" after hibernation
       // so we need to hydrate this.room again
-      await this.#initializeFromConnection(connection);
+      await this.#initialize();
     }
     return this.onClose(connection, code, reason, wasClean);
   }
@@ -234,12 +208,15 @@ export class Party<Env> extends DurableObject<Env> {
     if (this.#status !== "started") {
       // This means the room "woke up" after hibernation
       // so we need to hydrate this.room again
-      await this.#initializeFromConnection(connection);
+      await this.#initialize();
     }
     return this.onError(connection, error);
   }
 
   async #initialize(): Promise<void> {
+    if (!this.room) {
+      throw new Error("Room not set");
+    }
     switch (this.#status) {
       case "zero": {
         this.#status = "starting";
@@ -258,20 +235,6 @@ export class Party<Env> extends DurableObject<Env> {
       case "started":
         break;
     }
-  }
-
-  async #initializeFromRequest(req: Request) {
-    const room = this.#getRoomFromRequest(req);
-    assert(room, "No room details found in request");
-    this.room = room;
-    await this.#initialize();
-  }
-
-  async #initializeFromConnection(connection: Connection) {
-    const room = this.#getRoomFromConnection(connection);
-    assert(room, "No room details found in connection");
-    this.room = room;
-    await this.#initialize();
   }
 
   #attachSocketEventHandlers(connection: Connection) {
@@ -304,25 +267,6 @@ export class Party<Env> extends DurableObject<Env> {
     connection.addEventListener("message", handleMessageFromClient);
   }
 
-  #getRoomFromRequest(req: Request): string {
-    // get the room name from the request
-    // we expect the header x-partyflare-room to be set
-
-    const room = req.headers.get("x-partyflare-room");
-    if (!room) {
-      throw new Error("x-partyflare-room header not found in request");
-    }
-    return room;
-  }
-
-  #getRoomFromConnection(connection: Connection): string {
-    const { room } = connection;
-    if (!room) {
-      throw new Error("Room not found in connection");
-    }
-    return room;
-  }
-
   // Public API
 
   #_room: string | undefined;
@@ -334,6 +278,17 @@ export class Party<Env> extends DurableObject<Env> {
   }
   set room(room: string) {
     this.#_room = room;
+  }
+
+  // We won't have an await inside this function
+  // but it will be called remotely,
+  // so we need to mark it as async
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async withRoom(room: string) {
+    if (this.#_room && this.#_room !== room) {
+      throw new Error("Room has already been set for this party.");
+    }
+    this.room = room;
   }
 
   /** Send a message to all connected clients, except connection ids listed `without` */

@@ -40,7 +40,7 @@ export default {
 
 You can override the following methods on `Party` to add custom behavior:
 
-#### Lifecycle hooks: (all optionally `async`)
+### Lifecycle hooks: (all optionally `async`)
 
 - `onStart()` - when the party is started for the first time (or or waking up after hibernating)
 - `onConnect(connection, connContext)` - when a new connection is established
@@ -58,9 +58,9 @@ You can override the following methods on `Party` to add custom behavior:
 
 ### Party::room
 
-The `room` property is automatically set to the room name, determined by `Party.match()`.
+The `room` property is automatically set to the room name, determined by `Party.withRoom()`.
 
-#### Party.options.hibernate
+### Party.options.hibernate
 
 You can enable [hibernation](https://developers.cloudflare.com/durable-objects/reference/websockets/#websocket-hibernation) by passing a static `options` property on your party class. This will allow the party to be hibernated when it is not in use, and woken up when a new connection is established. All your lifecycle hooks will be called as expected when the party is woken up.
 
@@ -73,10 +73,10 @@ export class MyParty extends Party {
 }
 ```
 
-## `Party.match(request, env)`
+### `Party.withRoom(namespace, room)`
 
-This is a static method on `Party` that will return a `Response` if the request matches a party, or `null` if no party matches. This is useful for defining multiple parties in a single script.
+This is a utility method to create a new party class with a specific room name. It returns a DurableObjectStub that you can call further methods on, including `.fetch()`.
 
-It's default behaviour is to match a url that looks like `/parties/:party/:name` to a party named `:party`, and use `:name` as the room name.
+### `Party.match(request, env)`
 
-You can override this behavior by [TODO].
+This is a utility method to match a request to a party class like partyKit. It takes a url of form `/parties/:party/:room` and matches it with a namespace named Party (case insensitive) with a room name of `:room`.

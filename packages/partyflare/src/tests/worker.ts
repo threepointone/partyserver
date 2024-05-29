@@ -3,7 +3,8 @@ import { Party } from "../index";
 import type { Connection, ConnectionContext } from "../index";
 
 export type Env = {
-  Stateful: DurableObjectNamespace;
+  Stateful: DurableObjectNamespace<Stateful>;
+  OnStartParty: DurableObjectNamespace<OnStartParty>;
 };
 
 export class Stateful extends Party<Env> {
