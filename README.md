@@ -56,6 +56,10 @@ You can override the following methods on `Party` to add custom behavior:
 - `getConnections(tags = [])` - get all connections (optionally with the given tags)
 - `getConnection(id)` - get a connection by id
 
+### Party::room
+
+The `room` property is automatically set to the room name, determined by `Party.match()`.
+
 #### Party.options.hibernate
 
 You can enable [hibernation](https://developers.cloudflare.com/durable-objects/reference/websockets/#websocket-hibernation) by passing a static `options` property on your party class. This will allow the party to be hibernated when it is not in use, and woken up when a new connection is established. All your lifecycle hooks will be called as expected when the party is woken up.

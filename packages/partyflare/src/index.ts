@@ -45,6 +45,7 @@ function getPartyAndRoomFromUrl(url: URL) {
     };
   }
 
+  // /party/:name
   if (parts[1] === "party" && parts.length < 3) {
     return null;
   }
@@ -64,6 +65,7 @@ export class Party<Env> extends DurableObject<Env> {
   static options = {
     hibernate: false
   };
+
   static async match(
     req: Request,
     env: Record<string, unknown>,
@@ -118,36 +120,27 @@ export class Party<Env> extends DurableObject<Env> {
   }
 
   #status: "zero" | "starting" | "started" = "zero";
-  onStartPromise: Promise<void> | null = null;
+  #onStartPromise: Promise<void> | null = null;
 
-  connectionManager: ConnectionManager;
-  ParentClass: typeof Party;
-
-  #_room: string | undefined;
-  get room(): string {
-    if (!this.#_room) {
-      throw new Error("This party has not been initialised yet.");
-    }
-    return this.#_room;
-  }
-  set room(room: string) {
-    this.#_room = room;
-  }
+  #connectionManager: ConnectionManager;
+  #ParentClass: typeof Party;
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
 
     // TODO: fix this any type
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    this.ParentClass = Object.getPrototypeOf(this).constructor;
-    this.connectionManager = this.ParentClass.options.hibernate
+    this.#ParentClass = Object.getPrototypeOf(this).constructor;
+    this.#connectionManager = this.#ParentClass.options.hibernate
       ? new HibernatingConnectionManager(ctx)
       : new InMemoryConnectionManager();
 
     // TODO: throw error if any of
     // broadcast/getConnection/getConnections/getConnectionTags
+    // fetch/webSocketMessage/webSocketClose/webSocketError
     // have been overridden
   }
+
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
 
@@ -196,12 +189,12 @@ export class Party<Env> extends DurableObject<Env> {
       const tags = await this.getConnectionTags(connection, ctx);
 
       // Accept the websocket connection
-      connection = this.connectionManager.accept(connection, {
+      connection = this.#connectionManager.accept(connection, {
         tags,
         room: this.room
       });
 
-      if (!this.ParentClass.options.hibernate) {
+      if (!this.#ParentClass.options.hibernate) {
         this.#attachSocketEventHandlers(connection);
       }
       await this.onConnect(connection, ctx);
@@ -209,6 +202,7 @@ export class Party<Env> extends DurableObject<Env> {
       return new Response(null, { status: 101, webSocket: clientWebSocket });
     }
   }
+
   async webSocketMessage(ws: WebSocket, message: WSMessage): Promise<void> {
     const connection = createLazyConnection(ws);
     if (this.#status !== "started") {
@@ -219,6 +213,7 @@ export class Party<Env> extends DurableObject<Env> {
 
     return this.onMessage(connection, message);
   }
+
   async webSocketClose(
     ws: WebSocket,
     code: number,
@@ -250,14 +245,15 @@ export class Party<Env> extends DurableObject<Env> {
         this.#status = "starting";
         const maybeOnStartPromise = this.onStart();
         if (maybeOnStartPromise instanceof Promise) {
-          this.onStartPromise = maybeOnStartPromise;
-          await this.onStartPromise;
+          this.#onStartPromise = maybeOnStartPromise;
+          await this.#onStartPromise;
+          this.#onStartPromise = null;
         }
         this.#status = "started";
         break;
       }
       case "starting":
-        await this.onStartPromise;
+        await this.#onStartPromise;
         break;
       case "started":
         break;
@@ -308,12 +304,44 @@ export class Party<Env> extends DurableObject<Env> {
     connection.addEventListener("message", handleMessageFromClient);
   }
 
+  #getRoomFromRequest(req: Request): string {
+    // get the room name from the request
+    // we expect the header x-partyflare-room to be set
+
+    const room = req.headers.get("x-partyflare-room");
+    if (!room) {
+      throw new Error("x-partyflare-room header not found in request");
+    }
+    return room;
+  }
+
+  #getRoomFromConnection(connection: Connection): string {
+    const { room } = connection;
+    if (!room) {
+      throw new Error("Room not found in connection");
+    }
+    return room;
+  }
+
+  // Public API
+
+  #_room: string | undefined;
+  get room(): string {
+    if (!this.#_room) {
+      throw new Error("This party has not been initialised yet.");
+    }
+    return this.#_room;
+  }
+  set room(room: string) {
+    this.#_room = room;
+  }
+
   /** Send a message to all connected clients, except connection ids listed `without` */
   broadcast(
     msg: string | ArrayBuffer | ArrayBufferView,
     without?: string[] | undefined
   ): void {
-    for (const connection of this.connectionManager.getConnections()) {
+    for (const connection of this.#connectionManager.getConnections()) {
       if (!without || !without.includes(connection.id)) {
         connection.send(msg);
       }
@@ -322,7 +350,7 @@ export class Party<Env> extends DurableObject<Env> {
 
   /** Get a connection by connection id */
   getConnection<TState = unknown>(id: string): Connection<TState> | undefined {
-    return this.connectionManager.getConnection<TState>(id);
+    return this.#connectionManager.getConnection<TState>(id);
   }
 
   /**
@@ -330,7 +358,7 @@ export class Party<Env> extends DurableObject<Env> {
    * Use `Party.Server#getConnectionTags` to tag the connection on connect.
    */
   getConnections<TState = unknown>(tag?: string): Iterable<Connection<TState>> {
-    return this.connectionManager.getConnections<TState>(tag);
+    return this.#connectionManager.getConnections<TState>(tag);
   }
 
   /**
@@ -346,16 +374,36 @@ export class Party<Env> extends DurableObject<Env> {
     return [];
   }
 
-  // implemented by the user
+  // Implemented by the user
+
+  /**
+   * Called when the party is started for the first time.
+   */
   onStart(): void | Promise<void> {}
+
+  /**
+   * Called when a new connection is made to the party.
+   */
   onConnect(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     connection: Connection,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ctx: ConnectionContext
   ): void | Promise<void> {}
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onMessage(connection: Connection, message: WSMessage): void | Promise<void> {}
+
+  /**
+   * Called when a message is received from a connection.
+   */
+  onMessage(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    connection: Connection,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    message: WSMessage
+  ): void | Promise<void> {}
+
+  /**
+   * Called when a connection is closed.
+   */
   onClose(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     connection: Connection,
@@ -366,33 +414,25 @@ export class Party<Env> extends DurableObject<Env> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     wasClean: boolean
   ): void | Promise<void> {}
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onError(connection: Connection, error: unknown): void | Promise<void> {}
+
+  /**
+   * Called when an error occurs on a connection.
+   */
+  onError(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    connection: Connection,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    error: unknown
+  ): void | Promise<void> {}
+
+  /**
+   * Called when a request is made to the party.
+   */
   onRequest(request: Request): Response | Promise<Response> {
     // default to 404
     return new Response(
       `onRequest hasn't been implemented on the Durable Object responding to ${request.url}`,
       { status: 404 }
     );
-  }
-
-  #getRoomFromRequest(req: Request): string {
-    // get the room from the request
-    // headers: x-partyflare-room
-
-    const room = req.headers.get("x-partyflare-room");
-
-    if (!room) {
-      throw new Error("x-partyflare-room header not found in request");
-    }
-
-    return room;
-  }
-  #getRoomFromConnection(connection: Connection): string {
-    const { room } = connection;
-    if (!room) {
-      throw new Error("Room not found in connection");
-    }
-    return room;
   }
 }
