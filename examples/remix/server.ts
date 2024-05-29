@@ -1,5 +1,9 @@
-import { createRequestHandler } from "@remix-run/cloudflare";
+import { createRequestHandler, logDevReady } from "@remix-run/cloudflare";
 import * as build from "@remix-run/dev/server-build";
+
+if (process.env.NODE_ENV === "development") {
+  logDevReady(build);
+}
 
 const handleRemixRequest = createRequestHandler(build);
 
