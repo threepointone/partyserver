@@ -79,4 +79,4 @@ This is a utility method to create a new party class with a specific room name. 
 
 ### `Party.match(request, env)`
 
-This is a utility method to match a request to a party class like partyKit. It takes a url of form `/parties/:party/:room` and matches it with a namespace named Party (case insensitive) with a room name of `:room`.
+This is a utility method to match a request to a party class like PartyKit. It takes a url of form `/parties/:party/:room` and matches it with a namespace named Party (case insensitive) with a room name of `:room`.

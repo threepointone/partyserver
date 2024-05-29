@@ -39,7 +39,7 @@ export class OnStartParty extends Party<Env> {
       setTimeout(() => {
         this.counter++;
         resolve();
-      }, 1000);
+      }, 300);
     });
   }
   onConnect(connection: Connection) {
