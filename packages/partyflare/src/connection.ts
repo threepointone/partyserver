@@ -26,8 +26,9 @@ if (!("OPEN" in WebSocket)) {
 type ConnectionAttachments = {
   __pk: {
     id: string;
-    // uri: string;
-    room: string; // TODO: remove this
+    // TODO: remove this once we have
+    // durable object level setState
+    room: string;
   };
   __user?: unknown;
 };
@@ -93,11 +94,6 @@ export const createLazyConnection = (
         return attachments.get(ws).__pk.id;
       }
     },
-    // uri: {
-    //   get() {
-    //     return attachments.get(ws).__pk.uri;
-    //   },
-    // },
     room: {
       get() {
         return attachments.get(ws).__pk.room;
@@ -321,7 +317,6 @@ export class HibernatingConnectionManager<TState> implements ConnectionManager {
     connection.serializeAttachment({
       __pk: {
         id: connection.id,
-        // uri: connection.uri,
         room: options.room
       },
       __user: null
