@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.16
+
+### Patch Changes
+
+- [`bc6711e`](https://github.com/threepointone/partyflare/commit/bc6711ea2ea1e410bb57b591eb77fd01cfc7bdd8) Thanks [@threepointone](https://github.com/threepointone)! - Decouples URL and Party identity, Introduce Party.withRoom().
+
 ## 0.0.15
 
 ### Patch Changes
