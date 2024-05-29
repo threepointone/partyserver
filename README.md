@@ -58,7 +58,7 @@ You can override the following methods on `Party` to add custom behavior:
 
 ### Party::room
 
-The `room` property is automatically set to the room name, determined by `Party.withRoom()`.
+The `room` property is automatically set to the room name, determined by `Party.withRoom()`/`Party.match()`.
 
 ### Party.options.hibernate
 
