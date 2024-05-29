@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.13
+
+### Patch Changes
+
+- [`054ff57`](https://github.com/threepointone/partyflare/commit/054ff570fe86fc034cc93c0ade2ba0a267b1ee40) Thanks [@threepointone](https://github.com/threepointone)! - strict lints
+
 ## 0.0.12
 
 ### Patch Changes
