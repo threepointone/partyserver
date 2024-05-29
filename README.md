@@ -50,6 +50,12 @@ You can override the following methods on `Party` to add custom behavior:
 - `onRequest(request): Response` - when a request is received from the fetch handler
 - `getConnectionTags(connection, connContext)` - return an array of tags for a connection
 
+### Other methods:
+
+- `broadcast(message, exclude = [])` - send a message to all connections, optionally excluding some
+- `getConnections(tags = [])` - get all connections (optionally with the given tags)
+- `getConnection(id)` - get a connection by id
+
 #### Party.options.hibernate
 
 You can enable [hibernation](https://developers.cloudflare.com/durable-objects/reference/websockets/#websocket-hibernation) by passing a static `options` property on your party class. This will allow the party to be hibernated when it is not in use, and woken up when a new connection is established. All your lifecycle hooks will be called as expected when the party is woken up.
