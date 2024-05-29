@@ -25,10 +25,13 @@
   "dependencies": {
     "@changesets/changelog-github": "^0.5.0",
     "@changesets/cli": "^2.27.3",
+    "@cloudflare/vitest-pool-workers": "https://prerelease-registry.devprod.cloudflare.dev/workers-sdk/runs/9274295411/npm-package-cloudflare-vitest-pool-workers-5932",
     "@ianvs/prettier-plugin-sort-imports": "^4.2.1",
     "@manypkg/cli": "^0.21.4",
     "@typescript-eslint/eslint-plugin": "^7.11.0",
     "@typescript-eslint/parser": "^7.11.0",
+    "@vitest/runner": "1.5.0",
+    "@vitest/snapshot": "1.5.0",
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
     "eslint": "^8.0.0",
@@ -37,6 +40,7 @@
     "prettier": "^3.2.5",
     "tsup": "^8.0.2",
     "typescript": "^5.4.5",
+    "vitest": "1.5.0",
     "wrangler": "^3.57.2"
   },
   "trustedDependencies": [
