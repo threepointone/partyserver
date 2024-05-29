@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.17
+
+### Patch Changes
+
+- [`6e253c8`](https://github.com/threepointone/partyflare/commit/6e253c84f83ac9ce9e26d980606d8edbcbecdb58) Thanks [@threepointone](https://github.com/threepointone)! - Update package.json details
+
 ## 0.0.16
 
 ### Patch Changes
