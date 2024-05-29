@@ -45,6 +45,11 @@ export class OnStartParty extends Party<Env> {
   onConnect(connection: Connection) {
     connection.send(this.counter.toString());
   }
+  onRequest(
+    _request: Request<unknown, CfProperties<unknown>>
+  ): Response | Promise<Response> {
+    return new Response(this.counter.toString());
+  }
 }
 
 export default {

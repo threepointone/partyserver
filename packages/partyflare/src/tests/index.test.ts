@@ -34,59 +34,62 @@ describe("party", () => {
     const response = await worker.fetch(request, env, ctx);
     const ws = response.webSocket!;
 
-    await new Promise<void>((resolve, reject) => {
-      ws.accept();
-      ws.addEventListener("message", (message) => {
-        try {
-          expect(JSON.parse(message.data as string)).toEqual({
-            room: "123"
-          });
-          ws.close();
-          resolve();
-        } catch (e) {
-          ws.close();
-          reject(e);
-        }
-      });
+    const { promise, resolve, reject } = Promise.withResolvers<void>();
+    ws.accept();
+    ws.addEventListener("message", (message) => {
+      try {
+        expect(JSON.parse(message.data as string)).toEqual({
+          room: "123"
+        });
+        resolve();
+      } catch (e) {
+        reject(e);
+      } finally {
+        ws.close();
+      }
     });
+
+    return promise;
   });
 
   it("calls onStart only once, and does not process messages or requests until it is resolved", async () => {
     const ctx = createExecutionContext();
 
-    function makeConnection() {
-      return new Promise<void>((resolve, reject) => {
-        const request = new Request(
-          "http://example.com/parties/onstartparty/123",
-          {
-            headers: {
-              Upgrade: "websocket"
-            }
+    async function makeConnection() {
+      const request = new Request(
+        "http://example.com/parties/onstartparty/123",
+        {
+          headers: {
+            Upgrade: "websocket"
           }
-        );
-        worker
-          .fetch(request, env, ctx)
-          .then<void>((response) => {
-            const ws = response.webSocket!;
-            ws.accept();
-            ws.addEventListener("message", (message) => {
-              try {
-                expect(message.data).toEqual("1");
-                ws.close();
-                resolve();
-              } catch (e) {
-                ws.close();
-                reject(e);
-              }
-            });
-          })
-          .catch((e) => {
-            reject(e);
-          });
+        }
+      );
+      const response = await worker.fetch(request, env, ctx);
+      const ws = response.webSocket!;
+      ws.accept();
+      const { promise, resolve, reject } = Promise.withResolvers<void>();
+      ws.addEventListener("message", (message) => {
+        try {
+          expect(message.data).toEqual("1");
+          resolve();
+        } catch (err) {
+          reject(err);
+        } finally {
+          ws.close();
+        }
       });
+      return promise;
     }
 
-    await Promise.all([makeConnection(), makeConnection()]);
+    async function makeRequest() {
+      const request = new Request(
+        "http://example.com/parties/onstartparty/123"
+      );
+      const response = await worker.fetch(request, env, ctx);
+      expect(await response.text()).toEqual("1");
+    }
+
+    await Promise.all([makeConnection(), makeConnection(), makeRequest()]);
   });
   // it("can be connected with a query parameter");
   // it("can be connected with a header");
