@@ -13,6 +13,7 @@ export default function SyncExample() {
   return (
     <div className="tldraw__editor">
       <Tldraw
+        // eslint-disable-next-line jsx-a11y/no-autofocus
         autoFocus
         store={store}
         components={{

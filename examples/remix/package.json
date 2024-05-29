@@ -1,0 +1,29 @@
+{
+  "name": "@partykit/example-remix",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "build": "remix build",
+    "deploy": "wrangler deploy",
+    "dev": "remix dev -c \"wrangler dev\"",
+    "typegen": "wrangler types"
+  },
+  "dependencies": {
+    "@remix-run/cloudflare": "^2.9.2",
+    "@remix-run/react": "^2.9.2",
+    "@remix-run/server-runtime": "^2.9.2",
+    "isbot": "^4.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240524.0",
+    "@remix-run/dev": "^2.9.2",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

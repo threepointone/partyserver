@@ -11,7 +11,9 @@ module.exports = {
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "plugin:react/jsx-runtime",
     "plugin:react-hooks/recommended",
+    "plugin:jsx-a11y/recommended",
     "plugin:deprecation/recommended"
   ],
   ignorePatterns: [
@@ -21,6 +23,19 @@ module.exports = {
     ".eslintrc.js",
     "*.d.ts"
   ],
+  settings: {
+    react: {
+      version: "detect"
+    },
+    formComponents: ["Form"],
+    linkComponents: [
+      { name: "Link", linkAttribute: "to" },
+      { name: "NavLink", linkAttribute: "to" }
+    ],
+    "import/resolver": {
+      typescript: {}
+    }
+  },
   rules: {
     "@typescript-eslint/consistent-type-imports": "error",
     "@typescript-eslint/return-await": "error",

@@ -51,16 +51,17 @@ export class Party<Env> extends DurableObject<Env> {
     stub.withRoom(room).catch((e) => {
       console.error("Could not set room name:", e);
     });
+
     return stub;
   }
 
   /**
    * A utility function for PartyKit style routing.
    */
-  static async fetchRoomForRequest<Env, T extends Party<Env>>(
+  static fetchRoomForRequest<Env, T extends Party<Env>>(
     req: Request,
     env: Record<string, unknown>
-  ): Promise<Response | null> {
+  ): Promise<Response> | null {
     if (!partyMapCache.has(env)) {
       partyMapCache.set(
         env,
@@ -87,7 +88,8 @@ export class Party<Env> extends DurableObject<Env> {
     const room = parts[3],
       party = parts[2];
     if (parts[1] === "parties" && room && party) {
-      return Party.withRoom(map[party], room).fetch(req);
+      const stub = Party.withRoom(map[party], room);
+      return stub.fetch(req);
     } else {
       return null;
     }
@@ -214,7 +216,7 @@ export class Party<Env> extends DurableObject<Env> {
   }
 
   async #initialize(): Promise<void> {
-    if (!this.room) {
+    if (!this.#_room) {
       throw new Error("Room not set");
     }
     switch (this.#status) {
