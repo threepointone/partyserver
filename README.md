@@ -23,6 +23,8 @@ Partyflare provides the following features on top of durable objects:
 - will always use `idFromName` for routing
 - (TODO)
 
+## Usage
+
 ```ts
 import { Party } from "partyflare";
 
