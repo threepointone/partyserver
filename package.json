@@ -30,6 +30,7 @@
     "@cloudflare/vitest-pool-workers": "https://prerelease-registry.devprod.cloudflare.dev/workers-sdk/runs/9274295411/npm-package-cloudflare-vitest-pool-workers-5932",
     "@ianvs/prettier-plugin-sort-imports": "^4.2.1",
     "@manypkg/cli": "^0.21.4",
+    "@types/bun": "^1.1.3",
     "@typescript-eslint/eslint-plugin": "^7.11.0",
     "@typescript-eslint/parser": "^7.11.0",
     "@vitest/runner": "1.5.0",

@@ -1,5 +1,4 @@
 // rethink error handling, how to pass it on to the client
-// rethink alarms usage
 // rethink oBC/oBR
 // push for durable.setState (in addition to connection.setState)
 

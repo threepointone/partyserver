@@ -80,12 +80,19 @@ function createPartySessionStorage<Data, Env>(options: {
   });
 }
 
+// TODO: test the expiration stuff
 export class SessionStorage<Data, Env> extends Party<Env> {
   async createData(data: Data, expires: Date | undefined): Promise<undefined> {
-    // TODO: test `expires` is in the future?
+    // make sure `expires` is in the future
+    if (expires && expires < new Date()) {
+      throw new Error("Expiration date must be in the future");
+    }
+
     await this.ctx.storage.put("data", data || {});
     await this.ctx.storage.put("expires", expires || null);
-    // TODO: set alarm for `expires`?
+    if (expires) {
+      await this.ctx.storage.setAlarm(expires);
+    }
   }
   async readData(): Promise<Data | undefined> {
     const data = await this.ctx.storage.get<Data>("data");
@@ -99,15 +106,17 @@ export class SessionStorage<Data, Env> extends Party<Env> {
   async updateData(data: Data, expires: Date | undefined): Promise<undefined> {
     await this.ctx.storage.put("data", data || {});
     await this.ctx.storage.put("expires", expires || null);
-    // TODO: update alarm for `expires`?
+    if (expires) {
+      await this.ctx.storage.setAlarm(expires);
+    }
   }
   async deleteData(): Promise<undefined> {
     await this.ctx.storage.delete("data");
     await this.ctx.storage.delete("expires");
-    // TODO: delete alarm for `expires`?
+    await this.ctx.storage.deleteAlarm();
   }
-  alarm(): void | Promise<void> {
-    // TODO: this is where you'd wipe out old sessions
+  async alarm(): Promise<void> {
+    await this.deleteData();
   }
 }
 
