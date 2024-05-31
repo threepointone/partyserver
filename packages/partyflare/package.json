@@ -37,8 +37,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "nanoid": "^5.0.7",
-    "@cloudflare/workers-types": "^4.20240524.0"
+    "@cloudflare/workers-types": "^4.20240524.0",
+    "nanoid": "^5.0.7"
   },
   "devDependencies": {
     "ws": "^8.11.0"
