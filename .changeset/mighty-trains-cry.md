@@ -1,0 +1,5 @@
+---
+"partyflare": patch
+---
+
+chatgpt readme

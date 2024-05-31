@@ -1,96 +1,101 @@
+# partyflare
+
+A lightweight API for durable objects, inspired by [PartyKit](https://www.partykit.io/).
+
 > [!CAUTION]
-> Experimental early work, not recommended for production use.
+> This project is in its experimental early stages and is not recommended for production use.
 
-## partyflare
+## Installation
 
-A lightweight api for durable objects, inspired by [PartyKit](https://www.partykit.io/).
+To install partyflare, run the following command:
 
 ```shell
 npm install partyflare
 ```
 
-## Why?
+## Why Use Partyflare?
 
-Partyflare provides the following features on top of durable objects:
+Partyflare enhances durable objects with the following features:
 
 - Simple room-based routing
-- Lifecycle hooks for connections/requests
-- A unified api for hibernated/non-hibernated durable objects
-- Easy broadcasting to all/some connections in a room
+- Lifecycle hooks for connections and requests
+- A unified API for managing hibernated and non-hibernated durable objects
+- Easy broadcasting to all or selected connections in a room
 
-## Why not?
+## Limitations
 
-- will always use `idFromName` for routing
-- (TODO)
+- Always uses `idFromName` for routing
+- Additional features and improvements are planned (TODO)
 
 ## Usage
+
+Here's an example of how to use partyflare:
 
 ```ts
 import { Party } from "partyflare";
 
-// define any durable objects you want to use
+// Define your durable objects
 export class MyParty extends Party {
   onConnect(connection) {
-    console.log("connected", connection.id, "to room", this.room);
+    console.log("Connected", connection.id, "to room", this.room);
   }
+
   onMessage(connection, message) {
-    console.log("message", connection.id, message);
-    // send the message to all connections
-    this.broadcast(
-      message,
-      /* optionally exclude any connections that shouldn't recieve the message */
-      [connection.id]
-    );
+    console.log("Message from", connection.id, ":", message);
+    // Send the message to every other connection
+    this.broadcast(message, [connection.id]);
   }
 }
 
 export default {
-  // setup your fetch handler to use configured parties
+  // Set up your fetch handler to use configured parties
   fetch(request, env) {
     return (
-      Party.fetchRoomForRequest(req, env) ||
+      Party.fetchRoomForRequest(request, env) ||
       new Response("Not Found", { status: 404 })
     );
   }
 };
 ```
 
-## Overrides on `Party`
+## Customizing `Party`
 
 You can override the following methods on `Party` to add custom behavior:
 
-### Lifecycle hooks: (all optionally `async`)
+### Lifecycle Hooks
 
-- `onStart()` - when the party is started for the first time (or waking up after hibernating)
-- `onConnect(connection, connContext)` - when a new connection is established
-- `onMessage(connection, message)` - when a message is received from a connection
-- `onClose(connection, code, reason, wasClean)` - when a connection is closed
-- `onError(error)` - when an error occurs on a connection
-- `onRequest(request): Response` - when a request is received from the fetch handler
-- `getConnectionTags(connection, connContext): string[]` - assign tags to a connection
+These methods can be optionally `async`:
 
-### Other methods:
+- `onStart()` - Called when the party starts for the first time or after waking up from hibernation
+- `onConnect(connection, connContext)` - Called when a new connection is established
+- `onMessage(connection, message)` - Called when a message is received from a connection
+- `onClose(connection, code, reason, wasClean)` - Called when a connection is closed
+- `onError(error)` - Called when an error occurs on a connection
+- `onRequest(request): Response` - Called when a request is received from the fetch handler
+- `getConnectionTags(connection, connContext): string[]` - Assign tags to a connection
 
-- `broadcast(message, exclude = [])` - send a message to all connections, optionally excluding some
-- `getConnections(tags = [])` - get all connections (optionally with the given tags)
-- `getConnection(id)` - get a connection by id
+### Additional Methods
 
-### Connection
+- `broadcast(message, exclude = [])` - Send a message to all connections, optionally excluding some
+- `getConnections(tags = [])` - Get all connections, optionally filtered by tags
+- `getConnection(id)` - Get a connection by its ID
+
+### Connection Properties
 
 A connection is a standard WebSocket with the following additional properties:
 
-- `id` - a unique id for the connection
-- `tags` - an array of tags assigned to the connection (TODO)
-- `room` - the room name the connection is in
-- `state` - arbitrary state <2kb that can be set on the connection (with `connection.setState()`)
+- `id` - A unique ID for the connection
+- `tags` - An array of tags assigned to the connection (TODO)
+- `room` - The room name the connection is in
+- `state` - Arbitrary state data (up to 2KB) that can be set on the connection using `connection.setState()`
 
-### Party::room
+### `.room`
 
 The `room` property is automatically set to the room name, determined by `Party.withRoom()` or `Party.fetchRoomForRequest()`.
 
-### Party.options.hibernate
+### Hibernation Option
 
-You can enable [hibernation](https://developers.cloudflare.com/durable-objects/reference/websockets/#websocket-hibernation) by passing a static `options` property on your party class. This will allow the party to be hibernated when it is not in use, and woken up when a new connection is established. All your lifecycle hooks will be called as expected when the party is woken up.
+You can enable [hibernation](https://developers.cloudflare.com/durable-objects/reference/websockets/#websocket-hibernation) by setting a static `options` property on your party class. This allows the party to hibernate when not in use and wake up when a new connection is established. All lifecycle hooks will be called as expected when the party wakes up.
 
 ```ts
 export class MyParty extends Party {
@@ -101,10 +106,7 @@ export class MyParty extends Party {
 }
 ```
 
-### `Party.withRoom(namespace, room, {locationHint}): Promise<DurableObjectStub>`
+### Utility Methods
 
-This is a utility method to create a new party class with a specific room name. It returns a DurableObjectStub that you can call further methods on, including `.fetch()`. You can optionally pass a `locationHint` to [specify the location of the party](https://developers.cloudflare.com/durable-objects/reference/data-location/#provide-a-location-hint).
-
-### `Party.fetchRoomForRequest(request, env, {locationHint}): Promise<Response | null>`
-
-This is a utility method to match a request to a party class (ala PartyKit). It takes a url of form `/parties/:party/:room` and matches it with any namespace named `:party` (case insensitive) with a room name of `:room`.
+- `Party.withRoom(namespace, room, {locationHint}): Promise<DurableObjectStub>` - Create a new party class with a specific room name. Returns a DurableObjectStub for further methods, including `.fetch()`. Optionally pass a `locationHint` to specify the location of the party.
+- `Party.fetchRoomForRequest(request, env, {locationHint}): Promise<Response | null>` - Match a request to a party class. Takes a URL of the form `/parties/:party/:room` and matches it with any namespace named `:party` (case insensitive) and room name `:room`.
