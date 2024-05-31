@@ -39,18 +39,22 @@ export class Party<Env> extends DurableObject<Env> {
   /**
    * For a given party namespace, create a stub with a room name.
    */
-  static withRoom<Env, T extends Party<Env>>(
+  static async withRoom<Env, T extends Party<Env>>(
     partyNamespace: DurableObjectNamespace<T>,
-    room: string
-  ): DurableObjectStub<T> {
+    room: string,
+    options?: {
+      locationHint?: DurableObjectLocationHint;
+    }
+  ): Promise<DurableObjectStub<T>> {
     const docId = partyNamespace.idFromName(room).toString();
     const id = partyNamespace.idFromString(docId);
-    const stub = partyNamespace.get(id);
+    const stub = partyNamespace.get(id, options);
 
-    // TODO: is this safe?
-    stub.withRoom(room).catch((e) => {
-      console.error("Could not set room name:", e);
-    });
+    // TODO: fix this
+    await stub.withRoom(room);
+    // .catch((e) => {
+    //   console.error("Could not set room name:", e);
+    // });
 
     return stub;
   }
@@ -58,10 +62,13 @@ export class Party<Env> extends DurableObject<Env> {
   /**
    * A utility function for PartyKit style routing.
    */
-  static fetchRoomForRequest<Env, T extends Party<Env>>(
+  static async fetchRoomForRequest<Env, T extends Party<Env>>(
     req: Request,
-    env: Record<string, unknown>
-  ): Promise<Response> | null {
+    env: Record<string, unknown>,
+    options?: {
+      locationHint?: DurableObjectLocationHint;
+    }
+  ): Promise<Response | null> {
     if (!partyMapCache.has(env)) {
       partyMapCache.set(
         env,
@@ -88,7 +95,7 @@ export class Party<Env> extends DurableObject<Env> {
     const room = parts[3],
       party = parts[2];
     if (parts[1] === "parties" && room && party) {
-      const stub = Party.withRoom(map[party], room);
+      const stub = await Party.withRoom(map[party], room, options); // TODO: fix this
       return stub.fetch(req);
     } else {
       return null;
@@ -117,6 +124,9 @@ export class Party<Env> extends DurableObject<Env> {
     // have been overridden
   }
 
+  /**
+   * Handle incoming requests to the party. Don't use this, use onRequest instead
+   */
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
 
@@ -272,14 +282,14 @@ export class Party<Env> extends DurableObject<Env> {
   // Public API
 
   #_room: string | undefined;
+  /**
+   * The room name for this party. Read-only.
+   */
   get room(): string {
     if (!this.#_room) {
       throw new Error("This party has not been initialised yet.");
     }
     return this.#_room;
-  }
-  set room(room: string) {
-    this.#_room = room;
   }
 
   // We won't have an await inside this function
@@ -287,13 +297,16 @@ export class Party<Env> extends DurableObject<Env> {
   // so we need to mark it as async
   // eslint-disable-next-line @typescript-eslint/require-await
   async withRoom(room: string) {
+    if (!room) {
+      throw new Error("Room name is required.");
+    }
     if (this.#_room && this.#_room !== room) {
       throw new Error("Room has already been set for this party.");
     }
-    this.room = room;
+    this.#_room = room;
   }
 
-  /** Send a message to all connected clients, except connection ids listed `without` */
+  /** Send a message to all connected clients, except connection ids listed in `without` */
   broadcast(
     msg: string | ArrayBuffer | ArrayBufferView,
     without?: string[] | undefined
@@ -342,21 +355,27 @@ export class Party<Env> extends DurableObject<Env> {
    * Called when a new connection is made to the party.
    */
   onConnect(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     connection: Connection,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ctx: ConnectionContext
-  ): void | Promise<void> {}
+  ): void | Promise<void> {
+    console.warn(
+      `Connection ${connection.id} connected to room ${this.room}, but no onConnect handler was implemented.`
+    );
+  }
 
   /**
    * Called when a message is received from a connection.
    */
   onMessage(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     connection: Connection,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     message: WSMessage
-  ): void | Promise<void> {}
+  ): void | Promise<void> {
+    console.warn(
+      `Recieved message on connection ${connection.id}, but no onMessage handler was implemented.`
+    );
+  }
 
   /**
    * Called when a connection is closed.
@@ -375,12 +394,12 @@ export class Party<Env> extends DurableObject<Env> {
   /**
    * Called when an error occurs on a connection.
    */
-  onError(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    connection: Connection,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    error: unknown
-  ): void | Promise<void> {}
+  onError(connection: Connection, error: unknown): void | Promise<void> {
+    console.error(
+      `Error on connection ${connection.id} in room ${this.room}:`,
+      error
+    );
+  }
 
   /**
    * Called when a request is made to the party.

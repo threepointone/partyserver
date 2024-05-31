@@ -76,10 +76,10 @@ export class MyParty extends Party {
 }
 ```
 
-### `Party.withRoom(namespace, room)`
+### `Party.withRoom(namespace, room, {locationHint})`
 
-This is a utility method to create a new party class with a specific room name. It returns a DurableObjectStub that you can call further methods on, including `.fetch()`.
+This is a utility method to create a new party class with a specific room name. It returns a DurableObjectStub that you can call further methods on, including `.fetch()`. You can optionally pass a `locationHint` to [specify the location of the party](https://developers.cloudflare.com/durable-objects/reference/data-location/#provide-a-location-hint).
 
-### `Party.fetchRoomForRequest(request, env)`
+### `Party.fetchRoomForRequest(request, env, {locationHint})`
 
 This is a utility method to match a request to a party class (ala PartyKit). It takes a url of form `/parties/:party/:room` and matches it with any namespace named `:party` (case insensitive) with a room name of `:room`.

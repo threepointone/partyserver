@@ -12,7 +12,7 @@
   "scripts": {
     "check:test": "vitest -r src/tests --watch false",
     "test": "vitest -r src/tests",
-    "build": "tsup"
+    "build": "esbuild scripts/build.ts | node --input-type=module"
   },
   "files": [
     "dist",

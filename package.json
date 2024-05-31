@@ -13,6 +13,7 @@
     "check:type": "find . -name 'tsconfig.json' -not -path '*/node_modules/*' -print0 | xargs -0 -I {} bash -c 'echo \"tsc --project {}\"; tsc --project {} || exit 255' || exit 1",
     "copy-readme": "cp README.md packages/partyflare/README.md",
     "test": "npm run test -w partyflare",
+    "ncu": "bunx npm-check-updates",
     "postinstall": "sh -c '[ -f package-lock.json ] && echo \"Error: package-lock.json exists\" && exit 1 || exit 0'"
   },
   "keywords": [],
