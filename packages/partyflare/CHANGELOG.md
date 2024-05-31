@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.22
+
+### Patch Changes
+
+- [`569fa76`](https://github.com/threepointone/partyflare/commit/569fa7648f82f6f80b4b5b701eff1e95e04ebd95) Thanks [@threepointone](https://github.com/threepointone)! - more stuff in readme
+
 ## 0.0.21
 
 ### Patch Changes
