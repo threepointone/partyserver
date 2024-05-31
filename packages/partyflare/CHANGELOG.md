@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.24
+
+### Patch Changes
+
+- [`5126257`](https://github.com/threepointone/partyflare/commit/51262570bc94456651abd5a5b17056204bc0052a) Thanks [@threepointone](https://github.com/threepointone)! - tweak some more warnings
+
 ## 0.0.23
 
 ### Patch Changes
