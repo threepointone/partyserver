@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.26
+
+### Patch Changes
+
+- [`5494f87`](https://github.com/threepointone/partyflare/commit/5494f870bfbb1c102359fcfb383750b0b08828bd) Thanks [@threepointone](https://github.com/threepointone)! - s/Server.withName/getServerByName, s/Server.fetchServerForRequest/Server.partyFetch
+
 ## 0.0.25
 
 ### Patch Changes
