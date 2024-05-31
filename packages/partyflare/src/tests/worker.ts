@@ -1,13 +1,13 @@
-import { Party } from "../index";
+import { Server } from "../index";
 
 import type { Connection, ConnectionContext } from "../index";
 
 export type Env = {
   Stateful: DurableObjectNamespace<Stateful>;
-  OnStartParty: DurableObjectNamespace<OnStartParty>;
+  OnStartServer: DurableObjectNamespace<OnStartServer>;
 };
 
-export class Stateful extends Party<Env> {
+export class Stateful extends Server<Env> {
   static options = {
     hibernate: true
   };
@@ -18,7 +18,7 @@ export class Stateful extends Party<Env> {
   ): void | Promise<void> {
     connection.send(
       JSON.stringify({
-        room: this.room
+        name: this.name
       })
     );
   }
@@ -27,12 +27,12 @@ export class Stateful extends Party<Env> {
     _request: Request<unknown, CfProperties<unknown>>
   ): Response | Promise<Response> {
     return Response.json({
-      room: this.room
+      name: this.name
     });
   }
 }
 
-export class OnStartParty extends Party<Env> {
+export class OnStartServer extends Server<Env> {
   counter = 0;
   async onStart() {
     await new Promise<void>((resolve) => {
@@ -55,7 +55,7 @@ export class OnStartParty extends Party<Env> {
 export default {
   async fetch(request: Request, env: Env, _ctx: ExecutionContext) {
     return (
-      (await Party.fetchRoomForRequest(request, env)) ||
+      (await Server.fetchServerForRequest(request, env)) ||
       new Response("Not Found", { status: 404 })
     );
   }

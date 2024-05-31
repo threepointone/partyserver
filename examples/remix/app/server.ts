@@ -6,7 +6,7 @@ import {
 import * as build from "@remix-run/dev/server-build";
 import { WorkerEntrypoint } from "cloudflare:workers";
 import { nanoid } from "nanoid";
-import { Party } from "partyflare";
+import { Server } from "partyflare";
 
 import type { Tldraw } from "./tldraw/server";
 import type {
@@ -40,10 +40,10 @@ if (process.env.NODE_ENV === "development") {
   logDevReady(build);
 }
 
-function createPartySessionStorage<Data, Env>(options: {
+function createServerSessionStorage<Data, Env>(options: {
   cookie?: Partial<Cookie>;
   useThisId?: string;
-  party: DurableObjectNamespace<SessionStorage<Data, Env>>;
+  namespace: DurableObjectNamespace<SessionStorage<Data, Env>>;
 }) {
   return createSessionStorage<Data>({
     cookie: {
@@ -54,7 +54,7 @@ function createPartySessionStorage<Data, Env>(options: {
     },
     async createData(data, expires) {
       const id = options.useThisId || nanoid();
-      const stub = await Party.withRoom(options.party, id);
+      const stub = await Server.withName(options.namespace, id);
       // @ts-expect-error TODO: typescript hell
       await stub.createData(data, expires);
       return id;
@@ -64,14 +64,14 @@ function createPartySessionStorage<Data, Env>(options: {
       if (options.useThisId && id !== options.useThisId) {
         throw new Error("Invalid session id");
       }
-      const stub = await Party.withRoom(options.party, id);
+      const stub = await Server.withName(options.namespace, id);
       return stub.readData();
     },
     async updateData(id, data, expires) {
       if (options.useThisId && id !== options.useThisId) {
         throw new Error("Invalid session id");
       }
-      const stub = await Party.withRoom(options.party, id);
+      const stub = await Server.withName(options.namespace, id);
       // @ts-expect-error TODO: typescript hell
       await stub.updateData(data, expires);
     },
@@ -79,14 +79,14 @@ function createPartySessionStorage<Data, Env>(options: {
       if (options.useThisId && id !== options.useThisId) {
         throw new Error("Invalid session id");
       }
-      const stub = await Party.withRoom(options.party, id);
+      const stub = await Server.withName(options.namespace, id);
       await stub.deleteData();
     }
   });
 }
 
 // TODO: test the expiration stuff
-export class SessionStorage<Data, Env> extends Party<Env> {
+export class SessionStorage<Data, Env> extends Server<Env> {
   async createData(data: Data, expires: Date | undefined): Promise<undefined> {
     // make sure `expires` is in the future
     if (expires && expires < new Date()) {
@@ -137,17 +137,17 @@ type SessionContext<Data = unknown, FlashData = Data> = {
   ) => Promise<string>;
 };
 
-export class RemixServer extends Party<Env> {
-  sessions = createPartySessionStorage({
+export class RemixServer extends Server<Env> {
+  sessions = createServerSessionStorage({
     // TODO typescript hell
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    party: this.env.SessionStorage
+    namespace: this.env.SessionStorage
   });
 
   async fetch(request: Request) {
     return (
       // @ts-expect-error TODO: typescript hell
-      (await Party.fetchRoomForRequest(request, this.env)) ||
+      (await Server.fetchServerForRequest(request, this.env)) ||
       super.fetch(request)
     );
   }
@@ -184,10 +184,10 @@ export default class Worker extends WorkerEntrypoint<Env> {
     // we need to do this dance just to get the session id
     // from the request to route it to the correct Party
 
-    const sessionStores = createPartySessionStorage({
+    const sessionStores = createServerSessionStorage({
       // TODO typescript hell
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      party: this.env.SessionStorage
+      namespace: this.env.SessionStorage
     });
 
     // TODO: we just need the session id here, can we
@@ -197,7 +197,7 @@ export default class Worker extends WorkerEntrypoint<Env> {
     );
 
     return (
-      await Party.withRoom(this.env.RemixServer, session.id || nanoid())
+      await Server.withName(this.env.RemixServer, session.id || nanoid())
     ).fetch(request);
   }
 }

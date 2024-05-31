@@ -23,36 +23,36 @@ export * from "./types";
 
 export type WSMessage = ArrayBuffer | ArrayBufferView | string;
 
-// Let's cache the party namespace map
+// Let's cache the server namespace map
 // so we don't call it on every request
-const partyMapCache = new WeakMap<
+const serverMapCache = new WeakMap<
   Record<string, unknown>,
   Record<string, DurableObjectNamespace>
 >();
 
-export class Party<Env> extends DurableObject<Env> {
+export class Server<Env> extends DurableObject<Env> {
   static options = {
     hibernate: false
   };
 
   /**
-   * For a given party namespace, create a stub with a room name.
+   * For a given server namespace, create a server with a name.
    */
-  static async withRoom<Env, T extends Party<Env>>(
-    partyNamespace: DurableObjectNamespace<T>,
-    room: string,
+  static async withName<Env, T extends Server<Env>>(
+    serverNamespace: DurableObjectNamespace<T>,
+    name: string,
     options?: {
       locationHint?: DurableObjectLocationHint;
     }
   ): Promise<DurableObjectStub<T>> {
-    const docId = partyNamespace.idFromName(room).toString();
-    const id = partyNamespace.idFromString(docId);
-    const stub = partyNamespace.get(id, options);
+    const docId = serverNamespace.idFromName(name).toString();
+    const id = serverNamespace.idFromString(docId);
+    const stub = serverNamespace.get(id, options);
 
     // TODO: fix this
-    await stub.withRoom(room);
+    await stub.withName(name);
     // .catch((e) => {
-    //   console.error("Could not set room name:", e);
+    //   console.error("Could not set server name:", e);
     // });
 
     return stub;
@@ -61,15 +61,15 @@ export class Party<Env> extends DurableObject<Env> {
   /**
    * A utility function for PartyKit style routing.
    */
-  static async fetchRoomForRequest<Env, T extends Party<Env>>(
+  static async fetchServerForRequest<Env, T extends Server<Env>>(
     req: Request,
     env: Record<string, unknown>,
     options?: {
       locationHint?: DurableObjectLocationHint;
     }
   ): Promise<Response | null> {
-    if (!partyMapCache.has(env)) {
-      partyMapCache.set(
+    if (!serverMapCache.has(env)) {
+      serverMapCache.set(
         env,
         Object.entries(env).reduce((acc, [k, v]) => {
           // @ts-expect-error - we're checking for the existence of idFromName
@@ -80,7 +80,7 @@ export class Party<Env> extends DurableObject<Env> {
         }, {})
       );
     }
-    const map = partyMapCache.get(env) as Record<
+    const map = serverMapCache.get(env) as Record<
       string,
       DurableObjectNamespace<T>
     >;
@@ -91,15 +91,15 @@ export class Party<Env> extends DurableObject<Env> {
     if (parts[1] === "parties" && parts.length < 4) {
       return null;
     }
-    const room = parts[3],
-      party = parts[2];
-    if (parts[1] === "parties" && room && party) {
-      if (!map[party]) {
-        console.error(`The url ${req.url} does not match any party namespace. 
+    const name = parts[3],
+      namespace = parts[2];
+    if (parts[1] === "parties" && name && namespace) {
+      if (!map[namespace]) {
+        console.error(`The url ${req.url} does not match any server namespace. 
 Did you forget to add a durable object binding to the class in your wrangler.toml?`);
       }
 
-      const stub = await Party.withRoom(map[party], room, options); // TODO: fix this
+      const stub = await Server.withName(map[namespace], name, options); // TODO: fix this
       return stub.fetch(req);
     } else {
       return null;
@@ -110,7 +110,7 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
   #onStartPromise: Promise<void> | null = null;
 
   #connectionManager: ConnectionManager;
-  #ParentClass: typeof Party;
+  #ParentClass: typeof Server;
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
@@ -129,7 +129,7 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
   }
 
   /**
-   * Handle incoming requests to the party. Don't use this, use onRequest instead
+   * Handle incoming requests to the server.
    */
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
@@ -150,7 +150,7 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
 
       let connection: Connection = Object.assign(serverWebSocket, {
         id: connectionId,
-        room: this.room,
+        server: this.name,
         state: null as unknown as ConnectionState<unknown>,
         setState<T = unknown>(setState: T | ConnectionSetStateFn<T>) {
           let state: T;
@@ -173,7 +173,7 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
       // Accept the websocket connection
       connection = this.#connectionManager.accept(connection, {
         tags,
-        room: this.room
+        server: this.name
       });
 
       if (!this.#ParentClass.options.hibernate) {
@@ -188,8 +188,8 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
   async webSocketMessage(ws: WebSocket, message: WSMessage): Promise<void> {
     const connection = createLazyConnection(ws);
     if (this.#status !== "started") {
-      // This means the room "woke up" after hibernation
-      // so we need to hydrate this.room again
+      // This means the server "woke up" after hibernation
+      // so we need to hydrate it again
       await this.#initialize();
     }
 
@@ -204,8 +204,8 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
   ): Promise<void> {
     const connection = createLazyConnection(ws);
     if (this.#status !== "started") {
-      // This means the room "woke up" after hibernation
-      // so we need to hydrate this.room again
+      // This means the server "woke up" after hibernation
+      // so we need to hydrate it again
       await this.#initialize();
     }
     return this.onClose(connection, code, reason, wasClean);
@@ -214,17 +214,17 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
   async webSocketError(ws: WebSocket, error: unknown): Promise<void> {
     const connection = createLazyConnection(ws);
     if (this.#status !== "started") {
-      // This means the room "woke up" after hibernation
-      // so we need to hydrate this.room again
+      // This means the server "woke up" after hibernation
+      // so we need to hydrate it again
       await this.#initialize();
     }
     return this.onError(connection, error);
   }
 
   async #initialize(): Promise<void> {
-    if (!this.#_room) {
+    if (!this.#_name) {
       throw new Error(
-        "This party's room name has not been set, did you forget to call withRoom?"
+        "This server's name has not been set, did you forget to call withName?"
       );
     }
     switch (this.#status) {
@@ -279,31 +279,31 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
 
   // Public API
 
-  #_room: string | undefined;
+  #_name: string | undefined;
   /**
-   * The room name for this party. Read-only.
+   * The name for this server. Read-only.
    */
-  get room(): string {
-    if (!this.#_room) {
+  get name(): string {
+    if (!this.#_name) {
       throw new Error(
-        "This party has not been initialised yet, did you forget to call withRoom?"
+        "This server has not been initialised yet, did you forget to call withName?"
       );
     }
-    return this.#_room;
+    return this.#_name;
   }
 
   // We won't have an await inside this function
   // but it will be called remotely,
   // so we need to mark it as async
   // eslint-disable-next-line @typescript-eslint/require-await
-  async withRoom(room: string) {
-    if (!room) {
-      throw new Error("Room name is required.");
+  async withName(name: string) {
+    if (!name) {
+      throw new Error("A name is required.");
     }
-    if (this.#_room && this.#_room !== room) {
-      throw new Error("Room has already been set for this party.");
+    if (this.#_name && this.#_name !== name) {
+      throw new Error("This server already has a name.");
     }
-    this.#_room = room;
+    this.#_name = name;
   }
 
   /** Send a message to all connected clients, except connection ids listed in `without` */
@@ -325,14 +325,14 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
 
   /**
    * Get all connections. Optionally, you can provide a tag to filter returned connections.
-   * Use `Party.Server#getConnectionTags` to tag the connection on connect.
+   * Use `Server#getConnectionTags` to tag the connection on connect.
    */
   getConnections<TState = unknown>(tag?: string): Iterable<Connection<TState>> {
     return this.#connectionManager.getConnections<TState>(tag);
   }
 
   /**
-   * You can tag a connection to filter them in Party#getConnections.
+   * You can tag a connection to filter them in Server#getConnections.
    * Each connection supports up to 9 tags, each tag max length is 256 characters.
    */
   getConnectionTags(
@@ -347,12 +347,12 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
   // Implemented by the user
 
   /**
-   * Called when the party is started for the first time.
+   * Called when the server is started for the first time.
    */
   onStart(): void | Promise<void> {}
 
   /**
-   * Called when a new connection is made to the party.
+   * Called when a new connection is made to the server.
    */
   onConnect(
     connection: Connection,
@@ -360,7 +360,7 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
     ctx: ConnectionContext
   ): void | Promise<void> {
     console.warn(
-      `Connection ${connection.id} connected to ${this.#ParentClass.name}:${this.room}, but no onConnect handler was implemented.`
+      `Connection ${connection.id} connected to ${this.#ParentClass.name}:${this.name}, but no onConnect handler was implemented.`
     );
   }
 
@@ -396,18 +396,18 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
    */
   onError(connection: Connection, error: unknown): void | Promise<void> {
     console.error(
-      `Error on connection ${connection.id} in ${this.#ParentClass.name}:${this.room}:`,
+      `Error on connection ${connection.id} in ${this.#ParentClass.name}:${this.name}:`,
       error
     );
   }
 
   /**
-   * Called when a request is made to the party.
+   * Called when a request is made to the server.
    */
   onRequest(request: Request): Response | Promise<Response> {
     // default to 404
     return new Response(
-      `onRequest hasn't been implemented on ${this.#ParentClass.name}:${this.room} responding to ${request.url}`,
+      `onRequest hasn't been implemented on ${this.#ParentClass.name}:${this.name} responding to ${request.url}`,
       { status: 404 }
     );
   }

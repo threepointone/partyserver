@@ -1,4 +1,4 @@
-import { Party } from "partyflare";
+import { Server } from "partyflare";
 import { createTLSchema, throttle } from "tldraw";
 
 import type { Connection } from "partyflare";
@@ -8,7 +8,7 @@ type Env = {
   Tldraw: DurableObjectNamespace<Tldraw>;
 };
 
-export class Tldraw extends Party<Env> {
+export class Tldraw extends Server<Env> {
   records: Record<string, TLRecord> = {};
   readonly schema = createTLSchema();
 

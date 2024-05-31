@@ -7,9 +7,9 @@ name = "Stateful"
 class_name = "Stateful"
 
 [[durable_objects.bindings]]
-name = "OnStartParty"
-class_name = "OnStartParty"
+name = "OnStartServer"
+class_name = "OnStartServer"
 
  [[migrations]]
 tag = "v1" # Should be unique for each entry
-new_classes = ["Stateful", "OnStartParty"]
+new_classes = ["Stateful", "OnStartServer"]

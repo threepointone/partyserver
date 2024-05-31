@@ -28,7 +28,7 @@ type ConnectionAttachments = {
     id: string;
     // TODO: remove this once we have
     // durable object level setState
-    room: string;
+    server: string;
   };
   __user?: unknown;
 };
@@ -70,7 +70,7 @@ const isWrapped = (ws: WebSocket): ws is Connection => {
 };
 
 /**
- * Wraps a WebSocket with PartyConnection fields that rehydrate the
+ * Wraps a WebSocket with Connection fields that rehydrate the
  * socket attachments lazily only when requested.
  */
 export const createLazyConnection = (
@@ -94,9 +94,9 @@ export const createLazyConnection = (
         return attachments.get(ws).__pk.id;
       }
     },
-    room: {
+    server: {
       get() {
-        return attachments.get(ws).__pk.room;
+        return attachments.get(ws).__pk.server;
       }
     },
     socket: {
@@ -188,7 +188,7 @@ export interface ConnectionManager {
   getConnections<TState>(tag?: string): IterableIterator<Connection<TState>>;
   accept(
     connection: Connection,
-    options: { tags: string[]; room: string }
+    options: { tags: string[]; server: string }
   ): Connection;
 }
 
@@ -222,7 +222,7 @@ export class InMemoryConnectionManager<TState> implements ConnectionManager {
     }
   }
 
-  accept(connection: Connection, options: { tags: string[]; room: string }) {
+  accept(connection: Connection, options: { tags: string[]; server: string }) {
     connection.accept();
 
     this.#connections.set(connection.id, connection);
@@ -270,7 +270,7 @@ export class HibernatingConnectionManager<TState> implements ConnectionManager {
     return new HibernatingConnectionIterator<T>(this.controller, tag);
   }
 
-  accept(connection: Connection, options: { tags: string[]; room: string }) {
+  accept(connection: Connection, options: { tags: string[]; server: string }) {
     // dedupe tags in case user already provided id tag
     const tags = [
       connection.id,
@@ -302,7 +302,7 @@ export class HibernatingConnectionManager<TState> implements ConnectionManager {
     connection.serializeAttachment({
       __pk: {
         id: connection.id,
-        room: options.room
+        server: options.server
       },
       __user: null
     });

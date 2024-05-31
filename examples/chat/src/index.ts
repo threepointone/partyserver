@@ -1,5 +1,5 @@
 import { WorkerEntrypoint } from "cloudflare:workers";
-import { Party } from "partyflare";
+import { Server } from "partyflare";
 
 import type { Connection, WSMessage } from "partyflare";
 
@@ -7,7 +7,7 @@ type Env = {
   Chat: DurableObjectNamespace<Chat>;
 };
 
-export class Chat extends Party<Env> {
+export class Chat extends Server<Env> {
   static options = {
     hibernate: true
   };
@@ -20,7 +20,7 @@ export class Chat extends Party<Env> {
 export default class MyServer extends WorkerEntrypoint<Env> {
   async fetch(request: Request): Promise<Response> {
     return (
-      (await Party.fetchRoomForRequest(request, this.env)) ||
+      (await Server.fetchServerForRequest(request, this.env)) ||
       new Response("Not Found", { status: 404 })
     );
   }

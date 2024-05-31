@@ -14,13 +14,13 @@ declare module "cloudflare:test" {
   interface ProvidedEnv extends Env {}
 }
 
-describe("party", () => {
+describe("Server", () => {
   it("can be connected with a url", async () => {
     const ctx = createExecutionContext();
     const request = new Request("http://example.com/parties/stateful/123");
     const response = await worker.fetch(request, env, ctx);
     expect(await response.json()).toEqual({
-      room: "123"
+      name: "123"
     });
   });
 
@@ -39,7 +39,7 @@ describe("party", () => {
     ws.addEventListener("message", (message) => {
       try {
         expect(JSON.parse(message.data as string)).toEqual({
-          room: "123"
+          name: "123"
         });
         resolve();
       } catch (e) {
@@ -57,7 +57,7 @@ describe("party", () => {
 
     async function makeConnection() {
       const request = new Request(
-        "http://example.com/parties/onstartparty/123",
+        "http://example.com/parties/onstartserver/123",
         {
           headers: {
             Upgrade: "websocket"
@@ -83,7 +83,7 @@ describe("party", () => {
 
     async function makeRequest() {
       const request = new Request(
-        "http://example.com/parties/onstartparty/123"
+        "http://example.com/parties/onstartserver/123"
       );
       const response = await worker.fetch(request, env, ctx);
       expect(await response.text()).toEqual("1");

@@ -21,7 +21,7 @@ export type ConnectionContext = {
   request: Request;
 };
 
-/** A WebSocket connected to the Room */
+/** A WebSocket connected to the Server */
 export type Connection<TState = unknown> = WebSocket & {
   /** Connection identifier */
   id: string;
@@ -43,30 +43,7 @@ export type Connection<TState = unknown> = WebSocket & {
   deserializeAttachment<T = unknown>(): T | null;
 
   /**
-   * Room name
+   * Server's name
    */
-  room: string;
+  server: string;
 };
-
-export interface Room {
-  /** Room ID defined in the Party URL, e.g. /parties/:name/:id */
-  id: string;
-
-  /** Internal ID assigned by the platform. Use Party.id instead. */
-  internalID: string;
-
-  /** Send a message to all connected clients, except connection ids listed `without` */
-  broadcast: (
-    msg: string | ArrayBuffer | ArrayBufferView,
-    without?: string[] | undefined
-  ) => void;
-
-  /** Get a connection by connection id */
-  getConnection<TState = unknown>(id: string): Connection<TState> | undefined;
-
-  /**
-   * Get all connections. Optionally, you can provide a tag to filter returned connections.
-   * Use `Party.Server#getConnectionTags` to tag the connection on connect.
-   */
-  getConnections<TState = unknown>(tag?: string): Iterable<Connection<TState>>;
-}

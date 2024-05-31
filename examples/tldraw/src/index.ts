@@ -1,5 +1,5 @@
 import { WorkerEntrypoint } from "cloudflare:workers";
-import { Party } from "partyflare";
+import { Server } from "partyflare";
 import { createTLSchema, throttle } from "tldraw";
 
 import type { Connection } from "partyflare";
@@ -9,7 +9,7 @@ type Env = {
   Tldraw: DurableObjectNamespace<Tldraw>;
 };
 
-export class Tldraw extends Party<Env> {
+export class Tldraw extends Server<Env> {
   records: Record<string, TLRecord> = {};
   readonly schema = createTLSchema();
 
@@ -104,7 +104,7 @@ export class Tldraw extends Party<Env> {
 export default class MyServer extends WorkerEntrypoint<Env> {
   async fetch(request: Request): Promise<Response> {
     return (
-      (await Party.fetchRoomForRequest(request, this.env)) ||
+      (await Server.fetchServerForRequest(request, this.env)) ||
       new Response("Not Found", { status: 404 })
     );
   }
