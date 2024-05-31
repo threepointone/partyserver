@@ -1,10 +1,13 @@
-import { useLoaderData } from "@remix-run/react";
+import React, { Suspense } from "react";
+import { ClientOnly } from "remix-utils/client-only";
 
 import type {
   LoaderFunction,
   LoaderFunctionArgs,
   MetaFunction
 } from "@remix-run/cloudflare";
+
+const Tldraw = React.lazy(() => import("../tldraw/client/App"));
 
 export const meta: MetaFunction = () => {
   return [
@@ -38,28 +41,11 @@ export const loader: LoaderFunction = async ({
 };
 
 export default function Index() {
-  const data = useLoaderData<typeof loader>();
-  console.log(data);
-
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-      <h1>Welcome to Remix + Partyflare!</h1>
-      <ul>
-        <li>
-          <a
-            target="_blank"
-            href="https://developers.cloudflare.com/workers/"
-            rel="noreferrer"
-          >
-            Cloudflare Workers Docs
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
-            Remix Docs
-          </a>
-        </li>
-      </ul>
+      <Suspense fallback={<div>Loading...</div>}>
+        <ClientOnly>{() => <Tldraw />}</ClientOnly>
+      </Suspense>
     </div>
   );
 }

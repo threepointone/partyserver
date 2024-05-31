@@ -1,3 +1,4 @@
+import { cssBundleHref } from "@remix-run/css-bundle";
 import {
   Links,
   LiveReload,
@@ -6,6 +7,12 @@ import {
   Scripts,
   ScrollRestoration
 } from "@remix-run/react";
+
+import type { LinksFunction } from "@remix-run/cloudflare";
+
+export const links: LinksFunction = () => [
+  ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : [])
+];
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (

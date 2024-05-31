@@ -16,6 +16,11 @@ class_name = "SessionStorage"
 name = "RemixServer"
 class_name = "RemixServer"
 
+[[durable_objects.bindings]]
+name = "Tldraw"
+class_name = "Tldraw"
+
+
  [[migrations]]
 tag = "v1" # Should be unique for each entry
-new_classes = ["SessionStorage", "RemixServer"]
+new_classes = ["SessionStorage", "RemixServer", "Tldraw"]

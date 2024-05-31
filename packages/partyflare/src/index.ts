@@ -94,6 +94,11 @@ export class Party<Env> extends DurableObject<Env> {
     const room = parts[3],
       party = parts[2];
     if (parts[1] === "parties" && room && party) {
+      if (!map[party]) {
+        console.error(`The url ${req.url} does not match any party namespace. 
+Did you forget to add a durable object binding to the class in your wrangler.toml?`);
+      }
+
       const stub = await Party.withRoom(map[party], room, options); // TODO: fix this
       return stub.fetch(req);
     } else {
@@ -355,7 +360,7 @@ export class Party<Env> extends DurableObject<Env> {
     ctx: ConnectionContext
   ): void | Promise<void> {
     console.warn(
-      `Connection ${connection.id} connected to room ${this.room}, but no onConnect handler was implemented.`
+      `Connection ${connection.id} connected to ${this.#ParentClass.name}:${this.room}, but no onConnect handler was implemented.`
     );
   }
 
@@ -368,7 +373,7 @@ export class Party<Env> extends DurableObject<Env> {
     message: WSMessage
   ): void | Promise<void> {
     console.warn(
-      `Recieved message on connection ${connection.id}, but no onMessage handler was implemented.`
+      `Recieved message on connection ${this.#ParentClass.name}:${connection.id}, but no onMessage handler was implemented.`
     );
   }
 
@@ -391,7 +396,7 @@ export class Party<Env> extends DurableObject<Env> {
    */
   onError(connection: Connection, error: unknown): void | Promise<void> {
     console.error(
-      `Error on connection ${connection.id} in room ${this.room}:`,
+      `Error on connection ${connection.id} in ${this.#ParentClass.name}:${this.room}:`,
       error
     );
   }
@@ -402,7 +407,7 @@ export class Party<Env> extends DurableObject<Env> {
   onRequest(request: Request): Response | Promise<Response> {
     // default to 404
     return new Response(
-      `onRequest hasn't been implemented on the Durable Object responding to ${request.url}`,
+      `onRequest hasn't been implemented on ${this.#ParentClass.name}:${this.room} responding to ${request.url}`,
       { status: 404 }
     );
   }

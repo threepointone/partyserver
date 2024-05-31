@@ -8,6 +8,7 @@ import { WorkerEntrypoint } from "cloudflare:workers";
 import { nanoid } from "nanoid";
 import { Party } from "partyflare";
 
+import type { Tldraw } from "./tldraw/server";
 import type {
   Cookie,
   CookieParseOptions,
@@ -15,10 +16,13 @@ import type {
   Session
 } from "@remix-run/cloudflare";
 
+export { Tldraw } from "./tldraw/server";
+
 interface Env {
   RemixServer: DurableObjectNamespace<RemixServer>;
   // @ts-expect-error TODO: typescript hell
   SessionStorage: DurableObjectNamespace<SessionStorage>;
+  Tldraw: DurableObjectNamespace<Tldraw>;
 }
 
 declare module "@remix-run/cloudflare" {
@@ -29,7 +33,8 @@ declare module "@remix-run/cloudflare" {
 }
 
 const handleRemixRequest = createRequestHandler(build);
-// @ts-expect-error process isn't a global yet
+
+// @ts-expect-error we haven't loaded node's types for this yet
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 if (process.env.NODE_ENV === "development") {
   logDevReady(build);
@@ -183,10 +188,12 @@ export default class Worker extends WorkerEntrypoint<Env> {
       request.headers.get("Cookie")
     );
 
-    const stub = await Party.withRoom(
-      this.env.RemixServer,
-      session.id || nanoid()
+    return (
+      // @ts-expect-error TODO: typescript hell
+      (await Party.fetchRoomForRequest(request, this.env)) ||
+      (
+        await Party.withRoom(this.env.RemixServer, session.id || nanoid())
+      ).fetch(request)
     );
-    return stub.fetch(request);
   }
 }
