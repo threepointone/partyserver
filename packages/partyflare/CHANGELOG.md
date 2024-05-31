@@ -1,5 +1,13 @@
 # partyflare
 
+## 0.0.20
+
+### Patch Changes
+
+- [`1e61151`](https://github.com/threepointone/partyflare/commit/1e6115113667e1c6e78fbbf01a22d1e2a95d6a37) Thanks [@threepointone](https://github.com/threepointone)! - tighter deps
+
+- [`48ed3df`](https://github.com/threepointone/partyflare/commit/48ed3dfde6bf03055c2f8df371a4560bc78dbaeb) Thanks [@threepointone](https://github.com/threepointone)! - nanoid should be a regular dep
+
 ## 0.0.19
 
 ### Patch Changes
