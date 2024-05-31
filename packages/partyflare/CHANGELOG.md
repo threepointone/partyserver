@@ -1,5 +1,13 @@
 # partyflare
 
+## 0.0.19
+
+### Patch Changes
+
+- [`1be87b0`](https://github.com/threepointone/partyflare/commit/1be87b022f7daa1d8337bc7bae3b7d43d927c04d) Thanks [@threepointone](https://github.com/threepointone)! - remove legacy\_ methods
+
+- [`32f8b08`](https://github.com/threepointone/partyflare/commit/32f8b084eb1f37583e5627fc875dc54589a8f31d) Thanks [@threepointone](https://github.com/threepointone)! - add locationHint, make remix work inside a party, add a workaround for the ordering issue, adds loggin for some unimplemented methods
+
 ## 0.0.18
 
 ### Patch Changes
