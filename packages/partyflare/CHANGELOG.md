@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.21
+
+### Patch Changes
+
+- [`f328fcb`](https://github.com/threepointone/partyflare/commit/f328fcba8bbd541fa12af08bbbd6d99c9b815fdb) Thanks [@threepointone](https://github.com/threepointone)! - tweak some error messages
+
 ## 0.0.20
 
 ### Patch Changes
