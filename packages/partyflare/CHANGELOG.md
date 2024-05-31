@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.23
+
+### Patch Changes
+
+- [`3e33acf`](https://github.com/threepointone/partyflare/commit/3e33acfe34ed42622ade605899a576b4b2ce0ba2) Thanks [@threepointone](https://github.com/threepointone)! - chatgpt readme
+
 ## 0.0.22
 
 ### Patch Changes

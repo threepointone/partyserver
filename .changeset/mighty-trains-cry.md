@@ -1,5 +1,0 @@
----
-"partyflare": patch
----
-
-chatgpt readme
