@@ -190,34 +190,31 @@ export interface ConnectionManager {
     connection: Connection,
     options: { tags: string[]; room: string }
   ): Connection;
-
-  // This can be removed when connections is removed
-  legacy_getConnectionMap(): Map<string, Connection>;
 }
 
 /**
  * When not using hibernation, we track active connections manually.
  */
 export class InMemoryConnectionManager<TState> implements ConnectionManager {
-  connections: Map<string, Connection> = new Map();
+  #connections: Map<string, Connection> = new Map();
   tags: WeakMap<Connection, string[]> = new WeakMap();
 
   getCount() {
-    return this.connections.size;
+    return this.#connections.size;
   }
 
   getConnection<T = TState>(id: string) {
-    return this.connections.get(id) as Connection<T> | undefined;
+    return this.#connections.get(id) as Connection<T> | undefined;
   }
 
   *getConnections<T = TState>(tag?: string): IterableIterator<Connection<T>> {
     if (!tag) {
-      yield* this.connections.values() as IterableIterator<Connection<T>>;
+      yield* this.#connections.values() as IterableIterator<Connection<T>>;
       return;
     }
 
     // simulate DurableObjectState.getWebSockets(tag) behaviour
-    for (const connection of this.connections.values()) {
+    for (const connection of this.#connections.values()) {
       const connectionTags = this.tags.get(connection) ?? [];
       if (connectionTags.includes(tag)) {
         yield connection as Connection<T>;
@@ -225,14 +222,10 @@ export class InMemoryConnectionManager<TState> implements ConnectionManager {
     }
   }
 
-  legacy_getConnectionMap() {
-    return this.connections;
-  }
-
   accept(connection: Connection, options: { tags: string[]; room: string }) {
     connection.accept();
 
-    this.connections.set(connection.id, connection);
+    this.#connections.set(connection.id, connection);
     this.tags.set(connection, [
       // make sure we have id tag
       connection.id,
@@ -240,7 +233,7 @@ export class InMemoryConnectionManager<TState> implements ConnectionManager {
     ]);
 
     const removeConnection = () => {
-      this.connections.delete(connection.id);
+      this.#connections.delete(connection.id);
       connection.removeEventListener("close", removeConnection);
       connection.removeEventListener("error", removeConnection);
     };
@@ -275,14 +268,6 @@ export class HibernatingConnectionManager<TState> implements ConnectionManager {
 
   getConnections<T = TState>(tag?: string | undefined) {
     return new HibernatingConnectionIterator<T>(this.controller, tag);
-  }
-
-  legacy_getConnectionMap() {
-    const connections = new Map();
-    for (const connection of this.getConnections()) {
-      connections.set(connection.id, connection);
-    }
-    return connections;
   }
 
   accept(connection: Connection, options: { tags: string[]; room: string }) {
