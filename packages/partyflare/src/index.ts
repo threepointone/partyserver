@@ -136,14 +136,6 @@ export class Party<Env> extends DurableObject<Env> {
     if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") {
       return this.onRequest(request);
     } else {
-      if (
-        this.onConnect === Party.prototype.onConnect &&
-        this.onMessage === Party.prototype.onMessage
-      ) {
-        throw new Error(
-          "You must implement onConnect or onMessage in your Party subclass"
-        );
-      }
       // Create the websocket pair for the client
       const { 0: clientWebSocket, 1: serverWebSocket } = new WebSocketPair();
       let connectionId = url.searchParams.get("_pk");
@@ -226,7 +218,9 @@ export class Party<Env> extends DurableObject<Env> {
 
   async #initialize(): Promise<void> {
     if (!this.#_room) {
-      throw new Error("Room not set");
+      throw new Error(
+        "This party's room name has not been set, did you forget to call withRoom?"
+      );
     }
     switch (this.#status) {
       case "zero": {
@@ -286,7 +280,9 @@ export class Party<Env> extends DurableObject<Env> {
    */
   get room(): string {
     if (!this.#_room) {
-      throw new Error("This party has not been initialised yet.");
+      throw new Error(
+        "This party has not been initialised yet, did you forget to call withRoom?"
+      );
     }
     return this.#_room;
   }

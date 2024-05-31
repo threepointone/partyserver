@@ -51,7 +51,7 @@ You can override the following methods on `Party` to add custom behavior:
 - `onClose(connection, code, reason, wasClean)` - when a connection is closed
 - `onError(error)` - when an error occurs on a connection
 - `onRequest(request): Response` - when a request is received from the fetch handler
-- `getConnectionTags(connection, connContext)` - return an array of tags for a connection
+- `getConnectionTags(connection, connContext): string[]` - assign tags to a connection
 
 ### Other methods:
 
