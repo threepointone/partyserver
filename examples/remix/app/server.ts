@@ -144,6 +144,14 @@ export class RemixServer extends Party<Env> {
     party: this.env.SessionStorage
   });
 
+  async fetch(request: Request) {
+    return (
+      // @ts-expect-error TODO: typescript hell
+      (await Party.fetchRoomForRequest(request, this.env)) ||
+      super.fetch(request)
+    );
+  }
+
   async onRequest(request: Request): Promise<Response> {
     const session = {
       get: (options?: CookieParseOptions) => {
@@ -189,11 +197,7 @@ export default class Worker extends WorkerEntrypoint<Env> {
     );
 
     return (
-      // @ts-expect-error TODO: typescript hell
-      (await Party.fetchRoomForRequest(request, this.env)) ||
-      (
-        await Party.withRoom(this.env.RemixServer, session.id || nanoid())
-      ).fetch(request)
-    );
+      await Party.withRoom(this.env.RemixServer, session.id || nanoid())
+    ).fetch(request);
   }
 }
