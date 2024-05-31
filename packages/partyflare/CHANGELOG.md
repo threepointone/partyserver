@@ -1,5 +1,16 @@
 # partyflare
 
+## 0.0.25
+
+### Patch Changes
+
+- [`4010235`](https://github.com/threepointone/partyflare/commit/4010235412711aa08511f7115611544a62a737c0) Thanks [@threepointone](https://github.com/threepointone)! - rename a bunch of things
+
+  - Party -> Server
+  - .room -> .name
+  - withRoom -> withName
+  - fetchRoomForRequest -> fetchServerForRequest
+
 ## 0.0.24
 
 ### Patch Changes
