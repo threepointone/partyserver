@@ -51,7 +51,7 @@ export default {
   // Set up your fetch handler to use configured Servers
   fetch(request, env) {
     return (
-      Server.fetchServerForRequest(request, env) ||
+      Server.partyFetch(request, env) ||
       new Response("Not Found", { status: 404 })
     );
   }
@@ -91,7 +91,7 @@ A connection is a standard WebSocket with the following additional properties:
 
 ### `.name`
 
-The `name` property is automatically set to the server's name, determined by `Server.withName()` or `Server.fetchServerForRequest()`.
+The `name` property is automatically set to the server's name, determined by `getServerByName()` or `Server.partyFetch()`.
 
 ### Hibernation Option
 
@@ -108,5 +108,5 @@ export class MyServer extends Server {
 
 ### Utility Methods
 
-- `Server.withName(namespace, name, {locationHint}): Promise<DurableObjectStub>` - Create a new Server with a specific name. Returns a DurableObjectStub for further methods, including `.fetch()`. Optionally pass a `locationHint` to specify the location of the server.
-- `Server.fetchServerForRequest(request, env, {locationHint}): Promise<Response | null>` - Match a request to a server. Takes a URL of the form `/parties/:server/:name` and matches it with any namespace named `:server` (case insensitive) named `:name`.
+- `getServerByName(namespace, name, {locationHint}): Promise<DurableObjectStub>` - Create a new Server with a specific name. Optionally pass a `locationHint` to specify the location of the server.
+- `Server.partyFetch(request, env, {locationHint}): Promise<Response | null>` - Match a request to a server. Takes a URL of the form `/parties/:server/:name` and matches it with any namespace named `:server` (case insensitive) named `:name`.

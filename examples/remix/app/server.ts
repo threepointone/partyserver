@@ -6,7 +6,7 @@ import {
 import * as build from "@remix-run/dev/server-build";
 import { WorkerEntrypoint } from "cloudflare:workers";
 import { nanoid } from "nanoid";
-import { Server } from "partyflare";
+import { getServerByName, Server } from "partyflare";
 
 import type { Tldraw } from "./tldraw/server";
 import type {
@@ -54,7 +54,7 @@ function createServerSessionStorage<Data, Env>(options: {
     },
     async createData(data, expires) {
       const id = options.useThisId || nanoid();
-      const stub = await Server.withName(options.namespace, id);
+      const stub = await getServerByName(options.namespace, id);
       // @ts-expect-error TODO: typescript hell
       await stub.createData(data, expires);
       return id;
@@ -64,14 +64,14 @@ function createServerSessionStorage<Data, Env>(options: {
       if (options.useThisId && id !== options.useThisId) {
         throw new Error("Invalid session id");
       }
-      const stub = await Server.withName(options.namespace, id);
+      const stub = await getServerByName(options.namespace, id);
       return stub.readData();
     },
     async updateData(id, data, expires) {
       if (options.useThisId && id !== options.useThisId) {
         throw new Error("Invalid session id");
       }
-      const stub = await Server.withName(options.namespace, id);
+      const stub = await getServerByName(options.namespace, id);
       // @ts-expect-error TODO: typescript hell
       await stub.updateData(data, expires);
     },
@@ -79,7 +79,7 @@ function createServerSessionStorage<Data, Env>(options: {
       if (options.useThisId && id !== options.useThisId) {
         throw new Error("Invalid session id");
       }
-      const stub = await Server.withName(options.namespace, id);
+      const stub = await getServerByName(options.namespace, id);
       await stub.deleteData();
     }
   });
@@ -147,8 +147,7 @@ export class RemixServer extends Server<Env> {
   async fetch(request: Request) {
     return (
       // @ts-expect-error TODO: typescript hell
-      (await Server.fetchServerForRequest(request, this.env)) ||
-      super.fetch(request)
+      (await Server.partyFetch(request, this.env)) || super.fetch(request)
     );
   }
 
@@ -197,7 +196,7 @@ export default class Worker extends WorkerEntrypoint<Env> {
     );
 
     return (
-      await Server.withName(this.env.RemixServer, session.id || nanoid())
+      await getServerByName(this.env.RemixServer, session.id || nanoid())
     ).fetch(request);
   }
 }

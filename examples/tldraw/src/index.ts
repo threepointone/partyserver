@@ -104,7 +104,7 @@ export class Tldraw extends Server<Env> {
 export default class MyServer extends WorkerEntrypoint<Env> {
   async fetch(request: Request): Promise<Response> {
     return (
-      (await Server.fetchServerForRequest(request, this.env)) ||
+      (await Server.partyFetch(request, this.env)) ||
       new Response("Not Found", { status: 404 })
     );
   }

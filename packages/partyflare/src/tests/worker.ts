@@ -55,7 +55,7 @@ export class OnStartServer extends Server<Env> {
 export default {
   async fetch(request: Request, env: Env, _ctx: ExecutionContext) {
     return (
-      (await Server.fetchServerForRequest(request, env)) ||
+      (await Server.partyFetch(request, env)) ||
       new Response("Not Found", { status: 404 })
     );
   }

@@ -30,38 +30,38 @@ const serverMapCache = new WeakMap<
   Record<string, DurableObjectNamespace>
 >();
 
+/**
+ * For a given server namespace, create a server with a name.
+ */
+export async function getServerByName<Env, T extends Server<Env>>(
+  serverNamespace: DurableObjectNamespace<T>,
+  name: string,
+  options?: {
+    locationHint?: DurableObjectLocationHint;
+  }
+): Promise<DurableObjectStub<T>> {
+  const docId = serverNamespace.idFromName(name).toString();
+  const id = serverNamespace.idFromString(docId);
+  const stub = serverNamespace.get(id, options);
+
+  // TODO: fix this
+  await stub.setName(name);
+  // .catch((e) => {
+  //   console.error("Could not set server name:", e);
+  // });
+
+  return stub;
+}
+
 export class Server<Env> extends DurableObject<Env> {
   static options = {
     hibernate: false
   };
 
   /**
-   * For a given server namespace, create a server with a name.
-   */
-  static async withName<Env, T extends Server<Env>>(
-    serverNamespace: DurableObjectNamespace<T>,
-    name: string,
-    options?: {
-      locationHint?: DurableObjectLocationHint;
-    }
-  ): Promise<DurableObjectStub<T>> {
-    const docId = serverNamespace.idFromName(name).toString();
-    const id = serverNamespace.idFromString(docId);
-    const stub = serverNamespace.get(id, options);
-
-    // TODO: fix this
-    await stub.withName(name);
-    // .catch((e) => {
-    //   console.error("Could not set server name:", e);
-    // });
-
-    return stub;
-  }
-
-  /**
    * A utility function for PartyKit style routing.
    */
-  static async fetchServerForRequest<Env, T extends Server<Env>>(
+  static async partyFetch<Env, T extends Server<Env>>(
     req: Request,
     env: Record<string, unknown>,
     options?: {
@@ -99,7 +99,7 @@ export class Server<Env> extends DurableObject<Env> {
 Did you forget to add a durable object binding to the class in your wrangler.toml?`);
       }
 
-      const stub = await Server.withName(map[namespace], name, options); // TODO: fix this
+      const stub = await getServerByName(map[namespace], name, options); // TODO: fix this
       return stub.fetch(req);
     } else {
       return null;
@@ -296,7 +296,7 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
   // but it will be called remotely,
   // so we need to mark it as async
   // eslint-disable-next-line @typescript-eslint/require-await
-  async withName(name: string) {
+  async setName(name: string) {
     if (!name) {
       throw new Error("A name is required.");
     }
