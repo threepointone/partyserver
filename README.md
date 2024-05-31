@@ -9,6 +9,20 @@ A lightweight api for durable objects, inspired by [PartyKit](https://www.partyk
 npm install partyflare
 ```
 
+## Why?
+
+Partyflare provides the following features on top of durable objects:
+
+- Simple room-based routing
+- Lifecycle hooks for connections/requests
+- A unified api for hibernated/non-hibernated durable objects
+- Easy broadcasting to all/some connections in a room
+
+## Why not?
+
+- will always use `idFromName` for routing
+- (TODO)
+
 ```ts
 import { Party } from "partyflare";
 
@@ -45,7 +59,7 @@ You can override the following methods on `Party` to add custom behavior:
 
 ### Lifecycle hooks: (all optionally `async`)
 
-- `onStart()` - when the party is started for the first time (or or waking up after hibernating)
+- `onStart()` - when the party is started for the first time (or waking up after hibernating)
 - `onConnect(connection, connContext)` - when a new connection is established
 - `onMessage(connection, message)` - when a message is received from a connection
 - `onClose(connection, code, reason, wasClean)` - when a connection is closed
@@ -58,6 +72,15 @@ You can override the following methods on `Party` to add custom behavior:
 - `broadcast(message, exclude = [])` - send a message to all connections, optionally excluding some
 - `getConnections(tags = [])` - get all connections (optionally with the given tags)
 - `getConnection(id)` - get a connection by id
+
+### Connection
+
+A connection is a standard WebSocket with the following additional properties:
+
+- `id` - a unique id for the connection
+- `tags` - an array of tags assigned to the connection (TODO)
+- `room` - the room name the connection is in
+- `state` - arbitrary state <2kb that can be set on the connection (with `connection.setState()`)
 
 ### Party::room
 
@@ -76,10 +99,10 @@ export class MyParty extends Party {
 }
 ```
 
-### `Party.withRoom(namespace, room, {locationHint})`
+### `Party.withRoom(namespace, room, {locationHint}): Promise<DurableObjectStub>`
 
 This is a utility method to create a new party class with a specific room name. It returns a DurableObjectStub that you can call further methods on, including `.fetch()`. You can optionally pass a `locationHint` to [specify the location of the party](https://developers.cloudflare.com/durable-objects/reference/data-location/#provide-a-location-hint).
 
-### `Party.fetchRoomForRequest(request, env, {locationHint})`
+### `Party.fetchRoomForRequest(request, env, {locationHint}): Promise<Response | null>`
 
 This is a utility method to match a request to a party class (ala PartyKit). It takes a url of form `/parties/:party/:room` and matches it with any namespace named `:party` (case insensitive) with a room name of `:room`.
