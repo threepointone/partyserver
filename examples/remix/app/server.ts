@@ -146,8 +146,11 @@ export class RemixServer extends Server<Env> {
 
   async fetch(request: Request) {
     return (
+      //First let's check if the request is for a party
       // @ts-expect-error TODO: typescript hell
-      (await Server.partyFetch(request, this.env)) || super.fetch(request)
+      (await Server.partyFetch(request, this.env)) ||
+      // Otherwise let's just handle the request here
+      super.fetch(request)
     );
   }
 

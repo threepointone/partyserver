@@ -109,4 +109,4 @@ export class MyServer extends Server {
 ### Utility Methods
 
 - `getServerByName(namespace, name, {locationHint}): Promise<DurableObjectStub>` - Create a new Server with a specific name. Optionally pass a `locationHint` to specify the location of the server.
-- `Server.partyFetch(request, env, {locationHint}): Promise<Response | null>` - Match a request to a server. Takes a URL of the form `/parties/:server/:name` and matches it with any namespace named `:server` (case insensitive) named `:name`.
+- `Server.partyFetch(request, env, {locationHint}): Promise<Response | null>` - Match a request to a server. Takes a URL of the form `/parties/:server/:name` and matches it with any namespace named `:server` (case insensitive) and a server named `:name`.
