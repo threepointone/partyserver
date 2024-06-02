@@ -240,7 +240,9 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
         break;
       }
       case "starting":
-        await this.#onStartPromise;
+        if (this.#onStartPromise) {
+          await this.#onStartPromise;
+        }
         break;
       case "started":
         break;
@@ -360,7 +362,10 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
     ctx: ConnectionContext
   ): void | Promise<void> {
     console.warn(
-      `Connection ${connection.id} connected to ${this.#ParentClass.name}:${this.name}, but no onConnect handler was implemented.`
+      `Connection ${connection.id} connected to ${this.#ParentClass.name}:${this.name}`
+    );
+    console.log(
+      `Implement onConnect on ${this.#ParentClass.name} to handle websocket connections.`
     );
   }
 
@@ -373,7 +378,10 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
     message: WSMessage
   ): void | Promise<void> {
     console.warn(
-      `Recieved message on connection ${this.#ParentClass.name}:${connection.id}, but no onMessage handler was implemented.`
+      `Received message on connection ${this.#ParentClass.name}:${connection.id}`
+    );
+    console.log(
+      `Implement onMessage on ${this.#ParentClass.name} to handle this message.`
     );
   }
 
@@ -399,6 +407,9 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
       `Error on connection ${connection.id} in ${this.#ParentClass.name}:${this.name}:`,
       error
     );
+    console.log(
+      `Implement onError on ${this.#ParentClass.name} to handle this error.`
+    );
   }
 
   /**
@@ -406,9 +417,11 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
    */
   onRequest(request: Request): Response | Promise<Response> {
     // default to 404
-    return new Response(
-      `onRequest hasn't been implemented on ${this.#ParentClass.name}:${this.name} responding to ${request.url}`,
-      { status: 404 }
+
+    console.warn(
+      `onRequest hasn't been implemented on ${this.#ParentClass.name}:${this.name} responding to ${request.url}`
     );
+
+    return new Response(`Not implemented`, { status: 404 });
   }
 }
