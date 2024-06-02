@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.28
+
+### Patch Changes
+
+- [`d1da6d7`](https://github.com/threepointone/partyflare/commit/d1da6d74b16f3905ba9797f471de53d237f855b9) Thanks [@threepointone](https://github.com/threepointone)! - fix: rehydrate server name on websocket based hydration
+
 ## 0.0.27
 
 ### Patch Changes
