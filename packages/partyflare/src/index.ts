@@ -187,6 +187,11 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
 
   async webSocketMessage(ws: WebSocket, message: WSMessage): Promise<void> {
     const connection = createLazyConnection(ws);
+
+    // rehydrate the server name if it's wiken up
+    await this.setName(connection.server);
+    // TODO: ^ this shouldn't be async
+
     if (this.#status !== "started") {
       // This means the server "woke up" after hibernation
       // so we need to hydrate it again
@@ -203,6 +208,11 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
     wasClean: boolean
   ): Promise<void> {
     const connection = createLazyConnection(ws);
+
+    // rehydrate the server name if it's wiken up
+    await this.setName(connection.server);
+    // TODO: ^ this shouldn't be async
+
     if (this.#status !== "started") {
       // This means the server "woke up" after hibernation
       // so we need to hydrate it again
@@ -213,6 +223,11 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
 
   async webSocketError(ws: WebSocket, error: unknown): Promise<void> {
     const connection = createLazyConnection(ws);
+
+    // rehydrate the server name if it's wiken up
+    await this.setName(connection.server);
+    // TODO: ^ this shouldn't be async
+
     if (this.#status !== "started") {
       // This means the server "woke up" after hibernation
       // so we need to hydrate it again
