@@ -32,7 +32,11 @@ Partyflare enhances Durable Objects with the following features:
 
 Here's an example of how to use partyflare:
 
+Write your code:
+
 ```ts
+// index.ts
+
 import { Server } from "partyflare";
 
 // Define your Servers
@@ -57,20 +61,21 @@ export default {
     );
   }
 };
+```
 
-// Then configure wrangler.toml
+And configure your `wrangler.toml`:
 
-/**
- *
- * [[durable_objects.bindings]]
- * name = "MyServer"
- * class_name = "MyServer"
- *
- * [[migrations]]
- * tag = "v1" # Should be unique for each entry
- * new_classes = ["MyServer"]
- *
- */
+```toml
+name = "my-partyflare-app"
+main = "index.ts"
+
+[[durable_objects.bindings]]
+name = "MyServer"
+class_name = "MyServer"
+
+[[migrations]]
+tag = "v1" # Should be unique for each entry
+new_classes = ["MyServer"]
 ```
 
 See the [`/examples`](https://github.com/threepointone/partyflare/tree/main/examples) folder for more specific examples.
