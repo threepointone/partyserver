@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.29
+
+### Patch Changes
+
+- [`df3f51a`](https://github.com/threepointone/partyflare/commit/df3f51a18ffbe0599090db870fe77e97c81fc80d) Thanks [@threepointone](https://github.com/threepointone)! - add some more docs
+
 ## 0.0.28
 
 ### Patch Changes
