@@ -1,6 +1,6 @@
 # partyflare
 
-A lightweight API for durable objects, inspired by [PartyKit](https://www.partykit.io/).
+A lightweight API for [Durable Objects](https://developers.cloudflare.com/durable-objects/), inspired by [PartyKit](https://www.partykit.io/).
 
 > [!CAUTION]
 > This project is in its experimental early stages and is not recommended for production use.
@@ -15,12 +15,18 @@ npm install partyflare
 
 ## Why Use Partyflare?
 
-Partyflare enhances durable objects with the following features:
+Partyflare enhances Durable Objects with the following features:
 
 - Simple "room"-based routing
 - Lifecycle hooks for connections and requests
-- A unified API for managing hibernated and non-hibernated durable objects
+- A unified API for managing hibernated and non-hibernated Durable Objects
 - Easy broadcasting to all or selected connections in a server
+
+## How is it different from PartyKit?
+
+- Decouples the idea of a URL from the server name. This is useful when you want to associate a server with some other identifier like a session ID, etc. You can still use `Server.partyFetch()` to get PartyKit-style route matching.
+- Doesn't include bindings for other services like AI, static assets, etc. Instead, use wrangler's built-in support for those services.
+- Doesn't have PartyKit's auto-inferred declaration for Durable Object bindings and migrations, so you have to manually specify these in `wrangler.toml`. We may add this in the future.
 
 ## Usage
 
@@ -29,7 +35,7 @@ Here's an example of how to use partyflare:
 ```ts
 import { Server } from "partyflare";
 
-// Define your durable objects
+// Define your Servers
 export class MyServer extends Server {
   onConnect(connection) {
     console.log("Connected", connection.id, "to server", this.name);
@@ -52,9 +58,22 @@ export default {
   }
 };
 
-// and configure wrangler.toml's `durable_objects.bindings`
-// and `migrations` as usual
+// Then configure wrangler.toml
+
+/**
+ *
+ * [[durable_objects.bindings]]
+ * name = "MyServer"
+ * class_name = "MyServer"
+ *
+ * [[migrations]]
+ * tag = "v1" # Should be unique for each entry
+ * new_classes = ["MyServer"]
+ *
+ */
 ```
+
+See the [`/examples`](https://github.com/threepointone/partyflare/tree/main/examples) folder for more specific examples.
 
 ## Comparison to Erlang/Elixir
 
@@ -62,7 +81,7 @@ export default {
 
 Instead of spawning "actors", you create servers that handle connections and messages. This is because Durable Objects are designed to be long-lived and stateful, so it makes sense to model them as servers that can handle multiple connections.
 
-It differs in specific way: There's no "terminate" handler, because a durable object can get evicted any time, and we can't reliably call a "terminate" handler. Instead, you can set an alarm to run some cleanup code at some point in the future.
+It differs in a specific way: There's no "terminate" handler, because a Durable Object can "shut down" / get evicted at any time, and we can't reliably call a "terminate" handler. Instead, you can set an alarm to run some cleanup code at some point in the future.
 
 ## Customizing `Server`
 
@@ -124,5 +143,5 @@ export class MyServer extends Server {
 
 ### Utility Methods
 
-- `getServerByName(namespace, name, {locationHint}): Promise<DurableObjectStub>` - Create a new Server with a specific name. Optionally pass a `locationHint` to specify the location of the server.
+- `getServerByName(namespace, name, {locationHint}): Promise<DurableObjectStub>` - Create a new Server with a specific name. Optionally pass a `locationHint` to specify the [location](https://developers.cloudflare.com/durable-objects/reference/data-location/#provide-a-location-hint) of the server.
 - `Server.partyFetch(request, env, {locationHint}): Promise<Response | null>` - Match a request to a server. Takes a URL of the form `/parties/:server/:name` and matches it with any namespace named `:server` (case insensitive) and a server named `:name`.

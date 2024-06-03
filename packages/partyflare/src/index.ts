@@ -109,18 +109,15 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
   #status: "zero" | "starting" | "started" = "zero";
   #onStartPromise: Promise<void> | null = null;
 
-  #connectionManager: ConnectionManager;
-  #ParentClass: typeof Server;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  #ParentClass: typeof Server = Object.getPrototypeOf(this).constructor;
+
+  #connectionManager: ConnectionManager = this.#ParentClass.options.hibernate
+    ? new HibernatingConnectionManager(this.ctx)
+    : new InMemoryConnectionManager();
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
-
-    // TODO: fix this any type
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    this.#ParentClass = Object.getPrototypeOf(this).constructor;
-    this.#connectionManager = this.#ParentClass.options.hibernate
-      ? new HibernatingConnectionManager(ctx)
-      : new InMemoryConnectionManager();
 
     // TODO: throw error if any of
     // broadcast/getConnection/getConnections/getConnectionTags
