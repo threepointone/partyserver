@@ -1,5 +1,8 @@
 // This file contains a shared implementation of chunking logic for binary
 // WebSocket messages. Because the PartyKit platform limits individual
+
+import type { Connection } from "partyflare";
+
 // WebSocket messages to 1MB, we need to split larger messages into chunks.
 export const CHUNK_MAX_SIZE = 1_000_000;
 
@@ -10,7 +13,7 @@ const trace = (...args: unknown[]) => TRACE_ENABLED && console.log(...args);
 let warnedAboutLargeMessage = false;
 
 type MessageData = ArrayBufferLike | string;
-type MessageHandler = (message: { data: MessageData }) => void;
+type MessageHandler = (conn: Connection, message: MessageData) => void;
 type Batch = {
   id: string;
   type: "start" | "end";
@@ -85,17 +88,17 @@ export const sendChunked = (data: Uint8Array, ws: WebSocket) => {
  * 4. The server forwards the message to handlers
  */
 export const handleChunked = (
-  receive: (data: MessageData) => void
+  receive: (conn: Connection, data: MessageData) => void
 ): MessageHandler => {
   let batch: ArrayBuffer[] | undefined;
   let start: Batch | undefined;
 
-  return (message) => {
+  return (connection, message) => {
     if (typeof message === "string") {
       return;
     }
-    if (isBatchSentinel(message.data)) {
-      const marker = parseBatchMarker(message.data);
+    if (isBatchSentinel(message)) {
+      const marker = parseBatchMarker(message);
       if (marker.type === "start") {
         batch = [];
         start = marker;
@@ -126,7 +129,7 @@ export const handleChunked = (
             assertEquality(marker.size, bytesWritten, "client size");
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore typescript hell
-            receive(bytes);
+            receive(connection, bytes);
           } catch (e) {
             console.error(e);
             throw e;
@@ -139,11 +142,11 @@ export const handleChunked = (
     } else if (batch) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore typescript hell
-      batch.push(message.data);
+      batch.push(message);
     } else {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore typescript hell
-      receive(new Uint8Array(message.data));
+      receive(connection, new Uint8Array(message));
     }
   };
 };

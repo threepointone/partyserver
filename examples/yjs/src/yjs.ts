@@ -9,7 +9,7 @@ import { applyUpdate, encodeStateAsUpdate, Doc as YDoc } from "yjs";
 import { handleChunked } from "./chunking";
 
 import type { Env } from ".";
-import type { Connection, ConnectionContext, WSMessage } from "partyflare";
+import type { Connection, ConnectionContext } from "partyflare";
 
 const wsReadyStateConnecting = 0;
 const wsReadyStateOpen = 1;
@@ -117,44 +117,6 @@ function readSyncMessage(
   return messageType;
 }
 
-function messageListener(
-  conn: Connection,
-  doc: WSSharedDoc,
-  message: Uint8Array,
-  readOnly: boolean
-): void {
-  try {
-    const encoder = encoding.createEncoder();
-    const decoder = decoding.createDecoder(message);
-    const messageType = decoding.readVarUint(decoder);
-    switch (messageType) {
-      case messageSync:
-        encoding.writeVarUint(encoder, messageSync);
-        readSyncMessage(decoder, encoder, doc, conn, readOnly);
-
-        // If the `encoder` only contains the type of reply message and no
-        // message, there is no need to send the message. When `encoder` only
-        // contains the type of reply, its length is 1.
-        if (encoding.length(encoder) > 1) {
-          send(doc, conn, encoding.toUint8Array(encoder));
-        }
-        break;
-      case messageAwareness: {
-        awarenessProtocol.applyAwarenessUpdate(
-          doc.awareness,
-          decoding.readVarUint8Array(decoder),
-          conn
-        );
-        break;
-      }
-    }
-  } catch (err) {
-    console.error(err);
-    // @ts-expect-error - TODO: fix this
-    doc.emit("error", [err]);
-  }
-}
-
 function closeConn(doc: WSSharedDoc, conn: Connection): void {
   if (doc.conns.has(conn)) {
     const controlledIds: Set<number> = doc.conns.get(conn) as Set<number>;
@@ -244,12 +206,52 @@ export class Yjs extends Server<Env> {
     );
   }
 
-  onMessage(
-    _connection: Connection<unknown>,
-    _message: WSMessage
-  ): void | Promise<void> {
-    // no op to prevent logs
-  }
+  onMessage = handleChunked((conn, message) => {
+    if (typeof message === "string") {
+      console.warn(
+        `Received non-binary message. Override onMessage on ${this.#ParentClass.name} to handle string messages if required`
+      );
+      return;
+    }
+    try {
+      const encoder = encoding.createEncoder();
+      // TODO: this type seems odd
+      const decoder = decoding.createDecoder(message as Uint8Array);
+      const messageType = decoding.readVarUint(decoder);
+      switch (messageType) {
+        case messageSync:
+          encoding.writeVarUint(encoder, messageSync);
+          readSyncMessage(
+            decoder,
+            encoder,
+            this.#doc,
+            conn,
+            // TODO: readonly conections
+            false
+          );
+
+          // If the `encoder` only contains the type of reply message and no
+          // message, there is no need to send the message. When `encoder` only
+          // contains the type of reply, its length is 1.
+          if (encoding.length(encoder) > 1) {
+            send(this.#doc, conn, encoding.toUint8Array(encoder));
+          }
+          break;
+        case messageAwareness: {
+          awarenessProtocol.applyAwarenessUpdate(
+            this.#doc.awareness,
+            decoding.readVarUint8Array(decoder),
+            conn
+          );
+          break;
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      // @ts-expect-error - TODO: fix this
+      this.#doc.emit("error", [err]);
+    }
+  });
 
   onClose(
     connection: Connection<unknown>,
@@ -266,24 +268,6 @@ export class Yjs extends Server<Env> {
     // conn.binaryType = "arraybuffer"; // from y-websocket, breaks in our runtime
 
     this.#doc.conns.set(conn, new Set());
-    // listen and reply to events
-    conn.addEventListener(
-      "message",
-      // TODO: move this to onMessage
-      handleChunked((data) => {
-        if (typeof data !== "string") {
-          return messageListener(
-            conn,
-            this.#doc,
-            new Uint8Array(data),
-            // TODO: readonly conections
-            false
-          );
-        } else {
-          // silently ignore anything else
-        }
-      })
-    );
 
     // put the following in a variables in a block so the interval handlers don't keep in in
     // scope
