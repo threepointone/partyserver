@@ -4,7 +4,7 @@ import { WorkerEntrypoint } from "cloudflare:workers";
 import { Server } from "partyflare";
 import * as Y from "yjs";
 
-import { Yjs } from "./yjs";
+import { YjsDocument } from "./yjs";
 
 import type { Connection } from "partyflare";
 import type { Doc } from "yjs";
@@ -13,7 +13,7 @@ export type Env = {
   Document: DurableObjectNamespace<Document>;
 };
 
-export class Document extends Yjs<Env> {
+export class Document extends YjsDocument<Env> {
   async onLoad(doc: Y.Doc): Promise<Doc | null> {
     const content = await this.ctx.storage.get<string>("document");
     if (content) {

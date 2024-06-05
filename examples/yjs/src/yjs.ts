@@ -154,11 +154,11 @@ interface CallbackOptions {
   timeout?: number;
 }
 
-export class Yjs<Env> extends Server<Env> {
+export class YjsDocument<Env> extends Server<Env> {
   static callbackOptions: CallbackOptions = {};
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-  #ParentClass: typeof Yjs = Object.getPrototypeOf(this).constructor;
+  #ParentClass: typeof YjsDocument = Object.getPrototypeOf(this).constructor;
   #doc = new WSSharedDoc();
   // eslint-disable-next-line @typescript-eslint/require-await, @typescript-eslint/no-unused-vars
   async onLoad(doc: YDoc): Promise<YDoc | null> {
