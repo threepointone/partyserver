@@ -24,7 +24,7 @@ export class Document extends YjsDocument<Env> {
 
   async onSave(doc: Doc, _origin: Connection): Promise<void> {
     const content = Y.encodeStateAsUpdate(doc);
-    await this.ctx.storage.put(
+    await this.ctx.storage.put<string>(
       "document",
       Buffer.from(content).toString("base64")
     );
