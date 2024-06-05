@@ -19,8 +19,8 @@ const MY_COLOR = colours[Math.floor(Math.random() * colours.length)];
 
 function Tiptap() {
   const provider = useYProvider({
-    party: "yjs",
-    room: "y-partykit-text-editor-example" // replace with your own document name
+    party: "document",
+    room: "y-partyserver-text-editor-example" // replace with your own document name
   });
 
   const editor = useEditor({

@@ -10,9 +10,10 @@ watch_dir = "client"
 
 
 [[durable_objects.bindings]]
-name = "Yjs"
-class_name = "Yjs"
+name = "Document"
+class_name = "Document"
 
 [[migrations]]
 tag = "v1" # Should be unique for each entry
-new_classes = ["Yjs"]
+new_classes = ["Document"]
+

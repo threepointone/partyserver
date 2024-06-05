@@ -8,7 +8,6 @@ import { applyUpdate, encodeStateAsUpdate, Doc as YDoc } from "yjs";
 
 import { handleChunked } from "./chunking";
 
-import type { Env } from ".";
 import type { Connection, ConnectionContext } from "partyflare";
 
 const wsReadyStateConnecting = 0;
@@ -155,14 +154,14 @@ interface CallbackOptions {
   timeout?: number;
 }
 
-export class Yjs extends Server<Env> {
+export class Yjs<Env> extends Server<Env> {
   static callbackOptions: CallbackOptions = {};
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   #ParentClass: typeof Yjs = Object.getPrototypeOf(this).constructor;
   #doc = new WSSharedDoc();
-  // eslint-disable-next-line @typescript-eslint/require-await
-  async onLoad(): Promise<YDoc | null> {
+  // eslint-disable-next-line @typescript-eslint/require-await, @typescript-eslint/no-unused-vars
+  async onLoad(doc: YDoc): Promise<YDoc | null> {
     // to be implemented by the user
     return null;
   }
@@ -171,13 +170,11 @@ export class Yjs extends Server<Env> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     doc: YDoc,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    update: Uint8Array,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     origin: Connection
   ): Promise<void> {}
 
   async onStart(): Promise<void> {
-    const src = await this.onLoad();
+    const src = await this.onLoad(this.#doc);
     if (src != null) {
       const state = encodeStateAsUpdate(src);
       applyUpdate(this.#doc, state);
@@ -188,7 +185,7 @@ export class Yjs extends Server<Env> {
       debounce(
         (update: Uint8Array, origin: Connection, doc: YDoc) => {
           try {
-            this.onSave(doc, update, origin).catch((err) => {
+            this.onSave(doc, origin).catch((err) => {
               console.error("failed to persist:", err);
             });
           } catch (err) {
