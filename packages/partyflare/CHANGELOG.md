@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.31
+
+### Patch Changes
+
+- [`f877021`](https://github.com/threepointone/partyflare/commit/f8770218e04f93a45a81d182f6f4d89aaa4ac6b2) Thanks [@threepointone](https://github.com/threepointone)! - configurable prefix for .partyFetch
+
 ## 0.0.30
 
 ### Patch Changes
