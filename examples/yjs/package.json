@@ -11,15 +11,18 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@tailwindcss/forms": "^0.5.7",
     "@tiptap/extension-collaboration": "^2.4.0",
     "@tiptap/extension-collaboration-cursor": "^2.4.0",
     "@tiptap/react": "^2.4.0",
     "@tiptap/starter-kit": "^2.4.0",
+    "esbuild-plugin-tailwindcss": "^1.2.0",
     "lib0": "^0.2.92",
     "lodash.debounce": "^4.0.8",
     "partysocket": "^1.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "tailwindcss": "^3.4.4",
     "valibot": "^0.30.0",
     "y-protocols": "^1.0.6",
     "yjs": "^13.6.14"

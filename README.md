@@ -149,4 +149,4 @@ export class MyServer extends Server {
 ### Utility Methods
 
 - `getServerByName(namespace, name, {locationHint}): Promise<DurableObjectStub>` - Create a new Server with a specific name. Optionally pass a `locationHint` to specify the [location](https://developers.cloudflare.com/durable-objects/reference/data-location/#provide-a-location-hint) of the server.
-- `Server.partyFetch(request, env, {locationHint}): Promise<Response | null>` - Match a request to a server. Takes a URL of the form `/parties/:server/:name` and matches it with any namespace named `:server` (case insensitive) and a server named `:name`.
+- `Server.partyFetch(request, env, {locationHint, prefix = 'parties'}): Promise<Response | null>` - Match a request to a server. Takes a URL of the form `/${prefix}/:server/:name` and matches it with any namespace named `:server` (case insensitive) and a server named `:name`.

@@ -65,6 +65,7 @@ export class Server<Env> extends DurableObject<Env> {
     req: Request,
     env: Record<string, unknown>,
     options?: {
+      prefix?: string;
       locationHint?: DurableObjectLocationHint;
     }
   ): Promise<Response | null> {
@@ -85,15 +86,17 @@ export class Server<Env> extends DurableObject<Env> {
       DurableObjectNamespace<T>
     >;
 
+    const prefix = options?.prefix || "parties";
+
     const url = new URL(req.url);
 
     const parts = url.pathname.split("/");
-    if (parts[1] === "parties" && parts.length < 4) {
+    if (parts[1] === prefix && parts.length < 4) {
       return null;
     }
     const name = parts[3],
       namespace = parts[2];
-    if (parts[1] === "parties" && name && namespace) {
+    if (parts[1] === prefix && name && namespace) {
       if (!map[namespace]) {
         console.error(`The url ${req.url} does not match any server namespace. 
 Did you forget to add a durable object binding to the class in your wrangler.toml?`);
@@ -373,12 +376,12 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ctx: ConnectionContext
   ): void | Promise<void> {
-    console.warn(
+    console.log(
       `Connection ${connection.id} connected to ${this.#ParentClass.name}:${this.name}`
     );
-    console.log(
-      `Implement onConnect on ${this.#ParentClass.name} to handle websocket connections.`
-    );
+    // console.log(
+    //   `Implement onConnect on ${this.#ParentClass.name} to handle websocket connections.`
+    // );
   }
 
   /**
@@ -389,10 +392,10 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     message: WSMessage
   ): void | Promise<void> {
-    console.warn(
+    console.log(
       `Received message on connection ${this.#ParentClass.name}:${connection.id}`
     );
-    console.log(
+    console.info(
       `Implement onMessage on ${this.#ParentClass.name} to handle this message.`
     );
   }
@@ -419,7 +422,7 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
       `Error on connection ${connection.id} in ${this.#ParentClass.name}:${this.name}:`,
       error
     );
-    console.log(
+    console.info(
       `Implement onError on ${this.#ParentClass.name} to handle this error.`
     );
   }

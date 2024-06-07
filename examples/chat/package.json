@@ -11,9 +11,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.13",
+    "esbuild-plugin-tailwindcss": "^1.2.0",
     "partysocket": "^1.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "tailwindcss": "^3.4.4",
     "valibot": "^0.30.0"
   },
   "devDependencies": {

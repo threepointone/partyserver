@@ -5,6 +5,8 @@ import { usePartySocket } from "partysocket/react";
 
 import type { ChatMessage } from "../src/chat-types";
 
+import "./styles.css";
+
 const randomNames = [
   "Alice",
   "Bob",
@@ -44,10 +46,13 @@ function App() {
   });
   return (
     <>
+      <h2 style={{ marginBottom: 10 }}>
+        <b>Hi {me}!</b>
+      </h2>
       <div>
         {messages.map((message) => (
           <div className="message" key={message.id}>
-            <span className="user">{message.sender}:</span>
+            <b className="user">{message.sender}: &nbsp;</b>
             {message.content}
           </div>
         ))}

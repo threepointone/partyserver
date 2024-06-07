@@ -10,8 +10,10 @@ import StarterKit from "@tiptap/starter-kit";
 
 import useYProvider from "./react";
 
-// 5 bright colors
-const colours = ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#00FFFF"];
+import "./styles.css";
+
+// 5 pastel colors
+const colours = ["#FFC0CB", "#FFD700", "#98FB98", "#87CEFA", "#FFA07A"];
 
 // Pick a random color from the list
 // This is just for demonstration purposes
@@ -43,7 +45,12 @@ function Tiptap() {
     ]
   });
 
-  return <EditorContent style={{ border: "solid" }} editor={editor} />;
+  return (
+    <div>
+      <h1 style={{ marginBottom: 20 }}> A text editor </h1>
+      <EditorContent style={{ border: "solid" }} editor={editor} />
+    </div>
+  );
 }
 
 const root = createRoot(document.getElementById("root")!);
