@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.32
+
+### Patch Changes
+
+- [`41927c4`](https://github.com/threepointone/partyflare/commit/41927c43e032db30adb186787e5838df2005f08f) Thanks [@threepointone](https://github.com/threepointone)! - avoid string drama
+
 ## 0.0.31
 
 ### Patch Changes
