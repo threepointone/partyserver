@@ -40,8 +40,7 @@ export async function getServerByName<Env, T extends Server<Env>>(
     locationHint?: DurableObjectLocationHint;
   }
 ): Promise<DurableObjectStub<T>> {
-  const docId = serverNamespace.idFromName(name).toString();
-  const id = serverNamespace.idFromString(docId);
+  const id = serverNamespace.idFromName(name);
   const stub = serverNamespace.get(id, options);
 
   // TODO: fix this
