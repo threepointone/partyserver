@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.34
+
+### Patch Changes
+
+- [`c480e92`](https://github.com/threepointone/partyserver/commit/c480e925647c3634d7ae50232fcdddf3dd7e4ad4) Thanks [@threepointone](https://github.com/threepointone)! - use blockConcurrencyWhile for onStart
+
 ## 0.0.33
 
 ### Patch Changes
