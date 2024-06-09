@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.33
+
+### Patch Changes
+
+- [`edb1a5a`](https://github.com/threepointone/partyserver/commit/edb1a5a461f58c3aacf240b75fbc7bc7a13db3b3) Thanks [@threepointone](https://github.com/threepointone)! - trigger a release
+
 ## 0.0.32
 
 ### Patch Changes
