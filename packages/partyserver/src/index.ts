@@ -109,7 +109,6 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
   }
 
   #status: "zero" | "starting" | "started" = "zero";
-  #onStartPromise: Promise<void> | null = null;
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   #ParentClass: typeof Server = Object.getPrototypeOf(this).constructor;
@@ -241,26 +240,11 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
         "This server's name has not been set, did you forget to call withName?"
       );
     }
-    switch (this.#status) {
-      case "zero": {
-        this.#status = "starting";
-        const maybeOnStartPromise = this.onStart();
-        if (maybeOnStartPromise instanceof Promise) {
-          this.#onStartPromise = maybeOnStartPromise;
-          await this.#onStartPromise;
-          this.#onStartPromise = null;
-        }
-        this.#status = "started";
-        break;
-      }
-      case "starting":
-        if (this.#onStartPromise) {
-          await this.#onStartPromise;
-        }
-        break;
-      case "started":
-        break;
-    }
+    await this.ctx.blockConcurrencyWhile(async () => {
+      this.#status = "starting";
+      await this.onStart();
+      this.#status = "started";
+    });
   }
 
   #attachSocketEventHandlers(connection: Connection) {

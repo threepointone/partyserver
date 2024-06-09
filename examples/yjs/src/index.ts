@@ -4,26 +4,23 @@ import * as Y from "yjs";
 
 import { YjsDocument } from "./yjs";
 
-import type { Connection } from "partyserver";
-import type { Doc } from "yjs";
-
 export type Env = {
   Document: DurableObjectNamespace<Document>;
 };
 
 export class Document extends YjsDocument<Env> {
-  async onLoad(doc: Y.Doc): Promise<Doc | null> {
+  async onLoad() {
     const content = await this.ctx.storage.get<Uint8Array>("document");
     if (content) {
-      Y.applyUpdate(doc, content);
+      Y.applyUpdate(this.document, content);
     }
-    return doc;
+    return;
   }
 
-  async onSave(doc: Doc, _origin: Connection): Promise<void> {
+  async onSave() {
     await this.ctx.storage.put<Uint8Array>(
       "document",
-      Y.encodeStateAsUpdate(doc)
+      Y.encodeStateAsUpdate(this.document)
     );
   }
 }

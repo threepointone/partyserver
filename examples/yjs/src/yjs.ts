@@ -159,33 +159,29 @@ export class YjsDocument<Env> extends Server<Env> {
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   #ParentClass: typeof YjsDocument = Object.getPrototypeOf(this).constructor;
-  #doc = new WSSharedDoc();
-  // eslint-disable-next-line @typescript-eslint/require-await, @typescript-eslint/no-unused-vars
-  async onLoad(doc: YDoc): Promise<YDoc | null> {
+  readonly document = new WSSharedDoc();
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async onLoad(): Promise<void> {
     // to be implemented by the user
-    return null;
+    return;
   }
 
-  async onSave(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    doc: YDoc,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    origin: Connection
-  ): Promise<void> {}
+  async onSave(): Promise<void> {}
 
   async onStart(): Promise<void> {
-    const src = await this.onLoad(this.#doc);
+    const src = await this.onLoad();
     if (src != null) {
       const state = encodeStateAsUpdate(src);
-      applyUpdate(this.#doc, state);
+      applyUpdate(this.document, state);
     }
 
-    this.#doc.on(
+    this.document.on(
       "update",
       debounce(
-        (update: Uint8Array, origin: Connection, doc: YDoc) => {
+        (_update: Uint8Array, _origin: Connection, _doc: YDoc) => {
           try {
-            this.onSave(doc, origin).catch((err) => {
+            this.onSave().catch((err) => {
               console.error("failed to persist:", err);
             });
           } catch (err) {
@@ -221,7 +217,7 @@ export class YjsDocument<Env> extends Server<Env> {
           readSyncMessage(
             decoder,
             encoder,
-            this.#doc,
+            this.document,
             conn,
             // TODO: readonly conections
             false
@@ -231,12 +227,12 @@ export class YjsDocument<Env> extends Server<Env> {
           // message, there is no need to send the message. When `encoder` only
           // contains the type of reply, its length is 1.
           if (encoding.length(encoder) > 1) {
-            send(this.#doc, conn, encoding.toUint8Array(encoder));
+            send(this.document, conn, encoding.toUint8Array(encoder));
           }
           break;
         case messageAwareness: {
           awarenessProtocol.applyAwarenessUpdate(
-            this.#doc.awareness,
+            this.document.awareness,
             decoding.readVarUint8Array(decoder),
             conn
           );
@@ -246,7 +242,7 @@ export class YjsDocument<Env> extends Server<Env> {
     } catch (err) {
       console.error(err);
       // @ts-expect-error - TODO: fix this
-      this.#doc.emit("error", [err]);
+      this.document.emit("error", [err]);
     }
   });
 
@@ -256,7 +252,7 @@ export class YjsDocument<Env> extends Server<Env> {
     _reason: string,
     _wasClean: boolean
   ): void | Promise<void> {
-    closeConn(this.#doc, connection);
+    closeConn(this.document, connection);
   }
 
   // TODO: explore why onError gets triggered when a connection closes
@@ -264,7 +260,7 @@ export class YjsDocument<Env> extends Server<Env> {
   onConnect(conn: Connection<unknown>, _ctx: ConnectionContext) {
     // conn.binaryType = "arraybuffer"; // from y-websocket, breaks in our runtime
 
-    this.#doc.conns.set(conn, new Set());
+    this.document.conns.set(conn, new Set());
 
     // put the following in a variables in a block so the interval handlers don't keep in in
     // scope
@@ -272,20 +268,20 @@ export class YjsDocument<Env> extends Server<Env> {
       // send sync step 1
       const encoder = encoding.createEncoder();
       encoding.writeVarUint(encoder, messageSync);
-      syncProtocol.writeSyncStep1(encoder, this.#doc);
-      send(this.#doc, conn, encoding.toUint8Array(encoder));
-      const awarenessStates = this.#doc.awareness.getStates();
+      syncProtocol.writeSyncStep1(encoder, this.document);
+      send(this.document, conn, encoding.toUint8Array(encoder));
+      const awarenessStates = this.document.awareness.getStates();
       if (awarenessStates.size > 0) {
         const encoder = encoding.createEncoder();
         encoding.writeVarUint(encoder, messageAwareness);
         encoding.writeVarUint8Array(
           encoder,
           awarenessProtocol.encodeAwarenessUpdate(
-            this.#doc.awareness,
+            this.document.awareness,
             Array.from(awarenessStates.keys())
           )
         );
-        send(this.#doc, conn, encoding.toUint8Array(encoder));
+        send(this.document, conn, encoding.toUint8Array(encoder));
       }
     }
   }
