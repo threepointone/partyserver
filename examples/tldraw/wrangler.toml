@@ -1,4 +1,4 @@
-name = "partyflare-example-tldraw"
+name = "partyserver-example-tldraw"
 main = "src/index.ts"
 compatibility_date = "2024-04-19"
 

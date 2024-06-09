@@ -1,7 +1,7 @@
-import { Server } from "partyflare";
+import { Server } from "partyserver";
 import { createTLSchema, throttle } from "tldraw";
 
-import type { Connection } from "partyflare";
+import type { Connection } from "partyserver";
 import type { HistoryEntry, TLRecord, TLStoreSnapshot } from "tldraw";
 
 type Env = {

@@ -1,9 +1,9 @@
 {
-  "name": "partyflare",
+  "name": "partyserver",
   "version": "0.0.32",
   "repository": {
     "type": "git",
-    "url": "git://github.com/threepointone/partyflare"
+    "url": "git://github.com/threepointone/partyserver"
   },
   "main": "dist/index.js",
   "module": "dist/index.js",

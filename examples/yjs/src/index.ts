@@ -1,10 +1,10 @@
 import { WorkerEntrypoint } from "cloudflare:workers";
-import { Server } from "partyflare";
+import { Server } from "partyserver";
 import * as Y from "yjs";
 
 import { YjsDocument } from "./yjs";
 
-import type { Connection } from "partyflare";
+import type { Connection } from "partyserver";
 import type { Doc } from "yjs";
 
 export type Env = {

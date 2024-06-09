@@ -1,21 +1,21 @@
-# partyflare
+# PartyServer
 
-A lightweight API for [Durable Objects](https://developers.cloudflare.com/durable-objects/), inspired by [PartyKit](https://www.partykit.io/).
+Buuild real-time applications powered by [Durable Objects](https://developers.cloudflare.com/durable-objects/), inspired by [PartyKit](https://www.partykit.io/).
 
 > [!CAUTION]
 > This project is in its experimental early stages and is not recommended for production use.
 
 ## Installation
 
-To install partyflare, run the following command:
+To install PartyServer, run the following command:
 
 ```shell
-npm install partyflare
+npm install partyserver
 ```
 
-## Why Use Partyflare?
+## Why Use PartyServer?
 
-Partyflare enhances Durable Objects with the following features:
+PartyServer enhances Durable Objects with the following features:
 
 - Simple "room"-based routing
 - Lifecycle hooks for connections and requests
@@ -30,14 +30,14 @@ Partyflare enhances Durable Objects with the following features:
 
 ## Usage
 
-Here's an example of how to use partyflare:
+Here's an example of how to use PartyServer:
 
 Write your code:
 
 ```ts
 // index.ts
 
-import { Server } from "partyflare";
+import { Server } from "partyserver";
 
 // Define your Servers
 export class MyServer extends Server {
@@ -66,7 +66,7 @@ export default {
 And configure your `wrangler.toml`:
 
 ```toml
-name = "my-partyflare-app"
+name = "my-partyserver-app"
 main = "index.ts"
 
 [[durable_objects.bindings]]
@@ -78,7 +78,7 @@ tag = "v1" # Should be unique for each entry
 new_classes = ["MyServer"]
 ```
 
-See the [`/examples`](https://github.com/threepointone/partyflare/tree/main/examples) folder for more specific examples.
+See the [`/examples`](https://github.com/threepointone/partyserver/tree/main/examples) folder for more specific examples.
 
 ## Comparison to Erlang/Elixir
 
@@ -118,7 +118,7 @@ These methods can be optionally `async`:
 
 ### Durable Object methods
 
-- `fetch(request)` - Partyflare overrides the `fetch` method to add the lifecycle methods to the server instance. In most cases you don't have to implement this mehod yourself. If you do (for example, to add request handling before any lifecycle methods are called), make sure to call `super.fetch(request)` as appropriate to ensure the lifecycle methods are called.
+- `fetch(request)` - PartyServer overrides the `fetch` method to add the lifecycle methods to the server instance. In most cases you don't have to implement this mehod yourself. If you do (for example, to add request handling before any lifecycle methods are called), make sure to call `super.fetch(request)` as appropriate to ensure the lifecycle methods are called.
 
 - `alarm()` - Implement this method to handle alarms. This is the only way to run code after the server has been evicted. Read more about alarms [here](https://developers.cloudflare.com/durable-objects/api/alarms/).
 

@@ -1,4 +1,4 @@
-name = "partyflare-example-yjs"
+name = "partyserver-example-yjs"
 main = "src/index.ts"
 compatibility_date = "2024-04-19"
 

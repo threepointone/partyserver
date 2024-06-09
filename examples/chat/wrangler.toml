@@ -1,4 +1,4 @@
-name = "partyflare-example-chat"
+name = "partyserver-example-chat"
 main = "src/index.ts"
 compatibility_date = "2024-04-19"
 

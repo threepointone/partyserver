@@ -1,4 +1,4 @@
-# Welcome to Remix + Partyflare!
+# Welcome to Remix + PartyServer!
 
 ## Development
 

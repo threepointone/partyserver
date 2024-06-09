@@ -1,7 +1,7 @@
 import { WorkerEntrypoint } from "cloudflare:workers";
-import { Server } from "partyflare";
+import { Server } from "partyserver";
 
-import type { Connection, WSMessage } from "partyflare";
+import type { Connection, WSMessage } from "partyserver";
 
 type Env = {
   Chat: DurableObjectNamespace<Chat>;

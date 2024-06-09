@@ -6,7 +6,7 @@ import {
 import * as build from "@remix-run/dev/server-build";
 import { WorkerEntrypoint } from "cloudflare:workers";
 import { nanoid } from "nanoid";
-import { getServerByName, Server } from "partyflare";
+import { getServerByName, Server } from "partyserver";
 
 import type { Tldraw } from "./tldraw/server";
 import type {
