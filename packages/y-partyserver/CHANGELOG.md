@@ -1,5 +1,11 @@
 # y-partyserver
 
+## 0.0.3
+
+### Patch Changes
+
+- [`de8500e`](https://github.com/threepointone/partyserver/commit/de8500e4287d434ef07509ab6dbd56512626d73d) Thanks [@threepointone](https://github.com/threepointone)! - build y-partyserver and publish it
+
 ## 0.0.2
 
 ### Patch Changes
