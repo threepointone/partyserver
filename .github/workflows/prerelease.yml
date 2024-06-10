@@ -21,7 +21,7 @@ jobs:
       - run: bun install
 
       - name: Modify package.json version
-        run: bun .github/version-script.js
+        run: bun .github/version-script.ts
 
       - run: bun run copy-readme
 
