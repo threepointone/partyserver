@@ -13,6 +13,6 @@ await build({
 });
 
 // then run prettier on the generateed .d.ts files
-execSync("npx prettier --write dist/*.d.ts");
+execSync("bunx prettier --write dist/*.d.ts");
 
 process.exit(0);
