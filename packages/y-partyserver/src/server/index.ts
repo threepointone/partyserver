@@ -262,27 +262,23 @@ export class YjsDocument<Env> extends Server<Env> {
 
     this.document.conns.set(conn, new Set());
 
-    // put the following in a variables in a block so the interval handlers don't keep in in
-    // scope
-    {
-      // send sync step 1
+    // send sync step 1
+    const encoder = encoding.createEncoder();
+    encoding.writeVarUint(encoder, messageSync);
+    syncProtocol.writeSyncStep1(encoder, this.document);
+    send(this.document, conn, encoding.toUint8Array(encoder));
+    const awarenessStates = this.document.awareness.getStates();
+    if (awarenessStates.size > 0) {
       const encoder = encoding.createEncoder();
-      encoding.writeVarUint(encoder, messageSync);
-      syncProtocol.writeSyncStep1(encoder, this.document);
+      encoding.writeVarUint(encoder, messageAwareness);
+      encoding.writeVarUint8Array(
+        encoder,
+        awarenessProtocol.encodeAwarenessUpdate(
+          this.document.awareness,
+          Array.from(awarenessStates.keys())
+        )
+      );
       send(this.document, conn, encoding.toUint8Array(encoder));
-      const awarenessStates = this.document.awareness.getStates();
-      if (awarenessStates.size > 0) {
-        const encoder = encoding.createEncoder();
-        encoding.writeVarUint(encoder, messageAwareness);
-        encoding.writeVarUint8Array(
-          encoder,
-          awarenessProtocol.encodeAwarenessUpdate(
-            this.document.awareness,
-            Array.from(awarenessStates.keys())
-          )
-        );
-        send(this.document, conn, encoding.toUint8Array(encoder));
-      }
     }
   }
 }
