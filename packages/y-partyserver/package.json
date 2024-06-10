@@ -5,23 +5,25 @@
     "type": "git",
     "url": "git://github.com/threepointone/partyserver"
   },
+  "type": "module",
   "exports": {
     ".": {
-      "require": "./src/server/index.ts",
-      "import": "./src/server/index.ts"
+      "require": "./dist/server/index.js",
+      "import": "./dist/server/index.js",
+      "types": "./dist/server/index.d.ts"
     },
     "./provider": {
-      "require": "./src/provider/index.ts",
-      "import": "./src/provider/index.ts"
+      "require": "./dist/provider/index.js",
+      "import": "./dist/provider/index.js",
+      "types": "./dist/provider/index.d.ts"
     },
     "./react": {
-      "require": "./src/provider/react.tsx",
-      "import": "./src/provider/react.tsx"
+      "require": "./dist/provider/react.js",
+      "import": "./dist/provider/react.js",
+      "types": "./dist/provider/react.d.ts"
     }
   },
   "scripts": {
-    "check:test": "vitest -r src/tests --watch false",
-    "test": "vitest -r src/tests",
     "build": "bun scripts/build.ts"
   },
   "files": [
@@ -37,17 +39,18 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "lib0": "^0.2.92",
     "lodash.debounce": "^4.0.8",
-    "y-protocols": "^1.0.6",
-    "yjs": "^13.6.14"
+    "y-protocols": "^1.0.6"
   },
   "peerDependencies": {
-    "@cloudflare/workers-types": "^4.20240529.0"
+    "@cloudflare/workers-types": "^4.20240529.0",
+    "yjs": "^13.6.14"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240529.0",
     "@types/lodash.debounce": "^4.0.9",
-    "ws": "^8.11.0"
-  },
-  "private": true
+    "ws": "^8.11.0",
+    "yjs": "^13.6.14"
+  }
 }

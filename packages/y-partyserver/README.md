@@ -1,5 +1,8 @@
 ## y-partyserver
 
+> [!CAUTION]
+> This project is in its experimental early stages and is not recommended for production use.
+
 A [Yjs](https://docs.yjs.dev/) backend for [PartyServer](https://npmjs.com/package/partyserver). Build collaborative text editors and more, powered by [Durable Objects](https://developers.cloudflare.com/durable-objects/)!
 
 Step 1: Define your server as a subclass of `YjsServer`
