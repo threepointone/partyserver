@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import YPartyKitProvider from "./provider";
+import YPartyKitProvider from ".";
 
 import type * as Y from "yjs";
 

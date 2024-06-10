@@ -6,7 +6,7 @@ import * as awarenessProtocol from "y-protocols/awareness";
 import * as syncProtocol from "y-protocols/sync";
 import { applyUpdate, encodeStateAsUpdate, Doc as YDoc } from "yjs";
 
-import { handleChunked } from "./chunking";
+import { handleChunked } from "../shared/chunking";
 
 import type { Connection, ConnectionContext } from "partyserver";
 
@@ -118,7 +118,7 @@ function readSyncMessage(
 
 function closeConn(doc: WSSharedDoc, conn: Connection): void {
   if (doc.conns.has(conn)) {
-    const controlledIds: Set<number> = doc.conns.get(conn) as Set<number>;
+    const controlledIds: Set<number> = doc.conns.get(conn)!;
     doc.conns.delete(conn);
     awarenessProtocol.removeAwarenessStates(
       doc.awareness,

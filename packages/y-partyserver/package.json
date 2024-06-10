@@ -1,0 +1,53 @@
+{
+  "name": "y-partyserver",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/threepointone/partyserver"
+  },
+  "exports": {
+    ".": {
+      "require": "./src/server/index.ts",
+      "import": "./src/server/index.ts"
+    },
+    "./provider": {
+      "require": "./src/provider/index.ts",
+      "import": "./src/provider/index.ts"
+    },
+    "./react": {
+      "require": "./src/provider/react.tsx",
+      "import": "./src/provider/react.tsx"
+    }
+  },
+  "scripts": {
+    "check:test": "vitest -r src/tests --watch false",
+    "test": "vitest -r src/tests",
+    "build": "bun scripts/build.ts"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "yjs",
+    "collaboration",
+    "text-editors"
+  ],
+  "author": "Sunil Pai <threepointone@gmail.com>",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "lodash.debounce": "^4.0.8",
+    "y-protocols": "^1.0.6",
+    "yjs": "^13.6.14"
+  },
+  "peerDependencies": {
+    "@cloudflare/workers-types": "^4.20240529.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240529.0",
+    "@types/lodash.debounce": "^4.0.9",
+    "ws": "^8.11.0"
+  },
+  "private": true
+}

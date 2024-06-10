@@ -1,8 +1,7 @@
 import { WorkerEntrypoint } from "cloudflare:workers";
 import { Server } from "partyserver";
+import { YjsDocument } from "y-partyserver";
 import * as Y from "yjs";
-
-import { YjsDocument } from "./yjs";
 
 export type Env = {
   Document: DurableObjectNamespace<Document>;

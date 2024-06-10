@@ -10,7 +10,7 @@ import * as awarenessProtocol from "y-protocols/awareness";
 import * as syncProtocol from "y-protocols/sync";
 import { Doc as YDoc } from "yjs";
 
-import { sendChunked } from "../src/chunking";
+import { sendChunked } from "../shared/chunking";
 
 export const messageSync = 0;
 export const messageQueryAwareness = 3;
@@ -290,7 +290,7 @@ export class WebsocketProvider extends Observable<string> {
       connect = true,
       awareness = new awarenessProtocol.Awareness(doc),
       params = {},
-      WebSocketPolyfill = DefaultWebSocket as typeof WebSocket, // Optionally provide a WebSocket polyfill
+      WebSocketPolyfill = DefaultWebSocket, // Optionally provide a WebSocket polyfill
       resyncInterval = -1, // Request server state every `resyncInterval` milliseconds
       maxBackoffTime = 2500, // Maximum amount of time to wait before trying to reconnect (we try to reconnect using exponential backoff)
       disableBc = DEFAULT_DISABLE_BC // Disable cross-tab BroadcastChannel communication
@@ -298,7 +298,7 @@ export class WebsocketProvider extends Observable<string> {
       connect?: boolean;
       awareness?: awarenessProtocol.Awareness;
       params?: { [s: string]: string };
-      WebSocketPolyfill?: typeof WebSocket;
+      WebSocketPolyfill?: typeof WebSocket | null;
       resyncInterval?: number;
       maxBackoffTime?: number;
       disableBc?: boolean;
@@ -319,7 +319,7 @@ export class WebsocketProvider extends Observable<string> {
       (encodedParams.length === 0 ? "" : "?" + encodedParams);
     this.roomname = roomname;
     this.doc = doc;
-    this._WS = WebSocketPolyfill;
+    this._WS = WebSocketPolyfill!;
     this.awareness = awareness;
     this.wsconnected = false;
     this.wsconnecting = false;

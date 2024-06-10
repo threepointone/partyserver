@@ -1,14 +1,9 @@
-// import { useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
-// import { nanoid } from "nanoid";
-
-// src/Tiptap.jsx
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-
-import useYProvider from "./react";
+import useYProvider from "y-partyserver/react";
 
 import "./styles.css";
 

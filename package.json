@@ -58,5 +58,6 @@
     "core-js",
     "esbuild",
     "workerd"
-  ]
+  ],
+  "packageManager": "bun@1.1.12"
 }
