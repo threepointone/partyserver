@@ -1,5 +1,5 @@
 import { WorkerEntrypoint } from "cloudflare:workers";
-import { Server } from "partyserver";
+import { routePartykitRequest, Server } from "partyserver";
 
 import type { Connection, WSMessage } from "partyserver";
 
@@ -20,7 +20,7 @@ export class Chat extends Server<Env> {
 export default class MyServer extends WorkerEntrypoint<Env> {
   async fetch(request: Request): Promise<Response> {
     return (
-      (await Server.partyFetch(request, this.env)) ||
+      (await routePartykitRequest(request, this.env)) ||
       new Response("Not Found", { status: 404 })
     );
   }

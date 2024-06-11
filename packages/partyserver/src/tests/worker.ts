@@ -1,4 +1,4 @@
-import { Server } from "../index";
+import { routePartykitRequest, Server } from "../index";
 
 import type { Connection, ConnectionContext } from "../index";
 
@@ -55,7 +55,7 @@ export class OnStartServer extends Server<Env> {
 export default {
   async fetch(request: Request, env: Env, _ctx: ExecutionContext) {
     return (
-      (await Server.partyFetch(request, env)) ||
+      (await routePartykitRequest(request, env)) ||
       new Response("Not Found", { status: 404 })
     );
   }

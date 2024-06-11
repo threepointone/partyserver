@@ -24,7 +24,7 @@ PartyServer enhances Durable Objects with the following features:
 
 ## How is it different from PartyKit?
 
-- Decouples the idea of a URL from the server name. This is useful when you want to associate a server with some other identifier like a session ID, etc. You can still use `Server.partyFetch()` to get PartyKit-style route matching.
+- Decouples the idea of a URL from the server name. This is useful when you want to associate a server with some other identifier like a session ID, etc. You can still use `routePartykitRequest()` to get PartyKit-style route matching.
 - Doesn't include bindings for other services like AI, static assets, etc. Instead, use wrangler's built-in support for those services.
 - Doesn't have PartyKit's auto-inferred declaration for Durable Object bindings and migrations, so you have to manually specify these in `wrangler.toml`. We may add this in the future.
 
@@ -56,7 +56,7 @@ export default {
   // Set up your fetch handler to use configured Servers
   fetch(request, env) {
     return (
-      Server.partyFetch(request, env) ||
+      routePartykitRequest(request, env) ||
       new Response("Not Found", { status: 404 })
     );
   }
@@ -104,7 +104,7 @@ These methods can be optionally `async`:
 
 ## Properties
 
-- `.name` - (readonly) this is automatically set to the server's name, determined by `getServerByName()` or `Server.partyFetch()`.
+- `.name` - (readonly) this is automatically set to the server's name, determined by `getServerByName()` or `routePartykitRequest()`.
 - `.ctx` - the context object for the Durable Object, containing references to [`storage`](https://developers.cloudflare.com/durable-objects/api/transactional-storage-api/)
 - `.env` - the environment object for the Durable Object, usually defined by bindings and other configuration in your `wrangler.toml` configuration file.
 
@@ -141,7 +141,7 @@ export class MyServer extends Server {
 ### Utility Methods
 
 - `getServerByName(namespace, name, {locationHint}): Promise<DurableObjectStub>` - Create a new Server with a specific name. Optionally pass a `locationHint` to specify the [location](https://developers.cloudflare.com/durable-objects/reference/data-location/#provide-a-location-hint) of the server.
-- `Server.partyFetch(request, env, {locationHint, prefix = 'parties'}): Promise<Response | null>` - Match a request to a server. Takes a URL of the form `/${prefix}/:server/:name` and matches it with any namespace named `:server` (case insensitive) and a server named `:name`.
+- `routePartykitRequest(request, env, {locationHint, prefix = 'parties'}): Promise<Response | null>` - Match a request to a server. Takes a URL of the form `/${prefix}/:server/:name` and matches it with any namespace named `:server` (case insensitive) and a server named `:name`.
 
 ## Comparison to Erlang/Elixir
 

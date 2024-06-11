@@ -1,5 +1,5 @@
 import { WorkerEntrypoint } from "cloudflare:workers";
-import { Server } from "partyserver";
+import { routePartykitRequest } from "partyserver";
 import { YjsDocument } from "y-partyserver";
 import * as Y from "yjs";
 
@@ -27,7 +27,7 @@ export class Document extends YjsDocument<Env> {
 export default class MyServer extends WorkerEntrypoint<Env> {
   async fetch(request: Request): Promise<Response> {
     return (
-      (await Server.partyFetch(request, this.env)) ||
+      (await routePartykitRequest(request, this.env)) ||
       new Response("Not Found", { status: 404 })
     );
   }

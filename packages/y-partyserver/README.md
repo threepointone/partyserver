@@ -30,7 +30,7 @@ export {
     return (
       // this will route requests to /parties/document/:id
       // to the Document Durable Object
-      (await Server.partyFetch(request, this.env)) ||
+      (await routePartykitRequest(request, this.env)) ||
       new Response("Not Found", { status: 404 })
     );
   }

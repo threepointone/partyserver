@@ -52,61 +52,61 @@ export async function getServerByName<Env, T extends Server<Env>>(
   return stub;
 }
 
+/**
+ * A utility function for PartyKit style routing.
+ */
+export async function routePartykitRequest<Env, T extends Server<Env>>(
+  req: Request,
+  env: Record<string, unknown>,
+  options?: {
+    prefix?: string;
+    locationHint?: DurableObjectLocationHint;
+  }
+): Promise<Response | null> {
+  if (!serverMapCache.has(env)) {
+    serverMapCache.set(
+      env,
+      Object.entries(env).reduce((acc, [k, v]) => {
+        // @ts-expect-error - we're checking for the existence of idFromName
+        if (v && "idFromName" in v && typeof v.idFromName === "function") {
+          return { ...acc, [k.toLowerCase()]: v };
+        }
+        return acc;
+      }, {})
+    );
+  }
+  const map = serverMapCache.get(env) as Record<
+    string,
+    DurableObjectNamespace<T>
+  >;
+
+  const prefix = options?.prefix || "parties";
+
+  const url = new URL(req.url);
+
+  const parts = url.pathname.split("/");
+  if (parts[1] === prefix && parts.length < 4) {
+    return null;
+  }
+  const name = parts[3],
+    namespace = parts[2];
+  if (parts[1] === prefix && name && namespace) {
+    if (!map[namespace]) {
+      console.error(`The url ${req.url} does not match any server namespace. 
+Did you forget to add a durable object binding to the class in your wrangler.toml?`);
+    }
+
+    const stub = await getServerByName(map[namespace], name, options); // TODO: fix this
+    return stub.fetch(req);
+  } else {
+    return null;
+  }
+}
+
 export class Server<Env> extends DurableObject<Env> {
   static options = {
     hibernate: false
   };
-
-  /**
-   * A utility function for PartyKit style routing.
-   */
-  static async partyFetch<Env, T extends Server<Env>>(
-    req: Request,
-    env: Record<string, unknown>,
-    options?: {
-      prefix?: string;
-      locationHint?: DurableObjectLocationHint;
-    }
-  ): Promise<Response | null> {
-    if (!serverMapCache.has(env)) {
-      serverMapCache.set(
-        env,
-        Object.entries(env).reduce((acc, [k, v]) => {
-          // @ts-expect-error - we're checking for the existence of idFromName
-          if (v && "idFromName" in v && typeof v.idFromName === "function") {
-            return { ...acc, [k.toLowerCase()]: v };
-          }
-          return acc;
-        }, {})
-      );
-    }
-    const map = serverMapCache.get(env) as Record<
-      string,
-      DurableObjectNamespace<T>
-    >;
-
-    const prefix = options?.prefix || "parties";
-
-    const url = new URL(req.url);
-
-    const parts = url.pathname.split("/");
-    if (parts[1] === prefix && parts.length < 4) {
-      return null;
-    }
-    const name = parts[3],
-      namespace = parts[2];
-    if (parts[1] === prefix && name && namespace) {
-      if (!map[namespace]) {
-        console.error(`The url ${req.url} does not match any server namespace. 
-Did you forget to add a durable object binding to the class in your wrangler.toml?`);
-      }
-
-      const stub = await getServerByName(map[namespace], name, options); // TODO: fix this
-      return stub.fetch(req);
-    } else {
-      return null;
-    }
-  }
 
   #status: "zero" | "starting" | "started" = "zero";
 

@@ -6,7 +6,7 @@ import {
 import * as build from "@remix-run/dev/server-build";
 import { WorkerEntrypoint } from "cloudflare:workers";
 import { nanoid } from "nanoid";
-import { getServerByName, Server } from "partyserver";
+import { getServerByName, routePartykitRequest, Server } from "partyserver";
 
 import type { Tldraw } from "./tldraw/server";
 import type {
@@ -148,7 +148,7 @@ export class RemixServer extends Server<Env> {
     return (
       //First let's check if the request is for a party
       // @ts-expect-error TODO: typescript hell
-      (await Server.partyFetch(request, this.env)) ||
+      (await routePartykitRequest(request, this.env)) ||
       // Otherwise let's just handle the request here
       super.fetch(request)
     );
