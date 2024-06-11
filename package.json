@@ -10,7 +10,7 @@
     "check:lint": "eslint \"**/*.[tj]s?(x)\" --max-warnings=0 --report-unused-disable-directives",
     "check:repo": "manypkg check",
     "check:test": "npm run check:test -w partyserver",
-    "check:type": "find . -name 'tsconfig.json' -not -path '*/node_modules/*' -print0 | xargs -0 -I {} bash -c 'echo \"tsc --project {}\"; tsc --project {} || exit 255' || exit 1",
+    "check:type": "bun scripts/typecheck.ts",
     "copy-readme": "cp README.md packages/partyserver/README.md",
     "test": "npm run test -w partyserver",
     "ncu": "bunx npm-check-updates",
