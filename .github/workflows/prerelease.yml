@@ -23,6 +23,9 @@ jobs:
       - name: Modify package.json version
         run: bun .github/version-script.ts
 
+      - name: Resolve workspace dependencies
+        run: bun .github/resolve-workspace-versions.ts
+
       - run: bun run copy-readme
 
       - run: bun run build

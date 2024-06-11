@@ -45,6 +45,7 @@
   },
   "peerDependencies": {
     "@cloudflare/workers-types": "^4.20240529.0",
+    "partyserver": "workspace:*",
     "yjs": "^13.6.14"
   },
   "devDependencies": {
