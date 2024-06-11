@@ -17,7 +17,7 @@ export class Chat extends Server<Env> {
   }
 }
 
-export default class MyServer extends WorkerEnrypoint<Env> {
+export default class MyServer extends WorkerEntrypoint<Env> {
   async fetch(request: Request): Promise<Response> {
     return (
       (await Server.partyFetch(request, this.env)) ||
