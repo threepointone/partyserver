@@ -1,5 +1,11 @@
 # y-partyserver
 
+## 0.0.4
+
+### Patch Changes
+
+- [`eb347bc`](https://github.com/threepointone/partyserver/commit/eb347bc1da9bf4c1a6499b716ab4b33050afec00) Thanks [@threepointone](https://github.com/threepointone)! - trigger a build
+
 ## 0.0.3
 
 ### Patch Changes
