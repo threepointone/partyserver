@@ -1,8 +1,10 @@
-import { execSync } from "child_process";
 import * as fs from "fs";
 
+import { $ } from "bun";
+
 try {
-  const stdout = execSync("git rev-parse --short HEAD", { encoding: "utf-8" });
+  console.log("Getting current git hash...");
+  const stdout = (await $`git rev-parse --short HEAD`).text();
 
   for (const path of [
     "./packages/partyserver/package.json",
