@@ -50,6 +50,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240529.0",
     "@types/lodash.debounce": "^4.0.9",
+    "partyserver": "workspace:*",
     "ws": "^8.11.0",
     "yjs": "^13.6.14"
   }
