@@ -1,21 +1,21 @@
 import { $, Glob } from "bun";
 
-const glob = new Glob("**/tsconfig.json");
+const tsconfigs: string[] = [];
 
-const files: string[] = [];
-
-for await (const file of glob.scan(".")) {
+for await (const file of new Glob("**/tsconfig.json").scan(".")) {
   if (file.includes("node_modules")) continue;
-  files.push(file);
+  tsconfigs.push(file);
 }
 
-console.log(`Typechecking ${files.length} projects...`);
+console.log(`Typechecking ${tsconfigs.length} projects...`);
 
-const result = await Promise.allSettled(
-  files.map((file) => $`bunx tsc -p ${file}`)
-);
+const failed = (
+  await Promise.allSettled(
+    tsconfigs.map((tsconfig) => $`bunx tsc -p ${tsconfig}`)
+  )
+).filter((r) => r.status === "rejected");
 
-if (result.filter((r) => r.status === "rejected").length > 0) {
+if (failed.length > 0) {
   console.error("Some projects failed to typecheck!");
   process.exit(1);
 }
