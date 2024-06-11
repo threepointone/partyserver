@@ -3,7 +3,7 @@ import { build } from "tsup";
 
 await build({
   entry: ["src/index.ts"],
-  splitting: false,
+  splitting: true,
   sourcemap: true,
   clean: true,
   external: ["cloudflare:workers"],
