@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.37
+
+### Patch Changes
+
+- [`5b91153`](https://github.com/threepointone/partyserver/commit/5b91153bceef64079eb5e3d86900fa916fbf2cf5) Thanks [@threepointone](https://github.com/threepointone)! - try another release
+
 ## 0.0.36
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # y-partyserver
 
+## 0.0.6
+
+### Patch Changes
+
+- [`5b91153`](https://github.com/threepointone/partyserver/commit/5b91153bceef64079eb5e3d86900fa916fbf2cf5) Thanks [@threepointone](https://github.com/threepointone)! - try another release
+
+- Updated dependencies [[`5b91153`](https://github.com/threepointone/partyserver/commit/5b91153bceef64079eb5e3d86900fa916fbf2cf5)]:
+  - partyserver@0.0.37
+
 ## 0.0.5
 
 ### Patch Changes
