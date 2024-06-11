@@ -5,7 +5,7 @@
   "description": "PartyKit, for Workers",
   "scripts": {
     "build": "npm run build -w partyserver -w y-partyserver",
-    "check": "concurrently \"npm run check:repo\" \"npm run check:format\" \"npm run check:lint\" \"npm run check:type\" \"npm run check:test\" --kill-others-on-fail -m 2",
+    "check": "concurrently \"npm run check:repo\" \"npm run check:format\" \"npm run check:lint\" \"npm run check:type\" \"npm run check:test\" --kill-others-on-fail",
     "check:format": "prettier . --check --ignore-unknown",
     "check:lint": "eslint \"**/*.[tj]s?(x)\" --max-warnings=0 --report-unused-disable-directives",
     "check:repo": "manypkg check",
