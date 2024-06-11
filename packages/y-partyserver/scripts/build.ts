@@ -1,5 +1,4 @@
-import { execSync } from "child_process";
-
+import { $ } from "bun";
 import { build } from "tsup";
 
 await build({
@@ -16,7 +15,7 @@ await build({
   dts: true
 });
 
-// then run prettier on the generateed .d.ts files
-execSync("bunx prettier --write dist/**/*.d.ts");
+// then run prettier on the generated .d.ts files
+await $`prettier --write ./dist/**/*.d.ts`;
 
 process.exit(0);

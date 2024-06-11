@@ -10,9 +10,7 @@ for await (const file of new Glob("**/tsconfig.json").scan(".")) {
 console.log(`Typechecking ${tsconfigs.length} projects...`);
 
 const failed = (
-  await Promise.allSettled(
-    tsconfigs.map((tsconfig) => $`bunx tsc -p ${tsconfig}`)
-  )
+  await Promise.allSettled(tsconfigs.map((tsconfig) => $`tsc -p ${tsconfig}`))
 ).filter((r) => r.status === "rejected");
 
 if (failed.length > 0) {
