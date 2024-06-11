@@ -3,7 +3,7 @@
   "version": "0.0.38",
   "repository": {
     "type": "git",
-    "url": "git://github.com/threepointone/partyserver"
+    "url": "git://github.com/threepointone/partyserver.git"
   },
   "main": "dist/index.js",
   "module": "dist/index.js",
