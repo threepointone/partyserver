@@ -1,5 +1,14 @@
 # y-partyserver
 
+## 0.0.7
+
+### Patch Changes
+
+- [`74d7911`](https://github.com/threepointone/partyserver/commit/74d7911174dbb5f0a9a6f6925e9c615a19dbed74) Thanks [@threepointone](https://github.com/threepointone)! - s/Server.partyFetch/routePartyKitRequest
+
+- Updated dependencies [[`74d7911`](https://github.com/threepointone/partyserver/commit/74d7911174dbb5f0a9a6f6925e9c615a19dbed74)]:
+  - partyserver@0.0.38
+
 ## 0.0.6
 
 ### Patch Changes
