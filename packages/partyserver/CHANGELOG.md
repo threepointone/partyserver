@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.39
+
+### Patch Changes
+
+- [`2a254db`](https://github.com/threepointone/partyserver/commit/2a254dba427aa509c2fddc26be0ef3bbec881afc) Thanks [@threepointone](https://github.com/threepointone)! - trigger build
+
 ## 0.0.38
 
 ### Patch Changes
