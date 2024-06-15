@@ -1,5 +1,14 @@
 # y-partyserver
 
+## 0.0.10
+
+### Patch Changes
+
+- [`fa89266`](https://github.com/threepointone/partyserver/commit/fa89266ccc817a43e0a0274646a9f7265bf46320) Thanks [@threepointone](https://github.com/threepointone)! - update deps
+
+- Updated dependencies [[`fa89266`](https://github.com/threepointone/partyserver/commit/fa89266ccc817a43e0a0274646a9f7265bf46320)]:
+  - partyserver@0.0.41
+
 ## 0.0.9
 
 ### Patch Changes
