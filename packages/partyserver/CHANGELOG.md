@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.41
+
+### Patch Changes
+
+- [`fa89266`](https://github.com/threepointone/partyserver/commit/fa89266ccc817a43e0a0274646a9f7265bf46320) Thanks [@threepointone](https://github.com/threepointone)! - update deps
+
 ## 0.0.40
 
 ### Patch Changes
