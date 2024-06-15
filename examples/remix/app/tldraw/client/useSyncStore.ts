@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import PartySocket from "partysocket";
-import { createTLStore, defaultShapeUtils, throttle, uniqueId } from "tldraw";
+import {
+  createTLStore,
+  defaultShapeUtils,
+  loadSnapshot,
+  throttle,
+  uniqueId
+} from "tldraw";
 
 import type {
   HistoryEntry,
@@ -89,11 +95,11 @@ export function useSyncStore({
 
         switch (data.type) {
           case "init": {
-            store.loadSnapshot(data.snapshot);
+            loadSnapshot(store, data.snapshot);
             break;
           }
           case "recovery": {
-            store.loadSnapshot(data.snapshot);
+            loadSnapshot(store, data.snapshot);
             break;
           }
           case "update": {
