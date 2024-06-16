@@ -1,5 +1,13 @@
 # partyflare
 
+## 0.0.42
+
+### Patch Changes
+
+- [`ba68c03`](https://github.com/threepointone/partyserver/commit/ba68c036dc7edf4b7ae355e5570c6831a064a98c) Thanks [@threepointone](https://github.com/threepointone)! - fix: workaround for https://github.com/cloudflare/workerd/issues/2240
+
+  While waiting for https://github.com/cloudflare/workerd/issues/2240 to be fixed, let's instead send the namespace/room name ahead in the first request. This should be fine for all our websocket usecases for now
+
 ## 0.0.41
 
 ### Patch Changes
