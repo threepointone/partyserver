@@ -96,7 +96,16 @@ export async function routePartykitRequest<Env, T extends Server<Env>>(
 Did you forget to add a durable object binding to the class in your wrangler.toml?`);
     }
 
-    const stub = await getServerByName(map[namespace], name, options); // TODO: fix this
+    const id = map[namespace].idFromName(name);
+    const stub = map[namespace].get(id, options);
+
+    // const stub = await getServerByName(map[namespace], name, options); // TODO: fix this
+    // make a new request with additional headers
+
+    req = new Request(req);
+    req.headers.set("x-partykit-room", name);
+    req.headers.set("x-partykit-namespace", namespace);
+
     return stub.fetch(req);
   } else {
     return null;
@@ -120,6 +129,14 @@ export class Server<Env> extends DurableObject<Env> {
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
 
+    this.ctx
+      .blockConcurrencyWhile(async () => {
+        await this.#initialize();
+      })
+      .catch((e) => {
+        console.error("Error in blockConcurrencyWhile when initilaizing:", e);
+      });
+
     // TODO: throw error if any of
     // broadcast/getConnection/getConnections/getConnectionTags
     // fetch/webSocketMessage/webSocketClose/webSocketError
@@ -130,11 +147,19 @@ export class Server<Env> extends DurableObject<Env> {
    * Handle incoming requests to the server.
    */
   async fetch(request: Request): Promise<Response> {
-    const url = new URL(request.url);
+    {
+      // This is temporary while we solve https://github.com/cloudflare/workerd/issues/2240
 
-    if (this.#status !== "started") {
-      await this.#initialize();
+      // get namespace and room from headers
+      const _namespace = request.headers.get("x-partykit-namespace");
+      const room = request.headers.get("x-partykit-room");
+      if (!_namespace || !room) {
+        throw new Error("Missing namespace or room headers");
+      }
+      await this.setName(room);
     }
+
+    const url = new URL(request.url);
 
     if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") {
       return this.onRequest(request);
@@ -235,11 +260,6 @@ export class Server<Env> extends DurableObject<Env> {
   }
 
   async #initialize(): Promise<void> {
-    if (!this.#_name) {
-      throw new Error(
-        "This server's name has not been set, did you forget to call withName?"
-      );
-    }
     await this.ctx.blockConcurrencyWhile(async () => {
       this.#status = "starting";
       await this.onStart();
