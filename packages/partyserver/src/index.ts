@@ -134,7 +134,7 @@ export class Server<Env> extends DurableObject<Env> {
         await this.#initialize();
       })
       .catch((e) => {
-        console.error("Error in blockConcurrencyWhile when initilaizing:", e);
+        console.error(`Error while initilaizing ${this.#ParentClass.name}:`, e);
       });
 
     // TODO: throw error if any of
@@ -300,14 +300,23 @@ export class Server<Env> extends DurableObject<Env> {
   // Public API
 
   #_name: string | undefined;
+
+  #_longErrorAboutNameThrown = false;
   /**
-   * The name for this server. Read-only.
+   * The name for this server. Write-once-only.
    */
   get name(): string {
     if (!this.#_name) {
-      throw new Error(
-        "This server has not been initialised yet, did you forget to call withName?"
-      );
+      if (!this.#_longErrorAboutNameThrown) {
+        this.#_longErrorAboutNameThrown = true;
+        throw new Error(
+          `Attempting to read .name on ${this.#ParentClass.name} before it was set. The name can be set by explicitly calling .setName(name) on the stub, or by using routePartyKitRequest(). This is a known issue and will be fixed soon. Follow https://github.com/cloudflare/workerd/issues/2240 for more updates.`
+        );
+      } else {
+        throw new Error(
+          `Attempting to read .name on ${this.#ParentClass.name} before it was set.`
+        );
+      }
     }
     return this.#_name;
   }
