@@ -151,9 +151,9 @@ export class Server<Env> extends DurableObject<Env> {
       // This is temporary while we solve https://github.com/cloudflare/workerd/issues/2240
 
       // get namespace and room from headers
-      const _namespace = request.headers.get("x-partykit-namespace");
+      const namespace = request.headers.get("x-partykit-namespace");
       const room = request.headers.get("x-partykit-room");
-      if (!_namespace || !room) {
+      if (!namespace || !room) {
         throw new Error("Missing namespace or room headers");
       }
       await this.setName(room);
