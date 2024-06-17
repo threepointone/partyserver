@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.43
+
+### Patch Changes
+
+- [`6edd35e`](https://github.com/threepointone/partyserver/commit/6edd35e3f489d047867d3f8097b54566882a9173) Thanks [@threepointone](https://github.com/threepointone)! - A better error when trying to read .name before it's set
+
 ## 0.0.42
 
 ### Patch Changes
