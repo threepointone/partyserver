@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.44
+
+### Patch Changes
+
+- [`cb884ea`](https://github.com/threepointone/partyserver/commit/cb884ea811e4dcbb2d3056c0c4077b13adc59e21) Thanks [@threepointone](https://github.com/threepointone)! - don't fail when string bindings are in env
+
 ## 0.0.43
 
 ### Patch Changes
