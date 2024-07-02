@@ -67,8 +67,12 @@ export async function routePartykitRequest<Env, T extends Server<Env>>(
     serverMapCache.set(
       env,
       Object.entries(env).reduce((acc, [k, v]) => {
-        // @ts-expect-error - we're checking for the existence of idFromName
-        if (v && "idFromName" in v && typeof v.idFromName === "function") {
+        if (
+          v &&
+          typeof v === "object" &&
+          "idFromName" in v &&
+          typeof v.idFromName === "function"
+        ) {
           return { ...acc, [k.toLowerCase()]: v };
         }
         return acc;
