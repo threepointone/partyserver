@@ -359,6 +359,15 @@ export class Server<Env> extends DurableObject<Env> {
     this.#_name = name;
   }
 
+  #sendMessageToConnection(connection: Connection, message: WSMessage): void {
+    try {
+      connection.send(message);
+    } catch (e) {
+      // close connection
+      connection.close(1011, "Unexpected error");
+    }
+  }
+
   /** Send a message to all connected clients, except connection ids listed in `without` */
   broadcast(
     msg: string | ArrayBuffer | ArrayBufferView,
@@ -366,7 +375,7 @@ export class Server<Env> extends DurableObject<Env> {
   ): void {
     for (const connection of this.#connectionManager.getConnections()) {
       if (!without || !without.includes(connection.id)) {
-        connection.send(msg);
+        this.#sendMessageToConnection(connection, msg);
       }
     }
   }
