@@ -1,5 +1,16 @@
 # partyflare
 
+## 0.0.45
+
+### Patch Changes
+
+- [#62](https://github.com/threepointone/partyserver/pull/62) [`f9a0047`](https://github.com/threepointone/partyserver/commit/f9a0047fbcb561a20c9cf001c9808023d0b60288) Thanks [@threepointone](https://github.com/threepointone)! - close connection if sending broadcast message fails
+
+- [#60](https://github.com/threepointone/partyserver/pull/60) [`50883c9`](https://github.com/threepointone/partyserver/commit/50883c9e3715e3a54806d2ba0c514d72bf9fb5d3) Thanks [@threepointone](https://github.com/threepointone)! - feat: catch errors in DO's fetch
+
+  Catch errors in a DO's fetch. Basic.
+  We log the error stack right now which isn't a great thing, we'll revisit that later.
+
 ## 0.0.44
 
 ### Patch Changes
