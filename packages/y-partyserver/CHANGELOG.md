@@ -1,5 +1,12 @@
 # y-partyserver
 
+## 0.0.14
+
+### Patch Changes
+
+- Updated dependencies [[`f9a0047`](https://github.com/threepointone/partyserver/commit/f9a0047fbcb561a20c9cf001c9808023d0b60288), [`50883c9`](https://github.com/threepointone/partyserver/commit/50883c9e3715e3a54806d2ba0c514d72bf9fb5d3)]:
+  - partyserver@0.0.45
+
 ## 0.0.13
 
 ### Patch Changes
