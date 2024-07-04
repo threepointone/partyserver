@@ -163,52 +163,72 @@ export class Server<Env> extends DurableObject<Env> {
       await this.setName(room);
     }
 
-    const url = new URL(request.url);
+    try {
+      const url = new URL(request.url);
 
-    if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") {
-      return this.onRequest(request);
-    } else {
-      // Create the websocket pair for the client
-      const { 0: clientWebSocket, 1: serverWebSocket } = new WebSocketPair();
-      let connectionId = url.searchParams.get("_pk");
-      if (!connectionId) {
-        connectionId = nanoid();
-      }
-
-      let connection: Connection = Object.assign(serverWebSocket, {
-        id: connectionId,
-        server: this.name,
-        state: null as unknown as ConnectionState<unknown>,
-        setState<T = unknown>(setState: T | ConnectionSetStateFn<T>) {
-          let state: T;
-          if (setState instanceof Function) {
-            state = setState(this.state as ConnectionState<T>);
-          } else {
-            state = setState;
-          }
-
-          // TODO: deepFreeze object?
-          this.state = state as ConnectionState<T>;
-          return this.state;
+      if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") {
+        return await this.onRequest(request);
+      } else {
+        // Create the websocket pair for the client
+        const { 0: clientWebSocket, 1: serverWebSocket } = new WebSocketPair();
+        let connectionId = url.searchParams.get("_pk");
+        if (!connectionId) {
+          connectionId = nanoid();
         }
-      });
 
-      const ctx = { request };
+        let connection: Connection = Object.assign(serverWebSocket, {
+          id: connectionId,
+          server: this.name,
+          state: null as unknown as ConnectionState<unknown>,
+          setState<T = unknown>(setState: T | ConnectionSetStateFn<T>) {
+            let state: T;
+            if (setState instanceof Function) {
+              state = setState(this.state as ConnectionState<T>);
+            } else {
+              state = setState;
+            }
 
-      const tags = await this.getConnectionTags(connection, ctx);
+            // TODO: deepFreeze object?
+            this.state = state as ConnectionState<T>;
+            return this.state;
+          }
+        });
 
-      // Accept the websocket connection
-      connection = this.#connectionManager.accept(connection, {
-        tags,
-        server: this.name
-      });
+        const ctx = { request };
 
-      if (!this.#ParentClass.options.hibernate) {
-        this.#attachSocketEventHandlers(connection);
+        const tags = await this.getConnectionTags(connection, ctx);
+
+        // Accept the websocket connection
+        connection = this.#connectionManager.accept(connection, {
+          tags,
+          server: this.name
+        });
+
+        if (!this.#ParentClass.options.hibernate) {
+          this.#attachSocketEventHandlers(connection);
+        }
+        await this.onConnect(connection, ctx);
+
+        return new Response(null, { status: 101, webSocket: clientWebSocket });
       }
-      await this.onConnect(connection, ctx);
-
-      return new Response(null, { status: 101, webSocket: clientWebSocket });
+    } catch (err) {
+      console.error(
+        `Error in ${this.#ParentClass.name}:${this.name} fetch:`,
+        err
+      );
+      if (!(err instanceof Error)) throw err;
+      if (request.headers.get("Upgrade") == "websocket") {
+        // Annoyingly, if we return an HTTP error in response to a WebSocket request, Chrome devtools
+        // won't show us the response body! So... let's send a WebSocket response with an error
+        // frame instead.
+        const pair = new WebSocketPair();
+        pair[1].accept();
+        pair[1].send(JSON.stringify({ error: err.stack }));
+        pair[1].close(1011, "Uncaught exception during session setup");
+        return new Response(null, { status: 101, webSocket: pair[0] });
+      } else {
+        return new Response(err.stack, { status: 500 });
+      }
     }
   }
 
