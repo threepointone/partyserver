@@ -1,5 +1,11 @@
 # y-partyserver
 
+## 0.0.16
+
+### Patch Changes
+
+- [`afb511e`](https://github.com/threepointone/partyserver/commit/afb511ee53ee1db7fafcc745f47c7df14eaeb8eb) Thanks [@threepointone](https://github.com/threepointone)! - add some docs for y-partyserver
+
 ## 0.0.15
 
 ### Patch Changes
