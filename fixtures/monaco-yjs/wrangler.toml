@@ -5,7 +5,7 @@ compatibility_date = "2024-07-25"
 legacy_assets = './public'
 
 [build]
-command = "npx esbuild src/client/index.tsx --bundle --outdir=public/dist --platform=browser --format=esm --sourcemap"
+command = "bun scripts/build.ts"
 
 [[durable_objects.bindings]]
 name = "Monaco"

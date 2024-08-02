@@ -1,10 +1,7 @@
 import * as monaco from "monaco-editor";
-import BetterWebSocket from "partysocket/ws";
 import { MonacoBinding } from "y-monaco";
 import YPartyKitProvider from "y-partyserver/provider";
 import * as Y from "yjs";
-
-declare const PARTYKIT_HOST: string;
 
 window.MonacoEnvironment = {
   getWorkerUrl: function (moduleId, label) {
@@ -31,10 +28,14 @@ window.MonacoEnvironment = {
 
 window.addEventListener("load", () => {
   const ydoc = new Y.Doc();
-  const provider = new YPartyKitProvider(PARTYKIT_HOST, "monaco-demo", ydoc, {
-    // @ts-expect-error TODO: fix this
-    WebSocketPolyfill: BetterWebSocket
-  });
+  const provider = new YPartyKitProvider(
+    window.location.origin,
+    "monaco-demo",
+    ydoc,
+    {
+      party: "monaco"
+    }
+  );
 
   provider.ws?.send("do-the-thing");
 

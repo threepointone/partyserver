@@ -1,5 +1,6 @@
 // Polyfill WebSocket status code constants for environments that don't have them
 // in order to support libraries that expect standards-compatible WebSocket
+// implementations (e.g. PartySocket)
 
 import type {
   Connection,
@@ -7,7 +8,6 @@ import type {
   ConnectionState
 } from "./types";
 
-// implementations (e.g. PartySocket)
 if (!("OPEN" in WebSocket)) {
   const WebSocketStatus = {
     CONNECTING: WebSocket.READY_STATE_CONNECTING,
