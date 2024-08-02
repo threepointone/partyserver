@@ -3,7 +3,7 @@ module.exports = {
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: 2020,
-    EXPERIMENTAL_useProjectService: true,
+    projectService: true,
     sourceType: "module"
   },
   plugins: ["@typescript-eslint"],
@@ -21,7 +21,11 @@ module.exports = {
     "dist",
     "coverage",
     ".eslintrc.js",
-    "*.d.ts"
+    "*.d.ts",
+    "tailwind.config.js",
+    "fixtures/remix/remix.config.js",
+    "fixtures/node/run-with-node.mjs",
+    "fixtures/**/src/types.ts"
   ],
   settings: {
     react: {

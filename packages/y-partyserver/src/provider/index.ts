@@ -290,6 +290,7 @@ export class WebsocketProvider extends Observable<string> {
       connect = true,
       awareness = new awarenessProtocol.Awareness(doc),
       params = {},
+      isPrefixedUrl = false,
       WebSocketPolyfill = DefaultWebSocket, // Optionally provide a WebSocket polyfill
       resyncInterval = -1, // Request server state every `resyncInterval` milliseconds
       maxBackoffTime = 2500, // Maximum amount of time to wait before trying to reconnect (we try to reconnect using exponential backoff)
@@ -298,6 +299,7 @@ export class WebsocketProvider extends Observable<string> {
       connect?: boolean;
       awareness?: awarenessProtocol.Awareness;
       params?: { [s: string]: string };
+      isPrefixedUrl?: boolean;
       WebSocketPolyfill?: typeof WebSocket | null;
       resyncInterval?: number;
       maxBackoffTime?: number;
@@ -312,11 +314,12 @@ export class WebsocketProvider extends Observable<string> {
     const encodedParams = url.encodeQueryParams(params);
     this.maxBackoffTime = maxBackoffTime;
     this.bcChannel = serverUrl + "/" + roomname;
-    this.url =
-      serverUrl +
-      "/" +
-      roomname +
-      (encodedParams.length === 0 ? "" : "?" + encodedParams);
+    this.url = isPrefixedUrl
+      ? serverUrl
+      : serverUrl +
+        "/" +
+        roomname +
+        (encodedParams.length === 0 ? "" : "?" + encodedParams);
     this.roomname = roomname;
     this.doc = doc;
     this._WS = WebSocketPolyfill!;
@@ -557,7 +560,7 @@ function generateUUID(): string {
 function assertType(value: unknown, label: string, type: string) {
   if (typeof value !== type) {
     throw new Error(
-      `Invalid "${label}" parameter provided to YPartyKitProvider. Expected: ${type}, received: ${value as string}`
+      `Invalid "${label}" parameter provided to YPartyServerProvider. Expected: ${type}, received: ${value as string}`
     );
   }
 }
@@ -566,17 +569,18 @@ type Params = Record<string, string | null | undefined>;
 type ParamsProvider = Params | (() => Params | Promise<Params>);
 type BaseProviderOptions = ConstructorParameters<typeof WebsocketProvider>[3];
 
-type YPartyKitProviderOptions = Omit<
+type YPartyServerProviderOptions = Omit<
   NonNullable<BaseProviderOptions>,
   "params"
 > & {
   connectionId?: string;
   party?: string;
+  prefix?: string;
   params?: ParamsProvider;
   protocol?: "ws" | "wss";
 };
 
-export default class YPartyKitProvider extends WebsocketProvider {
+export default class YPartyServerProvider extends WebsocketProvider {
   id: string;
   #params?: ParamsProvider;
 
@@ -584,7 +588,7 @@ export default class YPartyKitProvider extends WebsocketProvider {
     host: string,
     room: string,
     doc?: YDoc,
-    options: YPartyKitProviderOptions = {}
+    options: YPartyServerProviderOptions = {}
   ) {
     assertType(host, "host", "string");
     assertType(room, "room", "string");
@@ -608,7 +612,7 @@ export default class YPartyKitProvider extends WebsocketProvider {
         host.split(".")[1] <= "31")
         ? "ws"
         : "wss")
-    }://${host}${options.party ? `/parties/${options.party}` : "/party"}`;
+    }://${host}${options.prefix || `/parties/${options.party || "main"}`}`;
 
     // use provided id, or generate a random one
     const id = options.connectionId ?? generateUUID();
@@ -619,6 +623,7 @@ export default class YPartyKitProvider extends WebsocketProvider {
     // don't connect until we've updated the url parameters
     const baseOptions = {
       ...rest,
+      isPrefixedUrl: !!options.prefix,
       connect: false
     };
 
@@ -657,7 +662,7 @@ export default class YPartyKitProvider extends WebsocketProvider {
       // finally, connect
       super.connect();
     } catch (err) {
-      console.error("Failed to open connecton to PartyKit", err);
+      console.error("Failed to open connecton to PartyServer", err);
       throw err;
     }
   }

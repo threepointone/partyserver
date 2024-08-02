@@ -143,6 +143,7 @@ function send(doc: WSSharedDoc, conn: Connection, m: Uint8Array) {
   }
   try {
     conn.send(m);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
     closeConn(doc, conn);
   }
@@ -154,7 +155,7 @@ interface CallbackOptions {
   timeout?: number;
 }
 
-export class YjsDocument<Env> extends Server<Env> {
+export class YjsDocument<Env = unknown> extends Server<Env> {
   static callbackOptions: CallbackOptions = {};
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access

@@ -37,9 +37,14 @@ export async function getServerByName<Env, T extends Server<Env>>(
   serverNamespace: DurableObjectNamespace<T>,
   name: string,
   options?: {
+    jurisdiction?: DurableObjectJurisdiction;
     locationHint?: DurableObjectLocationHint;
   }
 ): Promise<DurableObjectStub<T>> {
+  if (options?.jurisdiction) {
+    serverNamespace = serverNamespace.jurisdiction(options.jurisdiction);
+  }
+
   const id = serverNamespace.idFromName(name);
   const stub = serverNamespace.get(id, options);
 
@@ -55,11 +60,15 @@ export async function getServerByName<Env, T extends Server<Env>>(
 /**
  * A utility function for PartyKit style routing.
  */
-export async function routePartykitRequest<Env, T extends Server<Env>>(
+export async function routePartykitRequest<
+  Env = unknown,
+  T extends Server<Env> = Server<Env>
+>(
   req: Request,
   env: Record<string, unknown>,
   options?: {
     prefix?: string;
+    jurisdiction?: DurableObjectJurisdiction;
     locationHint?: DurableObjectLocationHint;
   }
 ): Promise<Response | null> {
@@ -100,8 +109,13 @@ export async function routePartykitRequest<Env, T extends Server<Env>>(
 Did you forget to add a durable object binding to the class in your wrangler.toml?`);
     }
 
-    const id = map[namespace].idFromName(name);
-    const stub = map[namespace].get(id, options);
+    let doNamespace = map[namespace];
+    if (options?.jurisdiction) {
+      doNamespace = doNamespace.jurisdiction(options.jurisdiction);
+    }
+
+    const id = doNamespace.idFromName(name);
+    const stub = doNamespace.get(id, options);
 
     // const stub = await getServerByName(map[namespace], name, options); // TODO: fix this
     // make a new request with additional headers
@@ -109,6 +123,9 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
     req = new Request(req);
     req.headers.set("x-partykit-room", name);
     req.headers.set("x-partykit-namespace", namespace);
+    if (options?.jurisdiction) {
+      req.headers.set("x-partykit-jurisdiction", options.jurisdiction);
+    }
 
     return stub.fetch(req);
   } else {
@@ -116,7 +133,7 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
   }
 }
 
-export class Server<Env> extends DurableObject<Env> {
+export class Server<Env = unknown> extends DurableObject<Env> {
   static options = {
     hibernate: false
   };
@@ -151,7 +168,7 @@ export class Server<Env> extends DurableObject<Env> {
    * Handle incoming requests to the server.
    */
   async fetch(request: Request): Promise<Response> {
-    {
+    if (!this.#_name) {
       // This is temporary while we solve https://github.com/cloudflare/workerd/issues/2240
 
       // get namespace and room from headers
@@ -362,7 +379,8 @@ export class Server<Env> extends DurableObject<Env> {
   #sendMessageToConnection(connection: Connection, message: WSMessage): void {
     try {
       connection.send(message);
-    } catch (e) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_e) {
       // close connection
       connection.close(1011, "Unexpected error");
     }

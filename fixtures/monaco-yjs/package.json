@@ -1,0 +1,13 @@
+{
+  "name": "@partyserver/fixture-monaco-yjs",
+  "version": "0.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "start": "wrangler dev"
+  },
+  "dependencies": {
+    "monaco-editor": "^0.50.0",
+    "y-monaco": "^0.1.6"
+  }
+}

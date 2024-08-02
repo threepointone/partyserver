@@ -1,5 +1,5 @@
 {
-  "name": "@partykit/partyserver-root",
+  "name": "@partyserver/partyserver-root",
   "version": "0.0.0",
   "private": true,
   "description": "PartyKit, for Workers",
@@ -17,47 +17,49 @@
     "all": "bun i && bun run build && bun check",
     "postinstall": "sh -c '[ -f package-lock.json ] && echo \"Error: package-lock.json exists\" && exit 1 || exit 0'"
   },
-  "keywords": [],
-  "author": "Sunil Pai <threepointone@gmail.com>",
+  "author": "Sunil Pai <spai@cloudflare.com>",
   "license": "ISC",
   "workspaces": [
     "packages/*",
-    "examples/*"
+    "examples/*",
+    "fixtures/*"
   ],
   "dependencies": {
     "@changesets/changelog-github": "^0.5.0",
-    "@changesets/cli": "^2.27.5",
-    "@cloudflare/vitest-pool-workers": "^0.4.5",
-    "@ianvs/prettier-plugin-sort-imports": "^4.2.1",
+    "@changesets/cli": "^2.27.7",
+    "@cloudflare/vitest-pool-workers": "^0.4.17",
+    "@ianvs/prettier-plugin-sort-imports": "^4.3.1",
     "@manypkg/cli": "^0.21.4",
     "@types/bun": "^1.1.6",
-    "@typescript-eslint/eslint-plugin": "^7.13.0",
-    "@typescript-eslint/parser": "^7.13.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
     "@vitest/runner": "1.5.0",
     "@vitest/snapshot": "1.5.0",
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
-    "daisyui": "^4.12.2",
+    "daisyui": "^4.12.10",
     "eslint": "^8.38.0",
-    "eslint-plugin-deprecation": "^2.0.0",
+    "eslint-plugin-deprecation": "^3.0.0",
     "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-jsx-a11y": "^6.8.0",
-    "eslint-plugin-react": "^7.34.2",
+    "eslint-plugin-jsx-a11y": "^6.9.0",
+    "eslint-plugin-react": "^7.35.0",
     "eslint-plugin-react-hooks": "^4.6.2",
-    "prettier": "^3.3.2",
-    "react-daisyui": "^5.0.0",
-    "tsup": "^8.1.0",
-    "typescript": "^5.5.3",
+    "prettier": "^3.3.3",
+    "react-daisyui": "^5.0.3",
+    "tsup": "^8.2.4",
+    "typescript": "^5.5.4",
     "vitest": "1.5.0",
-    "wrangler": "^3.63.0"
+    "wrangler": "^3.68.0"
   },
   "overrides": {
-    "esbuild": "0.21.4"
+    "esbuild": "0.21.4",
+    "@types/node": "20.8.3",
+    "prosemirror-model": "1.22.2"
   },
   "trustedDependencies": [
     "core-js",
     "esbuild",
     "workerd"
   ],
-  "packageManager": "bun@1.1.17"
+  "packageManager": "bun@1.1.21"
 }

@@ -1,0 +1,29 @@
+{
+  "name": "@partyserver/fixture-remix",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "remix build",
+    "deploy": "wrangler deploy",
+    "dev": "remix dev -c \"wrangler dev\""
+  },
+  "dependencies": {
+    "@remix-run/cloudflare": "^2.11.0",
+    "@remix-run/css-bundle": "^2.11.0",
+    "@remix-run/react": "^2.11.0",
+    "@remix-run/server-runtime": "^2.11.0",
+    "isbot": "^5.1.13",
+    "partysocket": "^1.0.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240729.0",
+    "@remix-run/dev": "^2.11.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

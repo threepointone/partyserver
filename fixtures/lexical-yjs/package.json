@@ -1,0 +1,17 @@
+{
+  "name": "@partyserver/fixture-lexical-yjs",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@lexical/react": "^0.17.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "lexical": "^0.17.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}

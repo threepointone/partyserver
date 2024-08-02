@@ -1,0 +1,19 @@
+{
+  "name": "@partyserver/fixture-tldraw",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "wrangler dev"
+  },
+  "dependencies": {
+    "partyserver": "workspace:*",
+    "partysocket": "^1.0.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tldraw": "^2.4.3"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0"
+  }
+}

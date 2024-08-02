@@ -1,0 +1,19 @@
+name = "partyserver-fixture-tiptap-yjs"
+main = "src/server/index.ts"
+compatibility_date = "2024-04-19"
+
+legacy_assets = "public"
+
+[build]
+command = "bun scripts/build.ts"
+watch_dir = "client"
+
+
+[[durable_objects.bindings]]
+name = "Document"
+class_name = "Document"
+
+[[migrations]]
+tag = "v1" # Should be unique for each entry
+new_classes = ["Document"]
+

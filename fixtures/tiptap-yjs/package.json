@@ -1,0 +1,26 @@
+{
+  "name": "@partyserver/fixture-tiptap-yjs",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "wrangler dev"
+  },
+  "dependencies": {
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.13",
+    "@tiptap/extension-collaboration": "^2.5.8",
+    "@tiptap/extension-collaboration-cursor": "^2.5.8",
+    "@tiptap/react": "^2.5.8",
+    "@tiptap/starter-kit": "^2.5.8",
+    "esbuild-plugin-tailwindcss": "^1.2.0",
+    "partyserver": "workspace:*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^3.4.7",
+    "y-partyserver": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0"
+  }
+}

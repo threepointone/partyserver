@@ -1,24 +1,25 @@
 import { useEffect, useState } from "react";
 
-import YPartyKitProvider from "./index";
+import YPartyServerProvider from "./index";
 
 import type * as Y from "yjs";
 
-type UseYPartyKitProviderOptions = {
+type UseYPartyServerProviderOptions = {
   host?: string | undefined;
   room: string;
   party?: string;
   doc?: Y.Doc;
-  options?: ConstructorParameters<typeof YPartyKitProvider>[3];
+  prefix?: string;
+  options?: ConstructorParameters<typeof YPartyServerProvider>[3];
 };
 
 export default function useYProvider(
-  yProviderOptions: UseYPartyKitProviderOptions
+  yProviderOptions: UseYPartyServerProviderOptions
 ) {
-  const { host, room, party, doc, options } = yProviderOptions;
-  const [provider] = useState<YPartyKitProvider>(
+  const { host, room, party, doc, options, prefix } = yProviderOptions;
+  const [provider] = useState<YPartyServerProvider>(
     () =>
-      new YPartyKitProvider(
+      new YPartyServerProvider(
         host ||
           (typeof window !== "undefined"
             ? window.location.host
@@ -28,6 +29,7 @@ export default function useYProvider(
         {
           connect: false,
           party,
+          prefix,
           ...options
         }
       )
