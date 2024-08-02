@@ -5,7 +5,7 @@ type Env = {
   MonacoServer: DurableObjectNamespace<MonacoServer>;
 };
 
-export class MonacoServer extends YjsDocument<Env> {}
+export class MonacoServer extends YjsDocument {}
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {

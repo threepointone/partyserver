@@ -7,7 +7,7 @@ export type Env = {
   Document: DurableObjectNamespace<Document>;
 };
 
-export class Document extends YjsDocument<Env> {
+export class Document extends YjsDocument {
   async onLoad() {
     const content = await this.ctx.storage.get<Uint8Array>("document");
     if (content) {

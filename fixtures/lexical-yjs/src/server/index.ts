@@ -8,7 +8,7 @@ export type Env = {
   Document: DurableObjectNamespace<LexicalDocument>;
 };
 
-export class LexicalDocument extends YjsDocument<Env> {
+export class LexicalDocument extends YjsDocument {
   // async onLoad() {
   //   const content = await this.ctx.storage.get<Uint8Array>("document");
   //   if (content) {
