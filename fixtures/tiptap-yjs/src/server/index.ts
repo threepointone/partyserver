@@ -1,34 +1,17 @@
-import { WorkerEntrypoint } from "cloudflare:workers";
 import { routePartykitRequest } from "partyserver";
 import { YjsDocument } from "y-partyserver";
-import * as Y from "yjs";
 
-export type Env = {
-  Document: DurableObjectNamespace<Document>;
+type Env = {
+  Document: DurableObjectNamespace<YjsDocument>;
 };
 
-export class Document extends YjsDocument {
-  async onLoad() {
-    const content = await this.ctx.storage.get<Uint8Array>("document");
-    if (content) {
-      Y.applyUpdate(this.document, content);
-    }
-    return;
-  }
+export { YjsDocument as Document };
 
-  async onSave() {
-    await this.ctx.storage.put<Uint8Array>(
-      "document",
-      Y.encodeStateAsUpdate(this.document)
-    );
-  }
-}
-
-export default class MyServer extends WorkerEntrypoint<Env> {
-  async fetch(request: Request): Promise<Response> {
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
     return (
-      (await routePartykitRequest(request, this.env)) ||
+      (await routePartykitRequest(request, env)) ||
       new Response("Not Found", { status: 404 })
     );
   }
-}
+} satisfies ExportedHandler<Env>;

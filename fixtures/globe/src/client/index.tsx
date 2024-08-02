@@ -27,7 +27,7 @@ function App() {
       }
     >
   >(new Map());
-  // Connect to the PartyKit server
+  // Connect to the PartyServer server
   const socket = usePartySocket({
     room: "default",
     party: "globe",
@@ -109,12 +109,12 @@ function App() {
       <p>
         Powered by <a href="https://cobe.vercel.app/">🌏 Cobe</a>,{" "}
         <a href="https://www.npmjs.com/package/phenomenon">Phenomenon</a> and{" "}
-        <a href="https://partykit.io/">🎈 PartyKit</a>
+        <a href="https://npmjs.com/package/partyserver/">🎈 PartyServer</a>
       </p>
       <p>
         Code:{" "}
-        <a href="https://github.com/partykit/sketch-globe">
-          https://github.com/partykit/sketch-globe
+        <a href="https://github.com/threepointone/partyserver/tree/main/fixtures/globe">
+          https://github.com/threepointone/partyserver/tree/main/fixtures/globe
         </a>
       </p>
     </div>

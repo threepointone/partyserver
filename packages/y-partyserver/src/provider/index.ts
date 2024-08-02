@@ -560,7 +560,7 @@ function generateUUID(): string {
 function assertType(value: unknown, label: string, type: string) {
   if (typeof value !== type) {
     throw new Error(
-      `Invalid "${label}" parameter provided to YPartyServerProvider. Expected: ${type}, received: ${value as string}`
+      `Invalid "${label}" parameter provided to YProvider. Expected: ${type}, received: ${value as string}`
     );
   }
 }
@@ -569,10 +569,7 @@ type Params = Record<string, string | null | undefined>;
 type ParamsProvider = Params | (() => Params | Promise<Params>);
 type BaseProviderOptions = ConstructorParameters<typeof WebsocketProvider>[3];
 
-type YPartyServerProviderOptions = Omit<
-  NonNullable<BaseProviderOptions>,
-  "params"
-> & {
+type YProviderOptions = Omit<NonNullable<BaseProviderOptions>, "params"> & {
   connectionId?: string;
   party?: string;
   prefix?: string;
@@ -580,7 +577,7 @@ type YPartyServerProviderOptions = Omit<
   protocol?: "ws" | "wss";
 };
 
-export default class YPartyServerProvider extends WebsocketProvider {
+export default class YProvider extends WebsocketProvider {
   id: string;
   #params?: ParamsProvider;
 
@@ -588,7 +585,7 @@ export default class YPartyServerProvider extends WebsocketProvider {
     host: string,
     room: string,
     doc?: YDoc,
-    options: YPartyServerProviderOptions = {}
+    options: YProviderOptions = {}
   ) {
     assertType(host, "host", "string");
     assertType(room, "room", "string");

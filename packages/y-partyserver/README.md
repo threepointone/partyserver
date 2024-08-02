@@ -25,18 +25,16 @@ export default class Document extends YjsServer {
 }
 
 // wire it up to your fetch handler
-export {
-  async fetch(request: Request): Promise<Response> {
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
     return (
       // this will route requests to /parties/document/:id
       // to the Document Durable Object
-      (await routePartykitRequest(request, this.env)) ||
+      (await routePartykitRequest(request, env)) ||
       new Response("Not Found", { status: 404 })
     );
   }
-}
-
-
+} satisfies ExportedHandler<Env>;
 ```
 
 Step 2: Configure `wrangler.toml`

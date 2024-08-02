@@ -1,9 +1,9 @@
 // This file contains a shared implementation of chunking logic for binary
-// WebSocket messages. Because the PartyKit platform limits individual
+// WebSocket messages. Because the Workers platform limits individual
+// WebSocket messages to 1MB, we need to split larger messages into chunks.
 
 import type { Connection } from "partyserver";
 
-// WebSocket messages to 1MB, we need to split larger messages into chunks.
 export const CHUNK_MAX_SIZE = 1_000_000;
 
 const BATCH_SENTINEL = "y-pk-batch";
@@ -38,7 +38,7 @@ export const sendChunked = (data: Uint8Array, ws: WebSocket) => {
 
   if (!warnedAboutLargeMessage) {
     console.warn(
-      "[y-partykit]",
+      "[y-partyserver]",
       "The Y.js update size exceeds 1MB, which is the maximum size for an individual update. The update will be split into chunks. This is an experimental feature.",
       `Message size: ${(data.byteLength / 1000 / 1000).toFixed(1)}MB`
     );

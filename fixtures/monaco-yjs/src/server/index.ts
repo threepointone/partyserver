@@ -2,10 +2,10 @@ import { routePartykitRequest } from "partyserver";
 import { YjsDocument } from "y-partyserver";
 
 type Env = {
-  MonacoServer: DurableObjectNamespace<MonacoServer>;
+  MonacoServer: DurableObjectNamespace<YjsDocument>;
 };
 
-export class MonacoServer extends YjsDocument {}
+export { YjsDocument as MonacoServer };
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -14,4 +14,4 @@ export default {
       new Response("Not Found", { status: 404 })
     );
   }
-};
+} satisfies ExportedHandler<Env>;

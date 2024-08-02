@@ -2,7 +2,7 @@
   "name": "@partyserver/partyserver-root",
   "version": "0.0.0",
   "private": true,
-  "description": "PartyKit, for Workers",
+  "description": "Everything's better with friends",
   "scripts": {
     "build": "npm run build -w partyserver -w y-partyserver",
     "check": "concurrently \"npm run check:repo\" \"npm run check:format\" \"npm run check:lint\" \"npm run check:type\" \"npm run check:test\" --kill-others-on-fail",

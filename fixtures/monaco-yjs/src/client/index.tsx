@@ -1,6 +1,6 @@
 import * as monaco from "monaco-editor";
 import { MonacoBinding } from "y-monaco";
-import YPartyKitProvider from "y-partyserver/provider";
+import YProvider from "y-partyserver/provider";
 import * as Y from "yjs";
 
 window.MonacoEnvironment = {
@@ -28,14 +28,9 @@ window.MonacoEnvironment = {
 
 window.addEventListener("load", () => {
   const ydoc = new Y.Doc();
-  const provider = new YPartyKitProvider(
-    window.location.origin,
-    "monaco-demo",
-    ydoc,
-    {
-      party: "monaco"
-    }
-  );
+  const provider = new YProvider(window.location.origin, "monaco-demo", ydoc, {
+    party: "monaco"
+  });
 
   provider.ws?.send("do-the-thing");
 

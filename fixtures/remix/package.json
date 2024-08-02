@@ -5,7 +5,7 @@
   "scripts": {
     "build": "remix build",
     "deploy": "wrangler deploy",
-    "dev": "remix dev -c \"wrangler dev\""
+    "start": "remix dev -c \"wrangler dev\""
   },
   "dependencies": {
     "@remix-run/cloudflare": "^2.11.0",
