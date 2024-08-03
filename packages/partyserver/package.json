@@ -1,6 +1,6 @@
 {
   "name": "partyserver",
-  "version": "0.0.46",
+  "version": "0.0.47",
   "repository": {
     "type": "git",
     "url": "git://github.com/threepointone/partyserver.git"
