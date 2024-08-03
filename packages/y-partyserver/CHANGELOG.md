@@ -1,5 +1,14 @@
 # y-partyserver
 
+## 0.0.17
+
+### Patch Changes
+
+- [`438c7b3`](https://github.com/threepointone/partyserver/commit/438c7b3b14ce5531e8f1a1bfdc23bb08f5c41002) Thanks [@threepointone](https://github.com/threepointone)! - y-partyserver: rename YjsServer - YServer, better docs
+
+- Updated dependencies [[`6993aec`](https://github.com/threepointone/partyserver/commit/6993aece9de79d8855de8079d27bdebe4b96f3ce)]:
+  - partyserver@0.0.47
+
 ## 0.0.16
 
 ### Patch Changes
