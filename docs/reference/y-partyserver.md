@@ -1,19 +1,22 @@
+## y-partyserver
+
+[//]: # "keep in sync with packages/y-partyserver/README.md"
+[//]: # "keep in sync with docs/reference/y-partyserver.md"
+
 `y-partyserver` is an addon library for `partyserver` designed to host backends for [Yjs](https://yjs.dev), a high-performance library of data structures for building collaborative software.
 
 _This document assumes some familiarity with Yjs. If you're new to Yjs, you can learn more about it in the [official documentation](https://docs.yjs.dev)._
 
 ## Setting up a Yjs Server
 
-Like PartyServer, `YjsDocument` is a class that extends `DurableObject` (as well as PartyServer's `Server`). The simplest Yjs backend can be set up like so:
+Like PartyServer, `YServer` is a class that extends `DurableObject` (as well as PartyServer's `Server`). The simplest Yjs backend can be set up like so:
 
 ```ts
-export { YjsDocument as MyYjsServer } from "y-partyserver";
+export { YServer as MyYServer } from "y-partyserver";
 
 // then setup wrangler.toml and a default fetch handler
 // like you would for PartyServer.
 ```
-
-See [Server Configuration](#server-configuration) for configuration options.
 
 ## Connecting from the client
 
@@ -31,21 +34,45 @@ const provider = new YProvider("localhost:8787", "my-document-name", yDoc);
 You can add additional options to the provider:
 
 ```tsx
-
-// ...
-const getAuthToken = () => { /* ... */ };
 const provider = new YProvider(
+  /* host */
   "localhost:8787",
-  "my-document-name", // document name
-  yDoc, // Yjs document/room instance
+  /* document/room name */
+  "my-document-name",
+  /* Yjs document instance */
+  yDoc,
   {
-    connect: false, // do not connect immediately, use provider.connect() when required
-    party: 'my-party', // the party name to connect to
-    awareness: new awarenessProtocol.Awareness(yDoc), // use your own Yjs awareness instance
-    // adds to the query string of the websocket connection, useful for e.g. auth tokens
+    /* whether to connect to the server immediately */
+    connect: false,
+    /* the party server path to connect to, defaults to "main" */
+    party: "my-party",
+    /* the path to the Yjs document on the server
+     * This replaces the default path of /parties/:party/:room.
+     */
+    prefix: "/my/own/path",
+    /* use your own Yjs awareness instance */
+    awareness: new awarenessProtocol.Awareness(yDoc),
+    /* query params to add to the websocket connection
+     * This can be an object or a function that returns an object
+     */
     params: async () => ({
       token: await getAuthToken()
-    });
+    }),
+    /* the WebSocket implementation to use
+     * This can be a polyfill or a custom implementation
+     */
+    WebSocketPolyfill: WebSocket,
+    /* the interval at which to resync the document
+     * This is set to -1 by default to disable resyncing by polling
+     */
+    resyncInterval: -1,
+    /* Maximum amount of time to wait before trying to reconnect
+     * (we try to reconnect using exponential backoff)
+     */
+    maxBackoffTimeout: 2500,
+
+    /* Disable cross-tab BroadcastChannel communication */
+    disableBc: false
   }
 );
 ```
@@ -61,6 +88,7 @@ function App() {
   const provider = useYProvider({
     host: "localhost:8787", // optional, defaults to window.location.host
     room: "my-document-name",
+    party: "my-party", // optional, defaults to "main"
     doc: yDoc, // optional!
     options
   });
@@ -75,11 +103,11 @@ To persists the Yjs document state between sessions, you can configure onLoad an
 
 ```ts
 // server.ts
-import YjsDocument from "y-partyserver";
+import { YServer } from "y-partyserver";
 
-export class MyDocument extends YjsDocument {
-  // control how often the onSave handler
-  // is called with these options
+export class MyDocument extends YServer {
+  /* control how often the onSave handler
+   * is called with these options */
   static callbackOptions = {
     // all of these are optional
     debounceWait: /* number, default = */ 2000,
@@ -89,48 +117,31 @@ export class MyDocument extends YjsDocument {
 
   // TODO: readonly mode
 
-  onLoad() {
+  async onLoad() {
     // load a document from a database, or some remote resource
-    // and return a Y.Doc instance here (or null if no document exists)
+    // and apply it on to the Yjs document instance at `this.document`
+    const content = (await fetchDataFromExternalService()) as Uint8Array;
+    if (content) {
+      Y.applyUpdate(this.document, content);
+    }
+    return;
   }
 
-  onSave() {
-    // called every few seconds after edits
-    // you can use this to write to a database
-    // or some external storage
-  }
+  async onSave() {
+    // called every few seconds after edits, and when the room empties
+    // you can use this to write to a database or some external storage
 
-  // this.document will always be the Yjs document instance
-  // for this room and you can use it to interact with the document
+    await sendDataToExternalService(
+      Y.encodeStateAsUpdate(this.document) satisfies Uint8Array
+    );
+  }
 }
 ```
 
-`onLoad` is called once when a client connects to the server. It should return a Yjs document instance. Once the document has been loaded, it's kept in memory until the session ends.
+`onLoad` is called once when a client connects to the server. It should initialise the Yjs document instance at `this.document`. Once the document has been loaded, it's kept in memory until the session ends.
 
-`onSave` is called periodically after the document has been edited. It should be used to save the document state to a database or some other external storage.
-
-```ts
-return onConnect(conn, this.party, {
-  async load() {
-    return await fetchDataFromExternalService();
-  },
-
-  callback: {
-    async handler(yDoc) {
-      return sendDataToExternalService(yDoc);
-    },
-    // only save after every 2 seconds (default)
-    debounceWait: 2000,
-    // if updates keep coming, save at least once every 10 seconds (default)
-    debounceMaxWait: 10000,
-  },
-});
-```
+`onSave` is called periodically after the document has been edited, and when the room is emptied. It should be used to save the document state to a database or some other external storage.
 
 ## Learn more
 
 For more information, refer to the [official Yjs documentation](https://docs.yjs.dev/ecosystem/editor-bindings). Examples provided in the Yjs documentation should work seamlessly with `y-partyserver` (ensure to replace `y-websocket` with `y-partyserver/provider`).
-
----
-
-Questions? Ideas? We'd love to hear from you 🎈 Reach out to us on [Discord](https://discord.gg/KDZb7J4uxJ) or [Twitter](https://twitter.com/partykit_io)!

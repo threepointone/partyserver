@@ -1,13 +1,13 @@
 import { routePartykitRequest } from "partyserver";
-import { YjsDocument } from "y-partyserver";
+import { YServer } from "y-partyserver";
 
 // import * as Y from "yjs";
 
 type Env = {
-  Document: DurableObjectNamespace<YjsDocument>;
+  Document: DurableObjectNamespace<YServer>;
 };
 
-export { YjsDocument as LexicalDocument };
+export { YServer as LexicalDocument };
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {

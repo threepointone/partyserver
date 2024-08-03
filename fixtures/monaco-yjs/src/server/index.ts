@@ -1,11 +1,11 @@
 import { routePartykitRequest } from "partyserver";
-import { YjsDocument } from "y-partyserver";
+import { YServer } from "y-partyserver";
 
 type Env = {
-  MonacoServer: DurableObjectNamespace<YjsDocument>;
+  MonacoServer: DurableObjectNamespace<YServer>;
 };
 
-export { YjsDocument as MonacoServer };
+export { YServer as MonacoServer };
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {

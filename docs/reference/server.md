@@ -14,8 +14,6 @@ Here, `Env` corresponds to the [bindings](https://developers.cloudflare.com/work
 
 ### Lifecycle Hooks
 
-These methods can be optionally `async`:
-
 - `onStart()` - Called when the server starts for the first time or after waking up from hibernation
 - `onConnect(connection, connContext)` - Called when a new connection is established
 - `onMessage(connection, message)` - Called when a message is received from a connection
@@ -23,6 +21,8 @@ These methods can be optionally `async`:
 - `onError(error)` - Called when an error occurs on a connection
 - `onRequest(request): Response` - Called when a request is received from the fetch handler
 - `getConnectionTags(connection, connContext): string[]` - Assign tags to a connection
+
+(All of these methods can be optionally `async`):
 
 ### Additional Methods
 
