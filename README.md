@@ -7,8 +7,6 @@ Build real-time applications powered by [Durable Objects](https://developers.clo
 
 ## Installation
 
-To install PartyServer, run the following command:
-
 ```shell
 npm install partyserver
 ```
@@ -39,7 +37,7 @@ Write your code:
 
 import { Server } from "partyserver";
 
-// Define your Servers
+// Define your Server
 export class MyServer extends Server {
   onConnect(connection) {
     console.log("Connected", connection.id, "to server", this.name);
@@ -78,7 +76,7 @@ tag = "v1" # Should be unique for each entry
 new_classes = ["MyServer"]
 ```
 
-See the [`/examples`](https://github.com/threepointone/partyserver/tree/main/examples) folder for more specific examples.
+See the [`/fixtures`](https://github.com/threepointone/partyserver/tree/main/fixtures) folder for more specific examples.
 
 ## Customizing `Server`
 
@@ -88,25 +86,35 @@ See the [`/examples`](https://github.com/threepointone/partyserver/tree/main/exa
 
 These methods can be optionally `async`:
 
-- `onStart()` - Called when the server starts for the first time or after waking up from hibernation
-- `onConnect(connection, connContext)` - Called when a new connection is established
-- `onMessage(connection, message)` - Called when a message is received from a connection
-- `onClose(connection, code, reason, wasClean)` - Called when a connection is closed
-- `onError(error)` - Called when an error occurs on a connection
-- `onRequest(request): Response` - Called when a request is received from the fetch handler
-- `getConnectionTags(connection, connContext): string[]` - Assign tags to a connection
+- `onStart()`: Called when the server starts for the first time or after waking up from hibernation. You can use this to load data from storage and perform other initialization, such as retrieving data or configuration from other services or databases.
+
+- `onConnect(connection, context)` - Called when a new websocket connection is established. You can use this to set up any connection-specific state or perform other initialization. Receives a reference to the connecting `Connection`, and a `ConnectionContext` that provides information about the initial connection request.
+
+- `onMessage(connection, message)` - Called when a message is received on a connection.
+
+- `onClose(connection, code, reason, wasClean)` - Called when a connection is closed by a client. By the time `onClose` is called, the connection is already closed and can no longer receive messages.
+
+- `onError(error)` - Called when an error occurs on a connection.
+
+- `onRequest(request): Response` - Called when a request is made to the server. This is useful for handling HTTP requests in addition to WebSocket connections.
+
+- `getConnectionTags(connection, context): string[]` - You can set additional metadata on connections by returning them from `getConnectionTags()`, and then filter connections based on the tag with `this.getConnections`.
 
 ### Additional Methods
 
-- `broadcast(message, exclude = [])` - Send a message to all connections, optionally excluding some
-- `getConnections(tags = [])` - Get all connections, optionally filtered by tags
-- `getConnection(id)` - Get a connection by its ID
+- `broadcast(message, exclude = [])` - Send a message to all connections, optionally excluding connection ids listed in the second array parameter.
+
+- `getConnections(tags = [])` - Get all currently connected WebSocket connections, optionally filtered by tags set by `getConnectionTags()`. Returns an iterable list of `Connection`.
+
+- `getConnection(id)` - Get a connection by its ID.
 
 ## Properties
 
-- `.name` - (readonly) this is automatically set to the server's name, determined by `getServerByName()` or `routePartykitRequest()`.
+- `.name` - (readonly) this is automatically set to the server's "name", determined by `getServerByName()` or `routePartykitRequest()`.
+
 - `.ctx` - the context object for the Durable Object, containing references to [`storage`](https://developers.cloudflare.com/durable-objects/api/transactional-storage-api/)
-- `.env` - the environment object for the Durable Object, usually defined by bindings and other configuration in your `wrangler.toml` configuration file.
+
+- `.env` - the environment object for the Durable Object, defined by bindings and other configuration in your `wrangler.toml` configuration file.
 
 ### Durable Object methods
 
@@ -125,7 +133,7 @@ A connection is a standard WebSocket with the following additional properties:
 - `server` - The server name the connection is in
 - `state` - Arbitrary state data (up to 2KB) that can be set on the connection using `connection.setState()`
 
-### Hibernation Option
+### Hibernation
 
 You can enable [hibernation](https://developers.cloudflare.com/durable-objects/reference/websockets/#websocket-hibernation) by setting a static `options` property on your Server class. This allows the server to hibernate when not in use and wake up when a new connection is established. All lifecycle hooks will be called as expected when the server wakes up.
 
@@ -140,8 +148,9 @@ export class MyServer extends Server {
 
 ### Utility Methods
 
-- `getServerByName(namespace, name, {locationHint}): Promise<DurableObjectStub>` - Create a new Server with a specific name. Optionally pass a `locationHint` to specify the [location](https://developers.cloudflare.com/durable-objects/reference/data-location/#provide-a-location-hint) of the server.
-- `routePartykitRequest(request, env, {locationHint, prefix = 'parties'}): Promise<Response | null>` - Match a request to a server. Takes a URL of the form `/${prefix}/:server/:name` and matches it with any namespace named `:server` (case insensitive) and a server named `:name`.
+- `getServerByName(namespace, name, {locationHint, jurisdiction}): Promise<DurableObjectStub>` - Create a new Server with a specific name. Optionally pass a `locationHint` to specify the [location](https://developers.cloudflare.com/durable-objects/reference/data-location/#provide-a-location-hint) or `jurisdiction` to specify the [jurisdiction](https://developers.cloudflare.com/durable-objects/reference/data-location/#restrict-durable-objects-to-a-jurisdiction) of the server.
+
+- `routePartykitRequest(request, env, {locationHint, jurisdiction, prefix = 'parties'}): Promise<Response | null>` - Match a request to a server. Takes a URL of the form `/${prefix}/:server/:name` and matches it with any namespace named `:server` (case insensitive) and a server named `:name`. Optionally pass a `locationHint` to specify the [location](https://developers.cloudflare.com/durable-objects/reference/data-location/#provide-a-location-hint) or `jurisdiction` to specify the [jurisdiction](https://developers.cloudflare.com/durable-objects/reference/data-location/#restrict-durable-objects-to-a-jurisdiction) of the server.
 
 ## Comparison to Erlang/Elixir
 
