@@ -44,7 +44,7 @@ const { PubSubServer, routePubSubRequest } = createPubSubServer({
   // Note: You CANNOT define a jurisdiction and locations at the same time
 });
 
-export PubSubServer;
+export { PubSubServer };
 
 // setup your worker handler
 export default {
