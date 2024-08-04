@@ -1,11 +1,12 @@
 // this looks for all package.jsons in /packages/**/package.json
 // and replaces it with the actual version ids
 
-// we do this in 2 passes
-// first let's cycle through all packages and get thier version numbers
 import * as fs from "fs";
 
 import { Glob } from "bun";
+
+// we do this in 2 passes
+// first let's cycle through all packages and get thier version numbers
 
 const packageJsons: Record<string, any> = {};
 

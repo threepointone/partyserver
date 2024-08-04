@@ -1,3 +1,0 @@
-- [server](server.md)
-- [y-partyserver](y-partyserver.md)
-- [partyserver.io](socket-io.md)

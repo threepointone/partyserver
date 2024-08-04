@@ -26,10 +26,7 @@ jobs:
       - name: Resolve workspace dependencies
         run: bun .github/resolve-workspace-versions.ts
 
-      - run: bun run copy-readme
-
       - run: bun run build
-
       - run: bun run check
 
       - run: npm publish --tag beta

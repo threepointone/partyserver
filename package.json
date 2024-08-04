@@ -11,7 +11,6 @@
     "check:repo": "manypkg check",
     "check:test": "npm run check:test -w partyserver",
     "check:type": "bun scripts/typecheck.ts",
-    "copy-readme": "cp README.md packages/partyserver/README.md",
     "test": "npm run test -w partyserver",
     "ncu": "bunx npm-check-updates",
     "all": "bun i && bun run build && bun check",
