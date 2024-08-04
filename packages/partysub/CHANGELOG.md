@@ -1,5 +1,11 @@
 # partysub
 
+## 0.0.2
+
+### Patch Changes
+
+- [`1985f63`](https://github.com/threepointone/partyserver/commit/1985f633290114c97e7c3ac27f59bed3bff94266) Thanks [@threepointone](https://github.com/threepointone)! - POST a message to a partysub server
+
 ## 0.0.1
 
 ### Patch Changes
