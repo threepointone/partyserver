@@ -1,0 +1,12 @@
+{
+  "name": "@partyserver/fixture-pubsub",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "start": "wrangler dev"
+  },
+  "dependencies": {
+    "nanoid": "^5.0.7",
+    "partysocket": "^1.0.2"
+  }
+}

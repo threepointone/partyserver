@@ -99,7 +99,7 @@ function App() {
 
 By default, PartyKit maintains a copy of the Yjs document as long as at least one client is connected to the server. When all clients disconnect, the document state may be lost.
 
-To persists the Yjs document state between sessions, you can configure onLoad and onSave methods:
+To persist the Yjs document state between sessions, you can configure onLoad and onSave methods:
 
 ```ts
 // server.ts
@@ -115,12 +115,12 @@ export class MyDocument extends YServer {
     timeout: /* number, default = */ 5000
   };
 
-  // TODO: readonly mode
-
   async onLoad() {
     // load a document from a database, or some remote resource
     // and apply it on to the Yjs document instance at `this.document`
-    const content = (await fetchDataFromExternalService()) as Uint8Array;
+    const content = (await fetchDataFromExternalService(
+      this.name
+    )) as Uint8Array;
     if (content) {
       Y.applyUpdate(this.document, content);
     }
@@ -132,6 +132,7 @@ export class MyDocument extends YServer {
     // you can use this to write to a database or some external storage
 
     await sendDataToExternalService(
+      this.name,
       Y.encodeStateAsUpdate(this.document) satisfies Uint8Array
     );
   }

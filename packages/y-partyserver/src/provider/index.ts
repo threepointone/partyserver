@@ -5,6 +5,7 @@ import * as math from "lib0/math";
 import { Observable } from "lib0/observable";
 import * as time from "lib0/time";
 import * as url from "lib0/url";
+import { nanoid } from "nanoid";
 import * as authProtocol from "y-protocols/auth";
 import * as awarenessProtocol from "y-protocols/awareness";
 import * as syncProtocol from "y-protocols/sync";
@@ -531,32 +532,6 @@ export class WebsocketProvider extends Observable<string> {
   }
 }
 
-function generateUUID(): string {
-  // Public Domain/MIT
-  if (crypto && crypto.randomUUID) {
-    return crypto.randomUUID();
-  }
-  let d = new Date().getTime(); //Timestamp
-  let d2 =
-    (typeof performance !== "undefined" &&
-      performance.now &&
-      performance.now() * 1000) ||
-    0; //Time in microseconds since page-load or 0 if unsupported
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    let r = Math.random() * 16; //random number between 0 and 16
-    if (d > 0) {
-      //Use timestamp until depleted
-      r = (d + r) % 16 | 0;
-      d = Math.floor(d / 16);
-    } else {
-      //Use microseconds since page-load if supported
-      r = (d2 + r) % 16 | 0;
-      d2 = Math.floor(d2 / 16);
-    }
-    return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
-  });
-}
-
 function assertType(value: unknown, label: string, type: string) {
   if (typeof value !== type) {
     throw new Error(
@@ -612,7 +587,7 @@ export default class YProvider extends WebsocketProvider {
     }://${host}${options.prefix || `/parties/${options.party || "main"}`}`;
 
     // use provided id, or generate a random one
-    const id = options.connectionId ?? generateUUID();
+    const id = options.connectionId ?? nanoid(10);
 
     // don't pass params to WebsocketProvider, we override them in connect()
     const { params, connect = true, ...rest } = options;

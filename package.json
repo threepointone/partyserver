@@ -4,7 +4,7 @@
   "private": true,
   "description": "Everything's better with friends",
   "scripts": {
-    "build": "npm run build -w partyserver -w y-partyserver",
+    "build": "npm run build -w partyserver -w y-partyserver -w partysub",
     "check": "concurrently \"npm run check:repo\" \"npm run check:format\" \"npm run check:lint\" \"npm run check:type\" \"npm run check:test\" --kill-others-on-fail",
     "check:format": "prettier . --check --ignore-unknown",
     "check:lint": "eslint \"**/*.[tj]s?(x)\" --max-warnings=0 --report-unused-disable-directives",

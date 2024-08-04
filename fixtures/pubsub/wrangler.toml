@@ -1,0 +1,16 @@
+name = "partyserver-fixture-node"
+main = 'src/server/index.ts'
+compatibility_date = "2024-07-25"
+
+build.command = "esbuild src/client/index.tsx --bundle --outdir=public/dist --sourcemap"
+
+legacy_assets = 'public'
+
+
+[[durable_objects.bindings]]
+name = "PubSub"
+class_name = "PubSubServer"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["PubSubServer"]

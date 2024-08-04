@@ -33,14 +33,14 @@
     "ai agents",
     "game server"
   ],
-  "author": "Sunil Pai <threepointone@gmail.com>",
+  "author": "Sunil Pai <spai@cloudflare.com>",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "nanoid": "^5.0.7"
   },
   "peerDependencies": {
-    "@cloudflare/workers-types": "^4.20240718.0"
+    "@cloudflare/workers-types": "^4.20240729.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240729.0",
