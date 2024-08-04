@@ -77,17 +77,16 @@ import { PartySocket } from "partysocket";
 const ws = new PartySocket({
   host: "...", // the host of the partyserver, defaults to window.location.host
   party: "pubsub", // the name of the party, use the binding's lowercase form
-  room: "default" // the name of the room/channel
+  room: "default", // the name of the room/channel
   query: {
     // by default, it subscribes to all topics
     // but you can set it to specific topics
     topics: [
-    "topic-abc", // a specific topic
-    "prefix:*" // a prefixed topic,
-  ],
+      "topic-abc", // a specific topic
+      "prefix:*" // a prefixed topic,
+    ]
   }
 });
-
 
 // Listen to incoming messages
 client.addEventListener("message", (event) => {
@@ -96,6 +95,19 @@ client.addEventListener("message", (event) => {
 
 // publish a message to the server
 ws.send(JSON.stringify({ topic: "topic-abc", data: "hello world" }));
+
+// You can also POST a message to the server
+PartySocket.fetch(
+  {
+    host: window.location.host, // the host of the partyserver
+    party: "pubsub", // the name of the party, use the binding's lowercase form
+    room: "default" // the name of the room/channel
+  },
+  {
+    method: "POST",
+    body: JSON.stringify({ topic: "topic-abc", data: "hello world" })
+  }
+);
 ```
 
 ### react

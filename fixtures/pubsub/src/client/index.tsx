@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { nanoid } from "nanoid";
+import { PartySocket } from "partysocket";
 import { usePartySocket } from "partysocket/react";
 
 function App() {
@@ -36,6 +37,21 @@ function App() {
           data: `${socket.id} says hello!`
         })
       );
+
+      PartySocket.fetch(
+        {
+          host: window.location.host,
+          party: "pubsub", // the name of the party, use the binding's lowercase form
+          room: "default" // the name of the room/channel
+        },
+        {
+          method: "POST",
+          body: JSON.stringify({
+            topic: "topic-abc",
+            data: "hello from a post!"
+          })
+        }
+      ).catch(console.error);
     }, 2000);
   }, [socket]);
 

@@ -55,6 +55,10 @@ export function createPubSubServer<Env = unknown>(options: {
         return;
       }
 
+      this.broadcastPubSubMessage(topic, data);
+    }
+
+    broadcastPubSubMessage(topic: string, data: string) {
       this.publish(topic, data);
       // also publish this message to all the other nodes
       const namespace =
@@ -97,6 +101,19 @@ export function createPubSubServer<Env = unknown>(options: {
           }
         }
       }
+    }
+
+    async onRequest(request: Request): Promise<Response> {
+      const { topic, data } = await request.json<{
+        topic: string;
+        data: string;
+      }>();
+      if (!topic || !data) {
+        return new Response("Invalid request", { status: 400 });
+      }
+      this.broadcastPubSubMessage(topic, data);
+
+      return new Response("OK");
     }
   }
 
