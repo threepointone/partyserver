@@ -1,5 +1,11 @@
 # partysub
 
+## 0.0.3
+
+### Patch Changes
+
+- [`a5c8650`](https://github.com/threepointone/partyserver/commit/a5c865066d2a82972a55eb08927787178d9e97d0) Thanks [@threepointone](https://github.com/threepointone)! - fix export in partysub readme
+
 ## 0.0.2
 
 ### Patch Changes
