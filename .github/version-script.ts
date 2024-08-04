@@ -8,7 +8,8 @@ try {
 
   for (const path of [
     "./packages/partyserver/package.json",
-    "./packages/y-partyserver/package.json"
+    "./packages/y-partyserver/package.json",
+    "./packages/partysub/package.json"
   ]) {
     const packageJson = JSON.parse(fs.readFileSync(path, "utf-8"));
     packageJson.version = "0.0.0-" + stdout.trim();
