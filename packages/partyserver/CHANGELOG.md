@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.48
+
+### Patch Changes
+
+- [`2530531`](https://github.com/threepointone/partyserver/commit/25305313cd2e3901800232ce01e5a144075bb9e4) Thanks [@threepointone](https://github.com/threepointone)! - partyserver: update deps, author email
+
 ## 0.0.47
 
 ### Patch Changes

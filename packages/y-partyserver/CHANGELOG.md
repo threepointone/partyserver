@@ -1,5 +1,14 @@
 # y-partyserver
 
+## 0.0.18
+
+### Patch Changes
+
+- [`2530531`](https://github.com/threepointone/partyserver/commit/25305313cd2e3901800232ce01e5a144075bb9e4) Thanks [@threepointone](https://github.com/threepointone)! - y-partyserver: update deps and author email, use nanoid for provider id generation
+
+- Updated dependencies [[`2530531`](https://github.com/threepointone/partyserver/commit/25305313cd2e3901800232ce01e5a144075bb9e4)]:
+  - partyserver@0.0.48
+
 ## 0.0.17
 
 ### Patch Changes
