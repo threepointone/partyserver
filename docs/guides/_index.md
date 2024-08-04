@@ -21,4 +21,5 @@
 - [text editors](text-editors.md)
 - [chat](chat.md)
 - [ai agents](ai-agents.md)
+- [pubsub](pubsub.md)
 - [migrating from partykit](migrating-from-partykit.md)
