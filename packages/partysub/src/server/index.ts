@@ -1,5 +1,10 @@
 import { routePartykitRequest, Server } from "partyserver";
 
+import {
+  countriesGroupedByLocation,
+  generateIdsGroupedByLocation
+} from "./gen-ids";
+
 import type { Connection, ConnectionContext, WSMessage } from "partyserver";
 
 type ConnectionState = {
@@ -9,13 +14,17 @@ type ConnectionState = {
 export function createPubSubServer<Env = unknown>(options: {
   binding: string;
   nodes?: number;
-  locations?: Record<DurableObjectLocationHint, number>;
+  locations?: Partial<Record<DurableObjectLocationHint, number>>;
   jurisdiction?: DurableObjectJurisdiction;
 }): {
   PubSubServer: typeof Server<Env>;
   routePubSubRequest: (request: Request, env: Env) => Promise<Response | null>;
 } {
-  const nodes = options.nodes || 1;
+  const nodeIDs = generateIdsGroupedByLocation(
+    options.nodes,
+    options.locations
+  );
+
   if (options.locations && options.jurisdiction) {
     throw new Error("You can't specify both locations and jurisdiction");
   }
@@ -65,24 +74,29 @@ export function createPubSubServer<Env = unknown>(options: {
         // @ts-expect-error I don't know typescript
         this.env[options.binding] as DurableObjectNamespace<PubSubServer<Env>>;
 
-      const baseName = this.name.split("-").slice(0, -1).join("-");
+      const baseName = this.name.split("-").slice(0, -2).join("-");
 
-      for (let i = 0; i < nodes; i++) {
-        const name = `${baseName}-${i}`;
+      for (const location of Object.keys(
+        nodeIDs
+      ) as DurableObjectLocationHint[]) {
+        {
+          for (const nodeID of nodeIDs[location]) {
+            const name = `${baseName}-${nodeID}`;
+            if (this.name === name) {
+              continue;
+            }
 
-        if (this.name === name) {
-          continue;
+            const id = namespace.idFromName(name);
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const stub = namespace.get(id);
+
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            stub.publish(topic, data).catch((err: Error) => {
+              console.error(`Error publishing to ${name}`);
+              console.error(err);
+            });
+          }
         }
-
-        const id = namespace.idFromName(name);
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const stub = namespace.get(id);
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        stub.publish(topic, data).catch((err: Error) => {
-          console.error(`Error publishing to ${name}`);
-          console.error(err);
-        });
       }
     }
 
@@ -137,12 +151,41 @@ export function createPubSubServer<Env = unknown>(options: {
       return null;
     }
 
-    const id = Math.floor(Math.random() * nodes);
-    const newPath = `/parties/${party}/${room}-${id}`;
+    let countryOfOrigin: Iso3166Alpha2Code | "T1" | undefined = request.cf
+      ?.country as Iso3166Alpha2Code | "T1" | undefined;
+    if (countryOfOrigin === "T1") {
+      countryOfOrigin = undefined;
+    }
+
+    // find which location this request came from
+    let foundLocation: DurableObjectLocationHint | undefined;
+    if (countryOfOrigin) {
+      for (const location of Object.keys(
+        countriesGroupedByLocation
+      ) as DurableObjectLocationHint[]) {
+        if (countriesGroupedByLocation[location].includes(countryOfOrigin)) {
+          foundLocation = location;
+          break;
+        }
+      }
+    }
+
+    if (!foundLocation || !Object.keys(nodeIDs).includes(foundLocation)) {
+      // pick a random one from Object.keys(nodeIDs)
+      const keys = Object.keys(nodeIDs);
+      foundLocation = keys[
+        Math.floor(Math.random() * keys.length)
+      ] as DurableObjectLocationHint;
+    }
+
+    const id = Math.floor(Math.random() * nodeIDs[foundLocation].length);
+    const newPath = `/parties/${party}/${room}-${nodeIDs[foundLocation][id]}`;
     url.pathname = newPath;
     const newRequest = new Request(url.toString(), request);
     // @ts-expect-error I don't know typescript
-    return routePartykitRequest(newRequest, env);
+    return routePartykitRequest(newRequest, env, {
+      locationHint: foundLocation
+    });
   }
 
   return {

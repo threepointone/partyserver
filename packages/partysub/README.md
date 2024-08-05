@@ -1,4 +1,4 @@
-## partysub
+## 🥖 partysub
 
 > [!WARNING]
 > This project is experimental and is not yet recommended for production use.
@@ -22,7 +22,6 @@ const { PubSubServer, routePubSubRequest } = createPubSubServer({
   binding: "PubSub", // the name of the binding
   nodes: /* number of nodes _PER :id_, default 1 */ 100,
 
-  // The below config doesn't work _yet_, but it's the goal
   locations: {
     // optionally define locations, and weight them
     // the weight determines how many nodes are spun up in that location
@@ -40,6 +39,8 @@ const { PubSubServer, routePubSubRequest } = createPubSubServer({
     // Note: In the future, we will autoscale servers
     // so this configuration isn't needed anymore
   },
+
+  // The below config doesn't work _yet_, but it's the goal
   jurisdiction: "eu" /* optional, default undefined */
   // Note: You CANNOT define a jurisdiction and locations at the same time
 });
