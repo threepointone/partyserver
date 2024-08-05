@@ -1,5 +1,11 @@
 # partysub
 
+## 0.0.4
+
+### Patch Changes
+
+- [`23ebafa`](https://github.com/threepointone/partyserver/commit/23ebafaa590a94370b0cda31a978947d18cb7be0) Thanks [@threepointone](https://github.com/threepointone)! - use `locations` to spin up nodes in specific areas
+
 ## 0.0.3
 
 ### Patch Changes
