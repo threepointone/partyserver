@@ -35,7 +35,7 @@ Write your code:
 ```ts
 // index.ts
 
-import { Server } from "partyserver";
+import { Server, routePartykitRequest } from "partyserver";
 
 // Define your Server
 export class MyServer extends Server {
