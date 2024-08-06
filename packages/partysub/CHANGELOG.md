@@ -1,5 +1,14 @@
 # partysub
 
+## 0.0.5
+
+### Patch Changes
+
+- [`af89974`](https://github.com/threepointone/partyserver/commit/af89974fea9bcd8d6bbbc31f5d308d9558885211) Thanks [@threepointone](https://github.com/threepointone)! - fix CI failure, run gen-ids tests, tweak warning on "main" party access
+
+- Updated dependencies [[`af89974`](https://github.com/threepointone/partyserver/commit/af89974fea9bcd8d6bbbc31f5d308d9558885211)]:
+  - partyserver@0.0.49
+
 ## 0.0.4
 
 ### Patch Changes
