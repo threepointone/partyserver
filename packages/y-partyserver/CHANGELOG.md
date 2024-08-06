@@ -1,5 +1,11 @@
 # y-partyserver
 
+## 0.0.20
+
+### Patch Changes
+
+- [`db1af7b`](https://github.com/threepointone/partyserver/commit/db1af7bdde0c2b2e21efb49d0a7fbd1ed01fa7d5) Thanks [@threepointone](https://github.com/threepointone)! - update deps
+
 ## 0.0.19
 
 ### Patch Changes
