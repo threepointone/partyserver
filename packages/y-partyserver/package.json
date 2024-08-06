@@ -39,7 +39,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "lib0": "^0.2.95",
+    "lib0": "^0.2.96",
     "lodash.debounce": "^4.0.8",
     "nanoid": "^5.0.7",
     "y-protocols": "^1.0.6"
