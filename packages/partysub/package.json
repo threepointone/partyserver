@@ -24,7 +24,8 @@
     }
   },
   "scripts": {
-    "build": "bun scripts/build.ts"
+    "build": "bun scripts/build.ts",
+    "check:test": "vitest -r src/server/tests --watch false"
   },
   "files": [
     "dist",

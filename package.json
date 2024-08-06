@@ -9,9 +9,8 @@
     "check:format": "prettier . --check --ignore-unknown",
     "check:lint": "eslint \"**/*.[tj]s?(x)\" --max-warnings=0 --report-unused-disable-directives",
     "check:repo": "manypkg check",
-    "check:test": "npm run check:test -w partyserver",
+    "check:test": "npm run check:test -w partyserver -w partysub",
     "check:type": "bun scripts/typecheck.ts",
-    "test": "npm run test -w partyserver",
     "ncu": "bunx npm-check-updates",
     "all": "bun i && bun run build && bun check",
     "postinstall": "sh -c '[ -f package-lock.json ] && echo \"Error: package-lock.json exists\" && exit 1 || exit 0'"

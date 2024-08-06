@@ -105,8 +105,16 @@ export async function routePartykitRequest<
     namespace = parts[2];
   if (parts[1] === prefix && name && namespace) {
     if (!map[namespace]) {
-      console.error(`The url ${req.url} does not match any server namespace. 
+      if (namespace === "main") {
+        console.warn(
+          `You appear to be migrating a PartyKit project to PartyServer.`
+        );
+        console.warn(`PartyServer doesn't have a "main" party by default. Try adding this to your PartySocket client:\n 
+party: "${Object.keys(map)[0].toLowerCase()}"`);
+      } else {
+        console.error(`The url ${req.url} does not match any server namespace. 
 Did you forget to add a durable object binding to the class in your wrangler.toml?`);
+      }
     }
 
     let doNamespace = map[namespace];
