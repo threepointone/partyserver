@@ -82,9 +82,9 @@ You can connect to the server from a client (like a browser or a mobile app) usi
 import { PartySocket } from "partysocket";
 
 const socket = new PartySocket({
-  host: 'https://my-partyserver-app.threepointone.workers.dev`, // optional, defaults to window.location.host,
-  party: 'my-server', // the server name. if you use routePartykitRequest, it automatically uses the kebab-cased version of the binding name (MyServer -> my-server)
-  room: 'my-room'
+  host: "https://my-partyserver-app.threepointone.workers.dev", // optional, defaults to window.location.host,
+  party: "my-server", // the server name. if you use routePartykitRequest, it automatically uses the kebab-cased version of the binding name (MyServer -> my-server)
+  room: "my-room"
 });
 ```
 
@@ -106,7 +106,7 @@ These methods can be optionally `async`:
 
 - `onClose(connection, code, reason, wasClean)` - Called when a connection is closed by a client. By the time `onClose` is called, the connection is already closed and can no longer receive messages.
 
-- `onError(error)` - Called when an error occurs on a connection.
+- `onError(connection, error)` - Called when an error occurs on a connection.
 
 - `onRequest(request): Response` - Called when a request is made to the server. This is useful for handling HTTP requests in addition to WebSocket connections.
 
