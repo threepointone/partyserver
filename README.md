@@ -10,7 +10,7 @@ This is the main repository for PartyServer. It contains the following packages:
 
 [Y-PartyServer](/packages/y-partyserver/README.md) - A library that adds Yjs support to PartyServer. Yjs is a CRDT library that allows for real-time collaborative editing. This library exposes a base class extending PartyServer that adds Yjs support, with utility hooks for loading/saving Yjs documents from any external storage.
 
-[🥖 partysub](/packages/partysub/README.md) - A library for doing pubsub at scale with PartyServer. It lets you configure a "room" to be backed by N separate Duable Object instances, and a strategy for spreading the laod across the world concentrated in configurable locations.
+[🥖 partysub](/packages/partysub/README.md) - A library for doing pubsub at scale with PartyServer. It lets you configure a "room" to be backed by N separate Durable Object instances, and a strategy for spreading the laod across the world concentrated in configurable locations.
 
 ### Fixtures
 
