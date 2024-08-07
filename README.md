@@ -6,7 +6,7 @@ Libraries / Examples / Documentation for building real-time apps (and more!) wit
 
 This is the main repository for PartyServer. It contains the following packages:
 
-[PartyServer](/packages/partyserver/README.md) - The core library for building real-time applications with Durable Objects. This library adds a boilerplate code on to a standard Durable Object that makes it easier to work with when using WebSockets, as well as adding some additional features like lifecycle hooks and broadcasting.
+[PartyServer](/packages/partyserver/README.md) - The core library for building real-time applications with Durable Objects. This library enhances a standard Durable Object to makes it easier to work with WebSockets, as well as adding some additional features like lifecycle hooks and broadcasting.
 
 [Y-PartyServer](/packages/y-partyserver/README.md) - A library that adds Yjs support to PartyServer. Yjs is a CRDT library that allows for real-time collaborative editing. This library exposes a base class extending PartyServer that adds Yjs support, with utility hooks for loading/saving Yjs documents from any external storage.
 
