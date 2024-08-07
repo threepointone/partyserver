@@ -35,7 +35,7 @@ Write your code:
 ```ts
 // index.ts
 
-import { Server } from "partyserver";
+import { routePartykitRequest, Server } from "partyserver";
 
 // Define your Server
 export class MyServer extends Server {
@@ -74,6 +74,18 @@ class_name = "MyServer"
 [[migrations]]
 tag = "v1" # Should be unique for each entry
 new_classes = ["MyServer"]
+```
+
+You can connect to the server from a client (like a browser or a mobile app) using [`partysocket`](npmjs.com/package/partysocket) or any other WebSocket client.
+
+```ts
+import { PartySocket } from "partysocket";
+
+const socket = new PartySocket({
+  host: 'https://my-partyserver-app.threepointone.workers.dev`, // optional, defaults to window.location.host,
+  party: 'my-server', // the server name. if you use routePartykitRequest, it automatically uses the kebab-cased version of the binding name (MyServer -> my-server)
+  room: 'my-room'
+});
 ```
 
 See the [`/fixtures`](https://github.com/threepointone/partyserver/tree/main/fixtures) folder for more specific examples.

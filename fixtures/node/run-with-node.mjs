@@ -5,7 +5,7 @@ import WS from "ws";
 const ps = new PartySocket({
   host: "127.0.0.1:8787",
   room: "test",
-  party: "myserver",
+  party: "my-server",
   WebSocket: WS
   // debug: true,
   // debugLogger: (_arg, ...args) => {

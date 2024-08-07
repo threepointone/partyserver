@@ -1,161 +1,19 @@
-# PartyServer
+## 🎈 PartyServer
 
-Build real-time applications powered by [Durable Objects](https://developers.cloudflare.com/durable-objects/), inspired by [PartyKit](https://www.partykit.io/).
+_Much like life, this is a Work in Progress._
 
-> [!WARNING]
-> This project is experimental and is not yet recommended for production use.
+Libraries / Examples / Documentation for building real-time apps (and more!) with [Cloudflare Workers](https://workers.cloudflare.com/). Powered by Durable Objects, Inspired by [PartyKit](https://www.partykit.io/).
 
-## Installation
+This is the main repository for PartyServer. It contains the following packages:
 
-```shell
-npm install partyserver
-```
+[PartyServer](/packages/partyserver/README.md) - The core library for building real-time applications with Durable Objects. This library adds a boilerplate code on to a standard Durable Object that makes it easier to work with when using WebSockets, as well as adding some additional features like lifecycle hooks and broadcasting.
 
-## Why Use PartyServer?
+[Y-PartyServer](/packages/y-partyserver/README.md) - A library that adds Yjs support to PartyServer. Yjs is a CRDT library that allows for real-time collaborative editing. This library exposes a base class extending PartyServer that adds Yjs support, with utility hooks for loading/saving Yjs documents from any external storage.
 
-PartyServer enhances Durable Objects with the following features:
+[🥖 partysub](/packages/partysub/README.md) - A library for doing pubsub at scale with PartyServer. It lets you configure a "room" to be baccked by N separate Duable Object instances, and a strategy for spreading the laod across the world concentrated in configurable locations.
 
-- Simple "room"-based routing
-- Lifecycle hooks for connections and requests
-- A unified API for managing hibernated and non-hibernated Durable Objects
-- Easy broadcasting to all or selected connections in a server
+### Fixtures
 
-## How is it different from PartyKit?
+We have a set of small examples for PartyServer in the [`fixtures`](/fixtures/) directory. These are small, self-contained examples that demonstrate how to use PartyServer in different ways. We will expand this repository with broader (and deeper!) examples in the future.
 
-- Decouples the idea of a URL from the server name. This is useful when you want to associate a server with some other identifier like a session ID, etc. You can still use `routePartykitRequest()` to get PartyKit-style route matching.
-- Doesn't include bindings for other services like AI, static assets, etc. Instead, use wrangler's built-in support for those services.
-- Doesn't have PartyKit's auto-inferred declaration for Durable Object bindings and migrations, so you have to manually specify these in `wrangler.toml`. We may add this in the future.
-
-## Usage
-
-Here's an example of how to use PartyServer:
-
-Write your code:
-
-```ts
-// index.ts
-
-import { Server } from "partyserver";
-
-// Define your Server
-export class MyServer extends Server {
-  onConnect(connection) {
-    console.log("Connected", connection.id, "to server", this.name);
-  }
-
-  onMessage(connection, message) {
-    console.log("Message from", connection.id, ":", message);
-    // Send the message to every other connection
-    this.broadcast(message, [connection.id]);
-  }
-}
-
-export default {
-  // Set up your fetch handler to use configured Servers
-  fetch(request, env) {
-    return (
-      routePartykitRequest(request, env) ||
-      new Response("Not Found", { status: 404 })
-    );
-  }
-};
-```
-
-And configure your `wrangler.toml`:
-
-```toml
-name = "my-partyserver-app"
-main = "index.ts"
-
-[[durable_objects.bindings]]
-name = "MyServer"
-class_name = "MyServer"
-
-[[migrations]]
-tag = "v1" # Should be unique for each entry
-new_classes = ["MyServer"]
-```
-
-See the [`/fixtures`](https://github.com/threepointone/partyserver/tree/main/fixtures) folder for more specific examples.
-
-## Customizing `Server`
-
-`Server` is a class that extends `DurableObject`. You can override the following methods on `Server` to add custom behavior:
-
-### Lifecycle Hooks
-
-These methods can be optionally `async`:
-
-- `onStart()`: Called when the server starts for the first time or after waking up from hibernation. You can use this to load data from storage and perform other initialization, such as retrieving data or configuration from other services or databases.
-
-- `onConnect(connection, context)` - Called when a new websocket connection is established. You can use this to set up any connection-specific state or perform other initialization. Receives a reference to the connecting `Connection`, and a `ConnectionContext` that provides information about the initial connection request.
-
-- `onMessage(connection, message)` - Called when a message is received on a connection.
-
-- `onClose(connection, code, reason, wasClean)` - Called when a connection is closed by a client. By the time `onClose` is called, the connection is already closed and can no longer receive messages.
-
-- `onError(error)` - Called when an error occurs on a connection.
-
-- `onRequest(request): Response` - Called when a request is made to the server. This is useful for handling HTTP requests in addition to WebSocket connections.
-
-- `getConnectionTags(connection, context): string[]` - You can set additional metadata on connections by returning them from `getConnectionTags()`, and then filter connections based on the tag with `this.getConnections`.
-
-### Additional Methods
-
-- `broadcast(message, exclude = [])` - Send a message to all connections, optionally excluding connection ids listed in the second array parameter.
-
-- `getConnections(tags = [])` - Get all currently connected WebSocket connections, optionally filtered by tags set by `getConnectionTags()`. Returns an iterable list of `Connection`.
-
-- `getConnection(id)` - Get a connection by its ID.
-
-## Properties
-
-- `.name` - (readonly) this is automatically set to the server's "name", determined by `getServerByName()` or `routePartykitRequest()`.
-
-- `.ctx` - the context object for the Durable Object, containing references to [`storage`](https://developers.cloudflare.com/durable-objects/api/transactional-storage-api/)
-
-- `.env` - the environment object for the Durable Object, defined by bindings and other configuration in your `wrangler.toml` configuration file.
-
-### Durable Object methods
-
-- `fetch(request)` - PartyServer overrides the `fetch` method to add the lifecycle methods to the server instance. In most cases you don't have to implement this mehod yourself. If you do (for example, to add request handling before any lifecycle methods are called), make sure to call `super.fetch(request)` as appropriate to ensure the lifecycle methods are called.
-
-- `alarm()` - Implement this method to handle alarms. This is the only way to run code after the server has been evicted. Read more about alarms [here](https://developers.cloudflare.com/durable-objects/api/alarms/).
-
-- Do not implement any of these methods on your server class: `webSocketMessage` /`webSocketClose` / `webSocketError`. We override them to call the lifecycle methods in hibernation mode.
-
-### Connection Properties
-
-A connection is a standard WebSocket with the following additional properties:
-
-- `id` - A unique ID for the connection
-- `tags` - An array of tags assigned to the connection (TODO)
-- `server` - The server name the connection is in
-- `state` - Arbitrary state data (up to 2KB) that can be set on the connection using `connection.setState()`
-
-### Hibernation
-
-You can enable [hibernation](https://developers.cloudflare.com/durable-objects/reference/websockets/#websocket-hibernation) by setting a static `options` property on your Server class. This allows the server to hibernate when not in use and wake up when a new connection is established. All lifecycle hooks will be called as expected when the server wakes up.
-
-```ts
-export class MyServer extends Server {
-  static options = {
-    hibernate: true
-  };
-  // ...
-}
-```
-
-### Utility Methods
-
-- `getServerByName(namespace, name, {locationHint, jurisdiction}): Promise<DurableObjectStub>` - Create a new Server with a specific name. Optionally pass a `locationHint` to specify the [location](https://developers.cloudflare.com/durable-objects/reference/data-location/#provide-a-location-hint) or `jurisdiction` to specify the [jurisdiction](https://developers.cloudflare.com/durable-objects/reference/data-location/#restrict-durable-objects-to-a-jurisdiction) of the server.
-
-- `routePartykitRequest(request, env, {locationHint, jurisdiction, prefix = 'parties'}): Promise<Response | null>` - Match a request to a server. Takes a URL of the form `/${prefix}/:server/:name` and matches it with any namespace named `:server` (case insensitive) and a server named `:name`. Optionally pass a `locationHint` to specify the [location](https://developers.cloudflare.com/durable-objects/reference/data-location/#provide-a-location-hint) or `jurisdiction` to specify the [jurisdiction](https://developers.cloudflare.com/durable-objects/reference/data-location/#restrict-durable-objects-to-a-jurisdiction) of the server.
-
-## Comparison to Erlang/Elixir
-
-"Wait", I hear you say, "this looks a lot like Erlang/Elixir's actor model!" And you'd be right! Durable Objects are inspired by the actor model/[GenServer](https://hexdocs.pm/elixir/1.12/GenServer.html) and aims to provide a similar experience for developers building applications on Cloudflare Workers. It's implemented fully in the infrastructure layer, so you don't have to maintain your own infrastructure.
-
-Instead of spawning "actors", you create servers that handle connections and messages. This is because Durable Objects are designed to be long-lived and stateful, so it makes sense to model them as servers that can handle multiple connections.
-
-It differs in a specific way: There's no "terminate" handler, because a Durable Object can "shut down" / get evicted at any time, and we can't reliably call a "terminate" handler. Instead, you can set an alarm to run some cleanup code at some point in the future.
+Reach out to [@threepointone on twitter](https://twitter.com/threepointone) or the [Cloudflare Workers Discord](https://discord.com/invite/cloudflaredev) to follow progress, and if you have any questions or feedback.

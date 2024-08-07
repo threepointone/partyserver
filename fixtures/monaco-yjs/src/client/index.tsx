@@ -1,4 +1,5 @@
 import * as monaco from "monaco-editor";
+import { WebSocket as BetterWebSocket } from "partysocket";
 import { MonacoBinding } from "y-monaco";
 import YProvider from "y-partyserver/provider";
 import * as Y from "yjs";
@@ -29,7 +30,9 @@ window.MonacoEnvironment = {
 window.addEventListener("load", () => {
   const ydoc = new Y.Doc();
   const provider = new YProvider(window.location.origin, "monaco-demo", ydoc, {
-    party: "monaco"
+    party: "monaco",
+    // @ts-expect-error I don't know typescript
+    WebSocketPolyfill: BetterWebSocket
   });
 
   provider.ws?.send("do-the-thing");

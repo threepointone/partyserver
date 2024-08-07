@@ -20,7 +20,7 @@ function Editor() {
 
   const yProvider = useYProvider({
     room: docName,
-    prefix: `/parties/lexicaldocument/${docName}`
+    prefix: `/parties/lexical-document/${docName}`
   });
 
   return (

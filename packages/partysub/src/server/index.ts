@@ -11,6 +11,16 @@ type ConnectionState = {
   topics: string[];
 };
 
+function camelCaseToKebabCase(str: string): string {
+  let kebabified = str.replace(
+    /[A-Z]/g,
+    (letter) => `-${letter.toLowerCase()}`
+  );
+  kebabified = kebabified.startsWith("-") ? kebabified.slice(1) : kebabified;
+  // also remove any trailing -'s
+  return kebabified.replace(/-$/, "");
+}
+
 export function createPubSubServer<Env = unknown>(options: {
   binding: string;
   nodes?: number;
@@ -147,7 +157,7 @@ export function createPubSubServer<Env = unknown>(options: {
     const party = parts[2];
     const room = parts[3];
 
-    if (party !== options.binding.toLowerCase()) {
+    if (party !== camelCaseToKebabCase(options.binding)) {
       return null;
     }
 

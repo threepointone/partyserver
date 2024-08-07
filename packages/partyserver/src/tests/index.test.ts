@@ -58,7 +58,7 @@ describe("Server", () => {
 
     async function makeConnection() {
       const request = new Request(
-        "http://example.com/parties/onstartserver/123",
+        "http://example.com/parties/on-start-server/123",
         {
           headers: {
             Upgrade: "websocket"
@@ -84,7 +84,7 @@ describe("Server", () => {
 
     async function makeRequest() {
       const request = new Request(
-        "http://example.com/parties/onstartserver/123"
+        "http://example.com/parties/on-start-server/123"
       );
       const response = await worker.fetch(request, env, ctx);
       expect(await response.text()).toEqual("1");

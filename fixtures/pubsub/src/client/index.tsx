@@ -15,7 +15,7 @@ function App() {
   const [id] = useState<string>(() => nanoid(8));
 
   const socket = usePartySocket({
-    party: "pubsub",
+    party: "pub-sub",
     room: "default",
     id,
     onMessage: (evt) => {
@@ -41,7 +41,7 @@ function App() {
       PartySocket.fetch(
         {
           host: window.location.host,
-          party: "pubsub", // the name of the party, use the binding's lowercase form
+          party: "pub-sub", // the name of the party, use the binding's lowercase form
           room: "default" // the name of the room/channel
         },
         {

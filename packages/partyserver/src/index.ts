@@ -57,6 +57,16 @@ export async function getServerByName<Env, T extends Server<Env>>(
   return stub;
 }
 
+function camelCaseToKebabCase(str: string): string {
+  let kebabified = str.replace(
+    /[A-Z]/g,
+    (letter) => `-${letter.toLowerCase()}`
+  );
+  kebabified = kebabified.startsWith("-") ? kebabified.slice(1) : kebabified;
+  // also remove any trailing -'s
+  return kebabified.replace(/-$/, "");
+}
+
 /**
  * A utility function for PartyKit style routing.
  */
@@ -82,7 +92,7 @@ export async function routePartykitRequest<
           "idFromName" in v &&
           typeof v.idFromName === "function"
         ) {
-          return { ...acc, [k.toLowerCase()]: v };
+          return { ...acc, [camelCaseToKebabCase(k)]: v };
         }
         return acc;
       }, {})
@@ -110,7 +120,7 @@ export async function routePartykitRequest<
           `You appear to be migrating a PartyKit project to PartyServer.`
         );
         console.warn(`PartyServer doesn't have a "main" party by default. Try adding this to your PartySocket client:\n 
-party: "${Object.keys(map)[0].toLowerCase()}"`);
+party: "${camelCaseToKebabCase(Object.keys(map)[0])}"`);
       } else {
         console.error(`The url ${req.url} does not match any server namespace. 
 Did you forget to add a durable object binding to the class in your wrangler.toml?`);
