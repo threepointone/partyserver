@@ -1,5 +1,12 @@
 # y-partyserver
 
+## 0.0.21
+
+### Patch Changes
+
+- Updated dependencies [[`c662425`](https://github.com/threepointone/partyserver/commit/c662425f24b7dcc1ae1f8dbf81def474ffad9261)]:
+  - partyserver@0.0.50
+
 ## 0.0.20
 
 ### Patch Changes
