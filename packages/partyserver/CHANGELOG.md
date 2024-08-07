@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.50
+
+### Patch Changes
+
+- [`c662425`](https://github.com/threepointone/partyserver/commit/c662425f24b7dcc1ae1f8dbf81def474ffad9261) Thanks [@threepointone](https://github.com/threepointone)! - use kebabcase when converting binding name to a party name
+
 ## 0.0.49
 
 ### Patch Changes

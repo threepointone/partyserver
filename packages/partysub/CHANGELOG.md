@@ -1,5 +1,14 @@
 # partysub
 
+## 0.0.6
+
+### Patch Changes
+
+- [`c662425`](https://github.com/threepointone/partyserver/commit/c662425f24b7dcc1ae1f8dbf81def474ffad9261) Thanks [@threepointone](https://github.com/threepointone)! - use kebabcase when converting binding name to a party name
+
+- Updated dependencies [[`c662425`](https://github.com/threepointone/partyserver/commit/c662425f24b7dcc1ae1f8dbf81def474ffad9261)]:
+  - partyserver@0.0.50
+
 ## 0.0.5
 
 ### Patch Changes
