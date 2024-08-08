@@ -76,7 +76,7 @@ tag = "v1" # Should be unique for each entry
 new_classes = ["MyServer"]
 ```
 
-You can connect to the server from a client (like a browser or a mobile app) using [`partysocket`](npmjs.com/package/partysocket) or any other WebSocket client.
+You can connect to the server from a client (like a browser or a mobile app) using [`partysocket`](https://npmjs.com/package/partysocket) or any other WebSocket client.
 
 ```ts
 import { PartySocket } from "partysocket";
