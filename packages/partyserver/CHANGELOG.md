@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.52
+
+### Patch Changes
+
+- [#81](https://github.com/threepointone/partyserver/pull/81) [`42e6502`](https://github.com/threepointone/partyserver/commit/42e65020dd96c424f98d19977739cef3d06ca3d4) Thanks [@threepointone](https://github.com/threepointone)! - implement onAlarm
+
 ## 0.0.51
 
 ### Patch Changes

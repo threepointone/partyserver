@@ -1,5 +1,12 @@
 # partysub
 
+## 0.0.8
+
+### Patch Changes
+
+- Updated dependencies [[`42e6502`](https://github.com/threepointone/partyserver/commit/42e65020dd96c424f98d19977739cef3d06ca3d4)]:
+  - partyserver@0.0.52
+
 ## 0.0.7
 
 ### Patch Changes
