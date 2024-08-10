@@ -110,6 +110,8 @@ These methods can be optionally `async`:
 
 - `onRequest(request): Response` - Called when a request is made to the server. This is useful for handling HTTP requests in addition to WebSocket connections.
 
+- `onAlarm()` - Called when an alarm is triggered. You can set an alarm by calling `this.ctx.storage.setAlarm(Date)`. Read more about Durable Objects alarms [here](https://developers.cloudflare.com/durable-objects/api/alarms/).
+
 - `getConnectionTags(connection, context): string[]` - You can set additional metadata on connections by returning them from `getConnectionTags()`, and then filter connections based on the tag with `this.getConnections`.
 
 ### Additional Methods
@@ -132,9 +134,9 @@ These methods can be optionally `async`:
 
 - `fetch(request)` - PartyServer overrides the `fetch` method to add the lifecycle methods to the server instance. In most cases you don't have to implement this mehod yourself. If you do (for example, to add request handling before any lifecycle methods are called), make sure to call `super.fetch(request)` as appropriate to ensure the lifecycle methods are called.
 
-- `alarm()` - Implement this method to handle alarms. This is the only way to run code after the server has been evicted. Read more about alarms [here](https://developers.cloudflare.com/durable-objects/api/alarms/).
+- `alarm()` - _You should not implement/override this yourself, use `onAlarm()` instead._ This method is called whenever an alarm is triggered. This is the only way to run code after the server has been evicted. Read more about alarms [here](https://developers.cloudflare.com/durable-objects/api/alarms/).
 
-- Do not implement any of these methods on your server class: `webSocketMessage` /`webSocketClose` / `webSocketError`. We override them to call the lifecycle methods in hibernation mode.
+- Do not implement any of these methods on your server class: `webSocketMessage` /`webSocketClose` / `webSocketError` / alarm. We override them to call the lifecycle methods in hibernation mode.
 
 ### Connection Properties
 

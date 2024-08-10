@@ -178,7 +178,7 @@ export class Server<Env = unknown> extends DurableObject<Env> {
 
     // TODO: throw error if any of
     // broadcast/getConnection/getConnections/getConnectionTags
-    // fetch/webSocketMessage/webSocketClose/webSocketError
+    // fetch/webSocketMessage/webSocketClose/webSocketError/alarm
     // have been overridden
   }
 
@@ -193,7 +193,8 @@ export class Server<Env = unknown> extends DurableObject<Env> {
       const namespace = request.headers.get("x-partykit-namespace");
       const room = request.headers.get("x-partykit-room");
       if (!namespace || !room) {
-        throw new Error("Missing namespace or room headers");
+        throw new Error(`Missing namespace or room headers when connecting to ${this.#ParentClass.name}.
+Did you try connecting directly to this Durable Object? Try using getServerByName(namespace, id) instead.`);
       }
       await this.setName(room);
     }
@@ -519,5 +520,20 @@ export class Server<Env = unknown> extends DurableObject<Env> {
     );
 
     return new Response(`Not implemented`, { status: 404 });
+  }
+
+  onAlarm(): void | Promise<void> {
+    console.log(
+      `Implement onAlarm on ${this.#ParentClass.name} to handle alarms.`
+    );
+  }
+
+  async alarm(): Promise<void> {
+    if (this.#status !== "started") {
+      // This means the server "woke up" after hibernation
+      // so we need to hydrate it again
+      await this.#initialize();
+    }
+    await this.onAlarm();
   }
 }
