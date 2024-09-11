@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.55
+
+### Patch Changes
+
+- [`d58418c`](https://github.com/threepointone/partyserver/commit/d58418c5aeb1795b17ce2994b7ae51994abf428b) Thanks [@threepointone](https://github.com/threepointone)! - remove the scary warning from the readme
+
 ## 0.0.54
 
 ### Patch Changes
