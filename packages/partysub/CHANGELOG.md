@@ -1,5 +1,14 @@
 # partysub
 
+## 0.0.10
+
+### Patch Changes
+
+- [#85](https://github.com/threepointone/partyserver/pull/85) [`5a744fb`](https://github.com/threepointone/partyserver/commit/5a744fbdfd074fce49daaf6a3b8315a6f6588560) Thanks [@threepointone](https://github.com/threepointone)! - Update dependencies
+
+- Updated dependencies [[`5a744fb`](https://github.com/threepointone/partyserver/commit/5a744fbdfd074fce49daaf6a3b8315a6f6588560)]:
+  - partyserver@0.0.54
+
 ## 0.0.9
 
 ### Patch Changes
