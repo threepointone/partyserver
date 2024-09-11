@@ -214,10 +214,10 @@ Did you try connecting directly to this Durable Object? Try using getServerByNam
       const url = new URL(request.url);
 
       // TODO: this is a hack to set the server name,
-      // so we can
+      // it'll be replaced with RPC later
       if (url.pathname === "/cdn-cgi/partyserver/set-name/") {
-        // we can
-        return Response.json({ success: true });
+        // we can just return a 200 for now
+        return Response.json({ ok: true });
       }
 
       if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") {
