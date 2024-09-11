@@ -33,6 +33,7 @@ const serverMapCache = new WeakMap<
 /**
  * For a given server namespace, create a server with a name.
  */
+// eslint-disable-next-line @typescript-eslint/require-await
 export async function getServerByName<Env, T extends Server<Env>>(
   serverNamespace: DurableObjectNamespace<T>,
   name: string,
@@ -48,11 +49,18 @@ export async function getServerByName<Env, T extends Server<Env>>(
   const id = serverNamespace.idFromName(name);
   const stub = serverNamespace.get(id, options);
 
-  // TODO: fix this
-  await stub.setName(name);
-  // .catch((e) => {
-  //   console.error("Could not set server name:", e);
-  // });
+  // TODO: fix this to use RPC
+
+  const req = new Request(
+    `http://dummy-example.cloudflare.com/cdn-cgi/partyserver/set-name/`
+  );
+
+  req.headers.set("x-partykit-room", name);
+
+  // Note the lack of await
+  stub.fetch(req).catch((e) => {
+    console.error("Could not set server name:", e);
+  });
 
   return stub;
 }
@@ -168,13 +176,13 @@ export class Server<Env = unknown> extends DurableObject<Env> {
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
 
-    this.ctx
-      .blockConcurrencyWhile(async () => {
-        await this.#initialize();
-      })
-      .catch((e) => {
-        console.error(`Error while initilaizing ${this.#ParentClass.name}:`, e);
-      });
+    // this.ctx
+    //   .blockConcurrencyWhile(async () => {
+    //     await this.#initialize();
+    //   })
+    //   .catch((e) => {
+    //     console.error(`Error while initilaizing ${this.#ParentClass.name}:`, e);
+    //   });
 
     // TODO: throw error if any of
     // broadcast/getConnection/getConnections/getConnectionTags
@@ -190,9 +198,12 @@ export class Server<Env = unknown> extends DurableObject<Env> {
       // This is temporary while we solve https://github.com/cloudflare/workerd/issues/2240
 
       // get namespace and room from headers
-      const namespace = request.headers.get("x-partykit-namespace");
+      // const namespace = request.headers.get("x-partykit-namespace");
       const room = request.headers.get("x-partykit-room");
-      if (!namespace || !room) {
+      if (
+        // !namespace ||
+        !room
+      ) {
         throw new Error(`Missing namespace or room headers when connecting to ${this.#ParentClass.name}.
 Did you try connecting directly to this Durable Object? Try using getServerByName(namespace, id) instead.`);
       }
@@ -201,6 +212,13 @@ Did you try connecting directly to this Durable Object? Try using getServerByNam
 
     try {
       const url = new URL(request.url);
+
+      // TODO: this is a hack to set the server name,
+      // so we can
+      if (url.pathname === "/cdn-cgi/partyserver/set-name/") {
+        // we can
+        return Response.json({ success: true });
+      }
 
       if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") {
         return await this.onRequest(request);
@@ -384,7 +402,6 @@ Did you try connecting directly to this Durable Object? Try using getServerByNam
   // We won't have an await inside this function
   // but it will be called remotely,
   // so we need to mark it as async
-  // eslint-disable-next-line @typescript-eslint/require-await
   async setName(name: string) {
     if (!name) {
       throw new Error("A name is required.");
@@ -393,6 +410,12 @@ Did you try connecting directly to this Durable Object? Try using getServerByNam
       throw new Error("This server already has a name.");
     }
     this.#_name = name;
+
+    if (this.#status !== "started") {
+      await this.ctx.blockConcurrencyWhile(async () => {
+        await this.#initialize();
+      });
+    }
   }
 
   #sendMessageToConnection(connection: Connection, message: WSMessage): void {

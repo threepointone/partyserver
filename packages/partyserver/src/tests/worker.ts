@@ -2,6 +2,12 @@ import { routePartykitRequest, Server } from "../index";
 
 import type { Connection, ConnectionContext } from "../index";
 
+function assert(condition: unknown, message: string): asserts condition {
+  if (!condition) {
+    throw new Error(message);
+  }
+}
+
 export type Env = {
   Stateful: DurableObjectNamespace<Stateful>;
   OnStartServer: DurableObjectNamespace<OnStartServer>;
@@ -35,6 +41,9 @@ export class Stateful extends Server<Env> {
 export class OnStartServer extends Server<Env> {
   counter = 0;
   async onStart() {
+    // this stray assert is simply to make sure .name is available
+    // inside onStart, it should throw if not
+    assert(this.name, "name is not available inside onStart");
     await new Promise<void>((resolve) => {
       setTimeout(() => {
         this.counter++;

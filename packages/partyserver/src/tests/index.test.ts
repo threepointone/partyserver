@@ -92,6 +92,15 @@ describe("Server", () => {
 
     await Promise.all([makeConnection(), makeConnection(), makeRequest()]);
   });
+
+  it(".name is available inside onStart", async () => {
+    const ctx = createExecutionContext();
+    const request = new Request(
+      "http://example.com/parties/on-start-server/999"
+    );
+    const response = await worker.fetch(request, env, ctx);
+    expect(response.status).toBe(200);
+  });
   // it("can be connected with a query parameter");
   // it("can be connected with a header");
 
