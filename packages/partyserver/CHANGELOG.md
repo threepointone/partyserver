@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.53
+
+### Patch Changes
+
+- [#83](https://github.com/threepointone/partyserver/pull/83) [`ca4a8c5`](https://github.com/threepointone/partyserver/commit/ca4a8c57bc0f15e115ba19cefa52d4ba013ea901) Thanks [@threepointone](https://github.com/threepointone)! - fix: .name available in onStart, faster getServerByName
+
 ## 0.0.52
 
 ### Patch Changes
