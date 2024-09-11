@@ -2,9 +2,6 @@
 
 Build real-time applications powered by [Durable Objects](https://developers.cloudflare.com/durable-objects/), inspired by [PartyKit](https://www.partykit.io/).
 
-> [!WARNING]
-> This project is experimental and is not yet recommended for production use.
-
 ## Installation
 
 ```shell
