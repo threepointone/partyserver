@@ -2,7 +2,7 @@ name = "partyserver-fixture-chat"
 main = "src/server/index.ts"
 compatibility_date = "2024-04-19"
 
-legacy_assets = "public"
+legacy_assets = "./public"
 
 [build]
 command = "bun scripts/build.ts"
