@@ -149,7 +149,7 @@ function send(doc: WSSharedDoc, conn: Connection, m: Uint8Array) {
   }
 }
 
-interface CallbackOptions {
+export interface CallbackOptions {
   debounceWait?: number;
   debounceMaxWait?: number;
   timeout?: number;
