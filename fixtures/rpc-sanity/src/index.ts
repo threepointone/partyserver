@@ -5,7 +5,6 @@ type Env = {
 };
 
 export class MyServer extends Server<Env> {
-  // eslint-disable-next-line @typescript-eslint/require-await
   async testMethod() {
     return this.name;
   }

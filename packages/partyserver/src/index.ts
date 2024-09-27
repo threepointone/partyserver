@@ -33,7 +33,6 @@ const serverMapCache = new WeakMap<
 /**
  * For a given server namespace, create a server with a name.
  */
-// eslint-disable-next-line @typescript-eslint/require-await
 export async function getServerByName<Env, T extends Server<Env>>(
   serverNamespace: DurableObjectNamespace<T>,
   name: string,

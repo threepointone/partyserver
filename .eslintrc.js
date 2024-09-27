@@ -43,6 +43,7 @@ module.exports = {
   rules: {
     "@typescript-eslint/consistent-type-imports": "error",
     "@typescript-eslint/return-await": "error",
+    "@typescript-eslint/require-await": "off",
     "@typescript-eslint/no-unused-vars": [
       "warn",
       {

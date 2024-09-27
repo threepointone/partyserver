@@ -162,7 +162,6 @@ export class YServer<Env = unknown> extends Server<Env> {
   #ParentClass: typeof YServer = Object.getPrototypeOf(this).constructor;
   readonly document = new WSSharedDoc();
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   async onLoad(): Promise<void> {
     // to be implemented by the user
     return;
