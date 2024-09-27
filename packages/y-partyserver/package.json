@@ -50,7 +50,7 @@
     "yjs": "^13.6.14"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240909.0",
+    "@cloudflare/workers-types": "^4.20240925.0",
     "@types/lodash.debounce": "^4.0.9",
     "partyserver": "workspace:*",
     "ws": "^8.18.0",
