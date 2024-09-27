@@ -1,5 +1,11 @@
 # y-partyserver
 
+## 0.0.27
+
+### Patch Changes
+
+- [`72e4370`](https://github.com/threepointone/partyserver/commit/72e43703703568711da27436efb99c23445de9e8) Thanks [@threepointone](https://github.com/threepointone)! - y-partyserver: export type for callback options
+
 ## 0.0.26
 
 ### Patch Changes
