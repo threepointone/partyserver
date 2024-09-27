@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.56
+
+### Patch Changes
+
+- [#88](https://github.com/threepointone/partyserver/pull/88) [`ec7a698`](https://github.com/threepointone/partyserver/commit/ec7a698510f1d4810db923656c7e6ab90cb83165) Thanks [@aryasaatvik](https://github.com/aryasaatvik)! - update @cloudflare/workers-types
+
 ## 0.0.55
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # y-partyserver
 
+## 0.0.28
+
+### Patch Changes
+
+- [#88](https://github.com/threepointone/partyserver/pull/88) [`ec7a698`](https://github.com/threepointone/partyserver/commit/ec7a698510f1d4810db923656c7e6ab90cb83165) Thanks [@aryasaatvik](https://github.com/aryasaatvik)! - update @cloudflare/workers-types
+
+- Updated dependencies [[`ec7a698`](https://github.com/threepointone/partyserver/commit/ec7a698510f1d4810db923656c7e6ab90cb83165)]:
+  - partyserver@0.0.56
+
 ## 0.0.27
 
 ### Patch Changes
