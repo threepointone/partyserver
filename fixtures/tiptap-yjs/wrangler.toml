@@ -2,7 +2,7 @@ name = "partyserver-fixture-tiptap-yjs"
 main = "src/server/index.ts"
 compatibility_date = "2024-04-19"
 
-legacy_assets = "public"
+assets = { directory = "public" }
 
 [build]
 command = "bun scripts/build.ts"
@@ -15,4 +15,4 @@ class_name = "Document"
 
 [[migrations]]
 tag = "v1" # Should be unique for each entry
-new_classes = ["Document"]
+new_sqlite_classes = ["Document"]
