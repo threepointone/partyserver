@@ -209,7 +209,11 @@ export class InMemoryConnectionManager<TState> implements ConnectionManager {
 
   *getConnections<T = TState>(tag?: string): IterableIterator<Connection<T>> {
     if (!tag) {
-      yield* this.#connections.values() as IterableIterator<Connection<T>>;
+      yield* this.#connections
+        .values()
+        .filter(
+          (c) => c.readyState === WebSocket.READY_STATE_OPEN
+        ) as IterableIterator<Connection<T>>;
       return;
     }
 
