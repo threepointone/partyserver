@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.57
+
+### Patch Changes
+
+- [#93](https://github.com/threepointone/partyserver/pull/93) [`d429303`](https://github.com/threepointone/partyserver/commit/d42930390514b0b60d9ef0da6337af754df5447e) Thanks [@third774](https://github.com/third774)! - Filter `.getConnections()` to only include ready connections when in non-hibernating mode
+
 ## 0.0.56
 
 ### Patch Changes
