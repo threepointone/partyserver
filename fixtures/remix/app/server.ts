@@ -31,7 +31,6 @@ declare module "@remix-run/cloudflare" {
 const handleRemixRequest = createRequestHandler(build);
 
 // @ts-expect-error we haven't loaded node's types for this yet
-// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 if (process.env.NODE_ENV === "development") {
   logDevReady(build);
 }
@@ -136,7 +135,6 @@ type SessionContext<Data = unknown, FlashData = Data> = {
 export class RemixServer extends Server<Env> {
   sessions = createServerSessionStorage({
     // TODO typescript hell
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     namespace: this.env.SessionStorage
   });
 
@@ -184,7 +182,6 @@ export default class Worker extends WorkerEntrypoint<Env> {
 
     const sessionStores = createServerSessionStorage({
       // TODO typescript hell
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       namespace: this.env.SessionStorage
     });
 

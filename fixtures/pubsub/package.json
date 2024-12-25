@@ -6,7 +6,7 @@
     "start": "wrangler dev"
   },
   "dependencies": {
-    "nanoid": "^5.0.7",
-    "partysocket": "^1.0.2"
+    "nanoid": "^5.0.9",
+    "partysocket": "^1.0.3"
   }
 }

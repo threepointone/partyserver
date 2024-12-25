@@ -2,7 +2,7 @@ name = "partyserver-fixture-remix"
 main = "./dist/index.js"
 compatibility_date = "2024-05-30"
 
-legacy_assets = "public"
+assets = {directory = "./public"}
 
 [define]
 "process.env.REMIX_DEV_ORIGIN"= "'http://127.0.0.1:8002'"

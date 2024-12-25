@@ -135,7 +135,6 @@ export function useSyncStore({
 
     const pendingChanges: HistoryEntry<TLRecord>[] = [];
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
     const sendChanges = throttle(() => {
       if (pendingChanges.length === 0) return;
       socket.send(
@@ -151,7 +150,6 @@ export function useSyncStore({
     const handleChange: StoreListener<TLRecord> = (event) => {
       if (event.source !== "user") return;
       pendingChanges.push(event);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       sendChanges();
     };
 

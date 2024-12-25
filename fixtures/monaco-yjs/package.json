@@ -7,8 +7,8 @@
     "start": "wrangler dev"
   },
   "dependencies": {
-    "monaco-editor": "^0.51.0",
-    "partysocket": "^1.0.2",
+    "monaco-editor": "^0.52.2",
+    "partysocket": "^1.0.3",
     "y-monaco": "^0.1.6"
   }
 }

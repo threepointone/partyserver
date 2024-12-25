@@ -12,12 +12,12 @@ import type { Connection, ConnectionContext } from "partyserver";
 
 const wsReadyStateConnecting = 0;
 const wsReadyStateOpen = 1;
-const wsReadyStateClosing = 2; // eslint-disable-line
-const wsReadyStateClosed = 3; // eslint-disable-line
+const wsReadyStateClosing = 2;
+const wsReadyStateClosed = 3;
 
 const messageSync = 0;
 const messageAwareness = 1;
-const messageAuth = 2; // eslint-disable-line
+const messageAuth = 2;
 
 function updateHandler(update: Uint8Array, origin: unknown, doc: WSSharedDoc) {
   const encoder = encoding.createEncoder();
@@ -143,7 +143,6 @@ function send(doc: WSSharedDoc, conn: Connection, m: Uint8Array) {
   }
   try {
     conn.send(m);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
     closeConn(doc, conn);
   }
@@ -158,7 +157,6 @@ export interface CallbackOptions {
 export class YServer<Env = unknown> extends Server<Env> {
   static callbackOptions: CallbackOptions = {};
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   #ParentClass: typeof YServer = Object.getPrototypeOf(this).constructor;
   readonly document = new WSSharedDoc();
 
@@ -199,6 +197,7 @@ export class YServer<Env = unknown> extends Server<Env> {
     );
   }
 
+  // @ts-ignore something something typescript
   onMessage = handleChunked((conn, message) => {
     if (typeof message === "string") {
       console.warn(
@@ -209,7 +208,7 @@ export class YServer<Env = unknown> extends Server<Env> {
     try {
       const encoder = encoding.createEncoder();
       // TODO: this type seems odd
-      const decoder = decoding.createDecoder(message as Uint8Array);
+      const decoder = decoding.createDecoder(message as unknown as Uint8Array);
       const messageType = decoding.readVarUint(decoder);
       switch (messageType) {
         case messageSync:

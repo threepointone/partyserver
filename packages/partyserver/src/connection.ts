@@ -10,13 +10,18 @@ import type {
 
 if (!("OPEN" in WebSocket)) {
   const WebSocketStatus = {
+    // @ts-expect-error
     CONNECTING: WebSocket.READY_STATE_CONNECTING,
+    // @ts-expect-error
     OPEN: WebSocket.READY_STATE_OPEN,
+    // @ts-expect-error
     CLOSING: WebSocket.READY_STATE_CLOSING,
+    // @ts-expect-error
     CLOSED: WebSocket.READY_STATE_CLOSED
   };
 
   Object.assign(WebSocket, WebSocketStatus);
+  // @ts-expect-error
   Object.assign(WebSocket.prototype, WebSocketStatus);
 }
 
@@ -85,6 +90,7 @@ export const createLazyConnection = (
   let initialState = undefined;
   if ("state" in ws) {
     initialState = ws.state;
+    // biome-ignore lint/performance/noDelete: <explanation>
     delete ws.state;
   }
 
@@ -153,7 +159,7 @@ export const createLazyConnection = (
 class HibernatingConnectionIterator<T>
   implements IterableIterator<Connection<T>>
 {
-  private index: number = 0;
+  private index = 0;
   private sockets: WebSocket[] | undefined;
   constructor(
     private state: DurableObjectState,
@@ -166,9 +172,11 @@ class HibernatingConnectionIterator<T>
 
   next(): IteratorResult<Connection<T>, number | undefined> {
     const sockets =
+      // biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
       this.sockets ?? (this.sockets = this.state.getWebSockets(this.tag));
 
     let socket: WebSocket;
+    // biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
     while ((socket = sockets[this.index++])) {
       // only yield open sockets to match non-hibernating behaviour
       if (socket.readyState === WebSocket.READY_STATE_OPEN) {
@@ -291,14 +299,13 @@ export class HibernatingConnectionManager<TState> implements ConnectionManager {
 
     for (const tag of tags) {
       if (typeof tag !== "string") {
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         throw new Error(`A connection tag must be a string. Received: ${tag}`);
       }
       if (tag === "") {
-        throw new Error(`A connection tag must not be an empty string.`);
+        throw new Error("A connection tag must not be an empty string.");
       }
       if (tag.length > 256) {
-        throw new Error(`A connection tag must not exceed 256 characters`);
+        throw new Error("A connection tag must not exceed 256 characters");
       }
     }
 

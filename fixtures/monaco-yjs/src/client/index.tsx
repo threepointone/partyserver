@@ -5,7 +5,7 @@ import YProvider from "y-partyserver/provider";
 import * as Y from "yjs";
 
 window.MonacoEnvironment = {
-  getWorkerUrl: function (moduleId, label) {
+  getWorkerUrl: (moduleId, label) => {
     if (label === "json") {
       // return "/dist/json.worker.bundle.js";
       return "/dist/monaco-editor/esm/vs/language/json/json.js";

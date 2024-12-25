@@ -21,7 +21,7 @@ export const loader: LoaderFunction = async ({
   context
 }: LoaderFunctionArgs) => {
   const session = await context.session.get();
-  let cookieHeader;
+  let cookieHeader: string | undefined;
   if (!session.id) {
     cookieHeader = await context.session.commit(session, {
       expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365)

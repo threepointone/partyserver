@@ -1,13 +1,14 @@
 // this looks for all package.jsons in /packages/**/package.json
 // and replaces it with the actual version ids
 
-import * as fs from "fs";
+import * as fs from "node:fs";
 
 import { Glob } from "bun";
 
 // we do this in 2 passes
 // first let's cycle through all packages and get thier version numbers
 
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 const packageJsons: Record<string, any> = {};
 
 for await (const file of new Glob("./packages/*/package.json").scan(".")) {
@@ -49,6 +50,6 @@ for (const [packageName, { file, packageJson }] of Object.entries(
     }
   }
   if (changed) {
-    fs.writeFileSync(file, JSON.stringify(packageJson, null, 2) + "\n");
+    fs.writeFileSync(file, `${JSON.stringify(packageJson, null, 2)}\n`);
   }
 }

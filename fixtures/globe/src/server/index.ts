@@ -24,8 +24,8 @@ export class Globe extends Server {
 
     // First, let's extract the position from the Cloudflare headers
     const { request } = ctx;
-    const lat = parseFloat(request.cf!.latitude as string);
-    const lng = parseFloat(request.cf!.longitude as string);
+    const lat = Number.parseFloat(request.cf!.latitude as string);
+    const lng = Number.parseFloat(request.cf!.longitude as string);
     const id = conn.id;
     // And save this on the connection's state
     conn.setState({
@@ -55,7 +55,6 @@ export class Globe extends Server {
             } satisfies OutgoingMessage)
           );
         }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         this.onCloseOrError(conn);
       }

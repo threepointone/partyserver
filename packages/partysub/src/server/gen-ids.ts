@@ -11,7 +11,7 @@ const defaultLocations: DurableObjectLocationHint[] = [
 ];
 
 export function generateIdsGroupedByLocation(
-  N: number = 9,
+  N = 9,
   config: Partial<Record<DurableObjectLocationHint, number>> = {
     wnam: 1,
     enam: 1,

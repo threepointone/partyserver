@@ -2,7 +2,7 @@ name = 'partyserver-fixture-lexical-yjs'
 main = 'src/server/index.ts'
 compatibility_date = "2024-07-25"
 
-legacy_assets = './public'
+assets = {directory = "./public"}
 
 [build]
 command = "npx esbuild src/client/index.tsx --bundle --outdir=public/dist --platform=browser --format=esm --sourcemap"

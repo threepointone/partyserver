@@ -8,19 +8,19 @@
   "type": "module",
   "exports": {
     ".": {
+      "types": "./dist/server/index.d.ts",
       "require": "./dist/server/index.js",
-      "import": "./dist/server/index.js",
-      "types": "./dist/server/index.d.ts"
+      "import": "./dist/server/index.js"
     },
     "./provider": {
+      "types": "./dist/provider/index.d.ts",
       "require": "./dist/provider/index.js",
-      "import": "./dist/provider/index.js",
-      "types": "./dist/provider/index.d.ts"
+      "import": "./dist/provider/index.js"
     },
     "./react": {
+      "types": "./dist/provider/react.d.ts",
       "require": "./dist/provider/react.js",
-      "import": "./dist/provider/react.js",
-      "types": "./dist/provider/react.d.ts"
+      "import": "./dist/provider/react.js"
     }
   },
   "scripts": {
@@ -39,9 +39,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "lib0": "^0.2.97",
+    "lib0": "^0.2.99",
     "lodash.debounce": "^4.0.8",
-    "nanoid": "^5.0.7",
+    "nanoid": "^5.0.9",
     "y-protocols": "^1.0.6"
   },
   "peerDependencies": {
@@ -50,10 +50,10 @@
     "yjs": "^13.6.14"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240925.0",
+    "@cloudflare/workers-types": "^4.20241224.0",
     "@types/lodash.debounce": "^4.0.9",
     "partyserver": "workspace:*",
     "ws": "^8.18.0",
-    "yjs": "^13.6.19"
+    "yjs": "^13.6.21"
   }
 }

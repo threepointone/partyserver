@@ -7,12 +7,12 @@
     "build": "npm run build -w partyserver -w y-partyserver -w partysub",
     "check": "concurrently \"npm run check:repo\" \"npm run check:format\" \"npm run check:lint\" \"npm run check:type\" \"npm run check:test\" --kill-others-on-fail",
     "check:format": "prettier . --check --ignore-unknown",
-    "check:lint": "eslint \"**/*.[tj]s?(x)\" --max-warnings=0 --report-unused-disable-directives",
+    "check:lint": "biome check",
     "check:repo": "manypkg check",
     "check:test": "npm run check:test -w partyserver -w partysub",
     "check:type": "bun scripts/typecheck.ts",
     "ncu": "bunx npm-check-updates",
-    "all": "bun i && bun run build && bun check",
+    "all": "bun i && npm run build && npm run check",
     "postinstall": "sh -c '[ -f package-lock.json ] && echo \"Error: package-lock.json exists\" && exit 1 || exit 0'"
   },
   "author": "Sunil Pai <spai@cloudflare.com>",
@@ -22,42 +22,35 @@
     "examples/*",
     "fixtures/*"
   ],
-  "dependencies": {
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@changesets/changelog-github": "^0.5.0",
-    "@changesets/cli": "^2.27.8",
-    "@cloudflare/vitest-pool-workers": "^0.4.30",
-    "@ianvs/prettier-plugin-sort-imports": "^4.3.1",
-    "@manypkg/cli": "^0.21.4",
-    "@types/bun": "^1.1.9",
-    "@typescript-eslint/eslint-plugin": "^8.0.1",
-    "@typescript-eslint/parser": "^8.0.1",
-    "@vitest/runner": "1.5.0",
-    "@vitest/snapshot": "1.5.0",
-    "concurrently": "^9.0.0",
+    "@changesets/cli": "^2.27.11",
+    "@cloudflare/vitest-pool-workers": "^0.5.40",
+    "@ianvs/prettier-plugin-sort-imports": "^4.4.0",
+    "@manypkg/cli": "^0.23.0",
+    "@types/bun": "^1.1.14",
+    "@vitest/runner": "2.1.8",
+    "@vitest/snapshot": "2.1.8",
+    "concurrently": "^9.1.0",
     "cross-env": "^7.0.3",
-    "daisyui": "^4.12.10",
-    "eslint": "^8.38.0",
-    "eslint-plugin-deprecation": "^3.0.0",
-    "eslint-plugin-import": "^2.30.0",
-    "eslint-plugin-jsx-a11y": "^6.10.0",
-    "eslint-plugin-react": "^7.35.2",
-    "eslint-plugin-react-hooks": "^4.6.2",
-    "prettier": "^3.3.3",
-    "react-daisyui": "^5.0.4",
-    "tsup": "^8.2.4",
-    "typescript": "^5.6.2",
-    "vitest": "1.5.0",
-    "wrangler": "^3.78.10"
+    "prettier": "^3.4.2",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "2.1.8",
+    "wrangler": "^3.99.0"
   },
   "overrides": {
-    "esbuild": "0.21.4",
+    "esbuild": "0.24.2",
     "@types/node": "20.8.3",
     "prosemirror-model": "1.22.2"
   },
   "trustedDependencies": [
+    "@biomejs/biome",
     "core-js",
     "esbuild",
     "workerd"
   ],
-  "packageManager": "bun@1.1.27"
+  "packageManager": "bun@1.1.42",
+  "type": "module"
 }
