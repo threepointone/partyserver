@@ -8,19 +8,19 @@
   "type": "module",
   "exports": {
     "./server": {
+      "types": "./dist/server/index.d.ts",
       "require": "./dist/server/index.js",
-      "import": "./dist/server/index.js",
-      "types": "./dist/server/index.d.ts"
+      "import": "./dist/server/index.js"
     },
     "./client": {
+      "types": "./dist/client/index.d.ts",
       "require": "./dist/client/index.js",
-      "import": "./dist/client/index.js",
-      "types": "./dist/client/index.d.ts"
+      "import": "./dist/client/index.js"
     },
     "./react": {
+      "types": "./dist/client/react.d.ts",
       "require": "./dist/client/react.js",
-      "import": "./dist/client/react.js",
-      "types": "./dist/client/react.d.ts"
+      "import": "./dist/client/react.js"
     }
   },
   "scripts": {
@@ -45,8 +45,8 @@
     "partysocket": "^1.0.2"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240925.0",
+    "@cloudflare/workers-types": "^4.20241224.0",
     "partyserver": "workspace:*",
-    "partysocket": "^1.0.2"
+    "partysocket": "^1.0.3"
   }
 }

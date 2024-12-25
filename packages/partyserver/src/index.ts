@@ -51,7 +51,7 @@ export async function getServerByName<Env, T extends Server<Env>>(
   // TODO: fix this to use RPC
 
   const req = new Request(
-    `http://dummy-example.cloudflare.com/cdn-cgi/partyserver/set-name/`
+    "http://dummy-example.cloudflare.com/cdn-cgi/partyserver/set-name/"
   );
 
   req.headers.set("x-partykit-room", name);
@@ -99,13 +99,14 @@ export async function routePartykitRequest<
           "idFromName" in v &&
           typeof v.idFromName === "function"
         ) {
-          return { ...acc, [camelCaseToKebabCase(k)]: v };
+          Object.assign(acc, { [camelCaseToKebabCase(k)]: v });
+          return acc;
         }
         return acc;
       }, {})
     );
   }
-  const map = serverMapCache.get(env) as Record<
+  const map = serverMapCache.get(env) as unknown as Record<
     string,
     DurableObjectNamespace<T>
   >;
@@ -118,13 +119,13 @@ export async function routePartykitRequest<
   if (parts[1] === prefix && parts.length < 4) {
     return null;
   }
-  const name = parts[3],
-    namespace = parts[2];
+  const name = parts[3];
+  const namespace = parts[2];
   if (parts[1] === prefix && name && namespace) {
     if (!map[namespace]) {
       if (namespace === "main") {
         console.warn(
-          `You appear to be migrating a PartyKit project to PartyServer.`
+          "You appear to be migrating a PartyKit project to PartyServer."
         );
         console.warn(`PartyServer doesn't have a "main" party by default. Try adding this to your PartySocket client:\n 
 party: "${camelCaseToKebabCase(Object.keys(map)[0])}"`);
@@ -165,13 +166,13 @@ export class Server<Env = unknown> extends DurableObject<Env> {
 
   #status: "zero" | "starting" | "started" = "zero";
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   #ParentClass: typeof Server = Object.getPrototypeOf(this).constructor;
 
   #connectionManager: ConnectionManager = this.#ParentClass.options.hibernate
     ? new HibernatingConnectionManager(this.ctx)
     : new InMemoryConnectionManager();
 
+  // biome-ignore lint/complexity/noUselessConstructor: <explanation>
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
 
@@ -270,7 +271,7 @@ Did you try connecting directly to this Durable Object? Try using getServerByNam
         err
       );
       if (!(err instanceof Error)) throw err;
-      if (request.headers.get("Upgrade") == "websocket") {
+      if (request.headers.get("Upgrade") === "websocket") {
         // Annoyingly, if we return an HTTP error in response to a WebSocket request, Chrome devtools
         // won't show us the response body! So... let's send a WebSocket response with an error
         // frame instead.
@@ -420,7 +421,6 @@ Did you try connecting directly to this Durable Object? Try using getServerByNam
   #sendMessageToConnection(connection: Connection, message: WSMessage): void {
     try {
       connection.send(message);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (_e) {
       // close connection
       connection.close(1011, "Unexpected error");
@@ -457,9 +457,7 @@ Did you try connecting directly to this Durable Object? Try using getServerByNam
    * Each connection supports up to 9 tags, each tag max length is 256 characters.
    */
   getConnectionTags(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     connection: Connection,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     context: ConnectionContext
   ): string[] | Promise<string[]> {
     return [];
@@ -477,7 +475,6 @@ Did you try connecting directly to this Durable Object? Try using getServerByNam
    */
   onConnect(
     connection: Connection,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ctx: ConnectionContext
   ): void | Promise<void> {
     console.log(
@@ -491,11 +488,7 @@ Did you try connecting directly to this Durable Object? Try using getServerByNam
   /**
    * Called when a message is received from a connection.
    */
-  onMessage(
-    connection: Connection,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    message: WSMessage
-  ): void | Promise<void> {
+  onMessage(connection: Connection, message: WSMessage): void | Promise<void> {
     console.log(
       `Received message on connection ${this.#ParentClass.name}:${connection.id}`
     );
@@ -508,13 +501,9 @@ Did you try connecting directly to this Durable Object? Try using getServerByNam
    * Called when a connection is closed.
    */
   onClose(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     connection: Connection,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     code: number,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     reason: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     wasClean: boolean
   ): void | Promise<void> {}
 
@@ -541,7 +530,7 @@ Did you try connecting directly to this Durable Object? Try using getServerByNam
       `onRequest hasn't been implemented on ${this.#ParentClass.name}:${this.name} responding to ${request.url}`
     );
 
-    return new Response(`Not implemented`, { status: 404 });
+    return new Response("Not implemented", { status: 404 });
   }
 
   onAlarm(): void | Promise<void> {

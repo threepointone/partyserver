@@ -8,19 +8,19 @@
   "dependencies": {
     "@tailwindcss/forms": "^0.5.9",
     "@tailwindcss/typography": "^0.5.15",
-    "@tiptap/extension-collaboration": "^2.6.6",
-    "@tiptap/extension-collaboration-cursor": "^2.6.6",
-    "@tiptap/react": "^2.6.6",
-    "@tiptap/starter-kit": "^2.6.6",
+    "@tiptap/extension-collaboration": "^2.10.4",
+    "@tiptap/extension-collaboration-cursor": "^2.10.4",
+    "@tiptap/react": "^2.10.4",
+    "@tiptap/starter-kit": "^2.10.4",
     "esbuild-plugin-tailwindcss": "^1.2.1",
     "partyserver": "workspace:*",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "tailwindcss": "^3.4.10",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwindcss": "^3.4.17",
     "y-partyserver": "workspace:*"
   },
   "devDependencies": {
-    "@types/react": "^18.3.5",
-    "@types/react-dom": "^18.3.0"
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2"
   }
 }

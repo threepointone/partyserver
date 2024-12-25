@@ -7,11 +7,11 @@
     "deploy": "wrangler deploy"
   },
   "dependencies": {
-    "@lexical/react": "^0.17.1",
-    "@types/react": "^18.3.5",
-    "@types/react-dom": "^18.3.0",
-    "lexical": "^0.17.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "@lexical/react": "^0.22.0",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "lexical": "^0.22.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   }
 }

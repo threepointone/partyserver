@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import * as fs from "node:fs";
 
 import { $ } from "bun";
 
@@ -12,8 +12,8 @@ try {
     "./packages/partysub/package.json"
   ]) {
     const packageJson = JSON.parse(fs.readFileSync(path, "utf-8"));
-    packageJson.version = "0.0.0-" + stdout.trim();
-    fs.writeFileSync(path, JSON.stringify(packageJson, null, 2) + "\n");
+    packageJson.version = `0.0.0-${stdout.trim()}`;
+    fs.writeFileSync(path, `${JSON.stringify(packageJson, null, 2)}\n`);
   }
 } catch (error) {
   console.error(error);

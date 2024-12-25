@@ -11,7 +11,6 @@ import worker from "./worker";
 import type { Env } from "./worker";
 
 declare module "cloudflare:test" {
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface ProvidedEnv extends Env {}
 }
 

@@ -147,7 +147,6 @@ function setupWS(provider: WebsocketProvider) {
         return;
       }
       provider.wsLastMessageReceived = time.getUnixTime();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const encoder = readMessage(provider, new Uint8Array(event.data), true);
       if (encoding.length(encoder) > 1) {
         sendChunked(encoding.toUint8Array(encoder), websocket);
@@ -257,7 +256,6 @@ const DefaultWebSocket = typeof WebSocket === "undefined" ? null : WebSocket;
  *
  * @extends {Observable<string>}
  */
-// eslint-disable-next-line deprecation/deprecation
 export class WebsocketProvider extends Observable<string> {
   maxBackoffTime: number;
   bcChannel: string;
@@ -314,13 +312,10 @@ export class WebsocketProvider extends Observable<string> {
     }
     const encodedParams = url.encodeQueryParams(params);
     this.maxBackoffTime = maxBackoffTime;
-    this.bcChannel = serverUrl + "/" + roomname;
+    this.bcChannel = `${serverUrl}/${roomname}`;
     this.url = isPrefixedUrl
       ? serverUrl
-      : serverUrl +
-        "/" +
-        roomname +
-        (encodedParams.length === 0 ? "" : "?" + encodedParams);
+      : `${serverUrl}/${roomname}${encodedParams.length === 0 ? "" : `?${encodedParams}`}`;
     this.roomname = roomname;
     this.doc = doc;
     this._WS = WebSocketPolyfill!;
@@ -533,6 +528,7 @@ export class WebsocketProvider extends Observable<string> {
 }
 
 function assertType(value: unknown, label: string, type: string) {
+  // biome-ignore lint/suspicious/useValidTypeof: <explanation>
   if (typeof value !== type) {
     throw new Error(
       `Invalid "${label}" parameter provided to YProvider. Expected: ${type}, received: ${value as string}`

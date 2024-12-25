@@ -127,7 +127,6 @@ export const handleChunked = (
             // validate data as read matches expected
             assertEquality(marker.count, batch.length, "received batch count");
             assertEquality(marker.size, bytesWritten, "client size");
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore typescript hell
             receive(connection, bytes);
           } catch (e) {
@@ -140,11 +139,9 @@ export const handleChunked = (
         }
       }
     } else if (batch) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore typescript hell
       batch.push(message);
     } else {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore typescript hell
       receive(connection, new Uint8Array(message));
     }
@@ -175,12 +172,12 @@ function serializeBatchMarker(batch: Batch): string {
 export function parseBatchMarker(msg: string) {
   const [sentinel, data] = msg.split("#", 2);
   if (sentinel !== BATCH_SENTINEL) {
-    throw new Error("Unexpected batch marker: " + msg);
+    throw new Error(`Unexpected batch marker: ${msg}`);
   }
 
   const batch = JSON.parse(data) as Batch;
   if (batch.type !== "start" && batch.type !== "end") {
-    throw new Error("Unexpected batch data: " + msg);
+    throw new Error(`Unexpected batch data: ${msg}`);
   }
 
   return batch;

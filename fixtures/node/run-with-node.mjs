@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import PartySocket from "partysocket";
 import WS from "ws";
 

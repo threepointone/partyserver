@@ -11,7 +11,7 @@ import type { LegacyRef } from "react";
 
 function App() {
   // A reference to the canvas element where we'll render the globe
-  const canvasRef = useRef<HTMLCanvasElement>();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   // The number of markers we're currently displaying
   const [counter, setCounter] = useState(0);
   // A map of marker IDs to their positions

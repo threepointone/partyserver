@@ -26,8 +26,8 @@ jobs:
       - name: Resolve workspace dependencies
         run: bun .github/resolve-workspace-versions.ts
 
-      - run: bun run build
-      - run: bun run check
+      - run: npm run build # bun run build goes into an infinte loop
+      - run: npm run check # bun run check goes into an infinte loop
 
       - run: npm publish --tag beta
         env:

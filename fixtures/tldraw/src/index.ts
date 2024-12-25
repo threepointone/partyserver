@@ -26,7 +26,6 @@ export class Tldraw extends Server {
     this.records = migrationResult.value;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
   persist = throttle(async () => {
     await this.ctx.storage.put("snapshot", {
       store: this.records,
@@ -74,9 +73,7 @@ export class Tldraw extends Server {
           // If it works, broadcast the update to all other clients
           this.broadcast(message, [sender.id]);
           // and update the storage layer
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
           await this.persist();
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
           // If we have a problem merging the update, we need to send a snapshot
           // of the current state to the client so they can get back in sync.

@@ -2,7 +2,7 @@ name = 'partyserver-fixture-monaco-yjs'
 main = 'src/server/index.ts'
 compatibility_date = "2024-07-25"
 
-legacy_assets = './public'
+assets = {directory = "./public"}
 
 [build]
 command = "bun scripts/build.ts"

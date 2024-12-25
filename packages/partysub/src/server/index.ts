@@ -89,23 +89,19 @@ export function createPubSubServer<Env = unknown>(options: {
       for (const location of Object.keys(
         nodeIDs
       ) as DurableObjectLocationHint[]) {
-        {
-          for (const nodeID of nodeIDs[location]) {
-            const name = `${baseName}-${nodeID}`;
-            if (this.name === name) {
-              continue;
-            }
-
-            const id = namespace.idFromName(name);
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            const stub = namespace.get(id);
-
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-            stub.publish(topic, data).catch((err: Error) => {
-              console.error(`Error publishing to ${name}`);
-              console.error(err);
-            });
+        for (const nodeID of nodeIDs[location]) {
+          const name = `${baseName}-${nodeID}`;
+          if (this.name === name) {
+            continue;
           }
+
+          const id = namespace.idFromName(name);
+          const stub = namespace.get(id);
+
+          stub.publish(topic, data).catch((err: Error) => {
+            console.error(`Error publishing to ${name}`);
+            console.error(err);
+          });
         }
       }
     }
