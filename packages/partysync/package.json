@@ -1,0 +1,55 @@
+{
+  "name": "partysync",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/threepointone/partyserver.git"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/client/index.d.ts",
+      "require": "./dist/client/index.js",
+      "import": "./dist/client/index.js"
+    },
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "require": "./dist/server/index.js",
+      "import": "./dist/server/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "require": "./dist/react/index.js",
+      "import": "./dist/react/index.js"
+    }
+  },
+  "scripts": {
+    "build": "bun scripts/build.ts"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "sync",
+    "local-first",
+    "durable-objects"
+  ],
+  "author": "Sunil Pai <spai@cloudflare.com>",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {},
+  "peerDependencies": {
+    "@cloudflare/workers-types": "^4.20240729.0",
+    "partyserver": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241224.0",
+    "partyserver": "workspace:*"
+  }
+}
