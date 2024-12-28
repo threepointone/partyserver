@@ -12,6 +12,8 @@ This is the main repository for PartyServer. It contains the following packages:
 
 [🥖 partysub](/packages/partysub/README.md) - A library for doing pubsub at scale with PartyServer. It lets you configure a "room" to be backed by N separate Durable Object instances, and a strategy for spreading the load across the world concentrated in configurable locations.
 
+[partysync](/packages/partysync/README.md) - An experimental library to synchronise state from a Durable Object to a client.
+
 ### Fixtures
 
 We have a set of small examples for PartyServer in the [`fixtures`](/fixtures/) directory. These are small, self-contained examples that demonstrate how to use PartyServer in different ways. We will expand this repository with broader (and deeper!) examples in the future.
