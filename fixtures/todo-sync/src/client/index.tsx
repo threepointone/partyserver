@@ -7,6 +7,17 @@ import { useSync } from "partysync/react";
 
 import type { TodoRecord, TodoRpc } from "../shared";
 
+const optimisticCache = new WeakSet<TodoRecord>();
+
+function isOptimistic(todo: TodoRecord) {
+  return optimisticCache.has(todo);
+}
+
+function setOptimistic(todo: TodoRecord) {
+  optimisticCache.add(todo);
+  return todo;
+}
+
 function App() {
   const [newTodo, setNewTodo] = useState("");
   const socket = usePartySocket({
@@ -23,14 +34,14 @@ function App() {
           const { id, text, completed } = request.payload;
           return [
             ...todos,
-            [id, text, completed, Date.now(), Date.now(), null]
+            setOptimistic([id, text, completed, Date.now(), Date.now(), null])
           ];
         }
         case "update": {
           const { id, text, completed } = request.payload;
           return todos.map((todo) =>
             todo[0] === id
-              ? [id, text, completed, todo[3], Date.now(), null]
+              ? setOptimistic([id, text, completed, todo[3], Date.now(), null])
               : todo
           );
         }
@@ -107,6 +118,9 @@ function App() {
             <li
               key={todo[0]}
               className="flex items-center gap-2 p-2 border rounded"
+              style={{
+                opacity: isOptimistic(todo) ? 0.5 : 1
+              }}
             >
               <input
                 type="checkbox"

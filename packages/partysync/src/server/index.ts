@@ -14,7 +14,11 @@ export class SyncServer<
   RecordType extends unknown[],
   Mutations extends { type: string; payload: unknown }
 > extends Server<Env> {
-  handleRpcRequest(rpc: Mutations): RecordType[] {
+  static options = {
+    hibernate: true
+  };
+
+  handleRpcRequest(rpc: Mutations): RecordType[] | Promise<RecordType[]> {
     throw new Error("Not implemented");
   }
 
@@ -54,55 +58,42 @@ export class SyncServer<
       return;
     }
 
-    function replySuccess(json: RpcRequest<Mutations>, message: RecordType[]) {
+    const { channel, id, request } = json as RpcRequest<Mutations>;
+
+    try {
+      const result = await this.handleRpcRequest(request);
+
       connection.send(
         JSON.stringify({
           type: "success",
           rpc: true,
-          channel: json.channel,
-          id: json.id,
-          result: message
+          channel: channel,
+          id: id,
+          result: result
         } satisfies RpcResponse<RecordType>)
       );
-    }
 
-    function replyError(json: RpcRequest<Mutations>, message: string[]) {
-      connection.send(
-        JSON.stringify({
-          type: "error",
-          rpc: true,
-          channel: json.channel,
-          id: json.id,
-          error: message
-        } satisfies RpcResponse<RecordType>)
-      );
-    }
-
-    const broadcastUpdate = (records: RecordType[]) => {
       this.broadcast(
         JSON.stringify({
           broadcast: true,
           type: "update",
           channel: json.channel,
-          payload: records
+          payload: result
         } satisfies BroadcastMessage<RecordType>),
         [connection.id]
       );
-    };
-
-    try {
-      const result = this.handleRpcRequest(
-        (json as RpcRequest<Mutations>).request
-      );
-
-      replySuccess(json as RpcRequest<Mutations>, result);
-      broadcastUpdate(result);
       return;
     } catch (err) {
-      replyError(json as RpcRequest<Mutations>, [(err as Error).message]);
+      connection.send(
+        JSON.stringify({
+          type: "error",
+          rpc: true,
+          channel: channel,
+          id: id,
+          error: [(err as Error).message]
+        } satisfies RpcResponse<RecordType>)
+      );
       return;
     }
   }
-
-  async onConnect(connection: Connection) {}
 }

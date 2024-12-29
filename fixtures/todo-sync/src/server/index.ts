@@ -8,6 +8,10 @@ type Env = {
   ToDos: DurableObjectNamespace<ToDos>;
 };
 
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {
     throw new Error(message);
@@ -37,7 +41,9 @@ export class ToDos extends SyncServer<Env, TodoRecord, TodoRpc> {
       deleted_at INTEGER DEFAULT NULL
     )`);
   }
-  handleRpcRequest(rpc: TodoRpc): TodoRecord[] {
+  async handleRpcRequest(rpc: TodoRpc): Promise<TodoRecord[]> {
+    await sleep(Math.random() * 2000);
+
     switch (rpc.type) {
       case "create": {
         const { id, text, completed } = rpc.payload;
@@ -49,6 +55,7 @@ export class ToDos extends SyncServer<Env, TodoRecord, TodoRpc> {
             completed
           ).raw()
         ];
+
         return result as TodoRecord[];
       }
       case "update": {
@@ -74,6 +81,7 @@ export class ToDos extends SyncServer<Env, TodoRecord, TodoRpc> {
             id
           ).raw()
         ];
+
         return result as TodoRecord[];
       }
     }

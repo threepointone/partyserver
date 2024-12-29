@@ -1,5 +1,4 @@
 import { startTransition, useEffect, useOptimistic, useState } from "react";
-import { usePartySocket } from "partysocket/react";
 
 import type {
   BroadcastMessage,
@@ -7,7 +6,7 @@ import type {
   RpcResponse,
   SyncRequest
 } from "..";
-import type { PartySocket } from "partysocket";
+import type { WebSocket as PSWebSocket } from "partysocket";
 
 // we keep the actual cache external to the class
 // so it can be reused across instances/rerenders
@@ -22,7 +21,7 @@ class RPC<RecordType extends unknown[], Mutation> {
   private controller = new AbortController();
   constructor(
     private channel: string,
-    private socket: PartySocket
+    private socket: PSWebSocket
   ) {
     const cache = rpcCaches.get(channel);
     if (!cache) {
@@ -93,10 +92,10 @@ class RPC<RecordType extends unknown[], Mutation> {
 
 export function useSync<RecordType extends unknown[], Mutation>(
   key: string,
-  socket: PartySocket,
+  socket: PSWebSocket,
   mutate: (currentState: RecordType[], request: Mutation) => RecordType[]
 ): [RecordType[], (request: Mutation) => void] {
-  const [data, setData] = useState<RecordType[]>([] as RecordType[]);
+  const [value, setValue] = useState<RecordType[]>([] as RecordType[]);
 
   const [rpc] = useState<RPC<RecordType, Mutation>>(
     () => new RPC<RecordType, Mutation>(key, socket)
@@ -123,7 +122,7 @@ export function useSync<RecordType extends unknown[], Mutation>(
         const message = JSON.parse(event.data);
         if (message.channel === key && message.sync === true) {
           // this is all the data for initial sync
-          setData(message.payload);
+          setValue(message.payload);
         }
       },
       { signal: controller.signal }
@@ -138,7 +137,7 @@ export function useSync<RecordType extends unknown[], Mutation>(
       const message = JSON.parse(event.data) as BroadcastMessage<RecordType>;
       if (message.broadcast === true && message.channel === key) {
         if (message.type === "update") {
-          setData((records) => {
+          setValue((records) => {
             const updates = message.payload;
             const updatedRecords = [...records];
             for (const update of updates) {
@@ -167,7 +166,7 @@ export function useSync<RecordType extends unknown[], Mutation>(
             return updatedRecords;
           });
         } else if (message.type === "delete-all") {
-          setData([]);
+          setValue([]);
         }
       }
     }
@@ -179,25 +178,29 @@ export function useSync<RecordType extends unknown[], Mutation>(
     };
   }, [socket, key]);
 
-  const [value, setValue] = useOptimistic<RecordType[], Mutation>(
-    data, // todo: this should be synced from the server
-    (currentState, request) => {
-      return mutate(currentState, request);
-    }
-  );
+  const [optimisticValue, setOptimisticValue] = useOptimistic<
+    RecordType[],
+    Mutation
+  >(value, (currentState, request) => {
+    return mutate(currentState, request);
+  });
+
   return [
-    value,
+    optimisticValue,
     (request) => {
-      rpc.call(request).then((result) => {
+      startTransition(async () => {
+        setOptimisticValue(request);
+
+        const result = await rpc.call(request);
         if (result.length === 0) {
           return;
         }
         // let changed = false;
-        const newData = [...data];
+        const newData = [...value];
         for (const record of result) {
           // if record is in data, update it
 
-          const index = data.findIndex((item) => item[0] === record[0]);
+          const index = value.findIndex((item) => item[0] === record[0]);
           if (index !== -1) {
             newData.splice(index, 1, record);
             // changed = true;
@@ -208,10 +211,9 @@ export function useSync<RecordType extends unknown[], Mutation>(
             // changed = true;
           }
         }
-        setData(newData);
-      });
-      startTransition(() => {
-        setValue(request);
+        startTransition(() => {
+          setValue(newData);
+        });
       });
     }
   ];
