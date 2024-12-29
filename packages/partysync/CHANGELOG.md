@@ -1,5 +1,11 @@
 # partysync
 
+## 0.0.4
+
+### Patch Changes
+
+- [`16c407c`](https://github.com/threepointone/partyserver/commit/16c407c5ba63947169786f886c807886d3c686bc) Thanks [@threepointone](https://github.com/threepointone)! - partysync: enable hibernation, try to fix optimistic updates
+
 ## 0.0.3
 
 ### Patch Changes
