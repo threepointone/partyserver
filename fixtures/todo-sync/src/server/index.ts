@@ -37,10 +37,10 @@ export class ToDos extends SyncServer<Env, TodoRecord, TodoRpc> {
       deleted_at INTEGER DEFAULT NULL
     )`);
   }
-  handleRpcRequest(rpc: RpcRequest<TodoRpc>): TodoRecord[] {
-    switch (rpc.request.type) {
+  handleRpcRequest(rpc: TodoRpc): TodoRecord[] {
+    switch (rpc.type) {
       case "create": {
-        const { id, text, completed } = rpc.request.payload;
+        const { id, text, completed } = rpc.payload;
         const result = [
           ...this.sql(
             "INSERT INTO todos (id, text, completed) VALUES (?, ?, ?) RETURNING *",
@@ -52,7 +52,7 @@ export class ToDos extends SyncServer<Env, TodoRecord, TodoRpc> {
         return result as TodoRecord[];
       }
       case "update": {
-        const { id, text, completed } = rpc.request.payload;
+        const { id, text, completed } = rpc.payload;
 
         const result = [
           ...this.sql(
@@ -66,7 +66,7 @@ export class ToDos extends SyncServer<Env, TodoRecord, TodoRpc> {
         return result as TodoRecord[];
       }
       case "delete": {
-        const { id } = rpc.request.payload;
+        const { id } = rpc.payload;
         assert(id, "id is required");
         const result = [
           ...this.sql(

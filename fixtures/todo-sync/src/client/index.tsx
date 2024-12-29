@@ -2,14 +2,21 @@ import "./styles.css";
 
 import { useState } from "react";
 import { createRoot } from "react-dom/client";
+import { usePartySocket } from "partysocket/react";
 import { useSync } from "partysync/react";
 
 import type { TodoRecord, TodoRpc } from "../shared";
 
 function App() {
   const [newTodo, setNewTodo] = useState("");
+  const socket = usePartySocket({
+    party: "todos",
+    room: "default"
+  });
+
   const [todos, mutate] = useSync<TodoRecord, TodoRpc>(
     "todos",
+    socket,
     (todos, request): TodoRecord[] => {
       switch (request.type) {
         case "create": {

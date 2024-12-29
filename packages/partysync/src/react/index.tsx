@@ -93,14 +93,10 @@ class RPC<RecordType extends unknown[], Mutation> {
 
 export function useSync<RecordType extends unknown[], Mutation>(
   key: string,
+  socket: PartySocket,
   mutate: (currentState: RecordType[], request: Mutation) => RecordType[]
 ): [RecordType[], (request: Mutation) => void] {
   const [data, setData] = useState<RecordType[]>([] as RecordType[]);
-
-  const socket = usePartySocket({
-    party: key,
-    room: "default"
-  });
 
   const [rpc] = useState<RPC<RecordType, Mutation>>(
     () => new RPC<RecordType, Mutation>(key, socket)

@@ -14,7 +14,7 @@ export class SyncServer<
   RecordType extends unknown[],
   Mutations extends { type: string; payload: unknown }
 > extends Server<Env> {
-  handleRpcRequest(rpc: RpcRequest<Mutations>): RecordType[] {
+  handleRpcRequest(rpc: Mutations): RecordType[] {
     throw new Error("Not implemented");
   }
 
@@ -91,7 +91,9 @@ export class SyncServer<
     };
 
     try {
-      const result = this.handleRpcRequest(json as RpcRequest<Mutations>);
+      const result = this.handleRpcRequest(
+        (json as RpcRequest<Mutations>).request
+      );
 
       replySuccess(json as RpcRequest<Mutations>, result);
       broadcastUpdate(result);
