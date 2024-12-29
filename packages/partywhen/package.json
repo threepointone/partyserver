@@ -1,0 +1,25 @@
+{
+  "name": "partywhen",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/threepointone/partyserver.git"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "bun scripts/build.ts"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "scheduling",
+    "cron",
+    "ai agents",
+    "durable-objects"
+  ],
+  "author": "Sunil Pai <spai@cloudflare.com>",
+  "license": "ISC",
+  "description": "A library for scheduling and running tasks in Cloudflare Workers"
+}

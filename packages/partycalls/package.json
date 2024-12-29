@@ -1,0 +1,21 @@
+{
+  "name": "partycalls",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/threepointone/partyserver.git"
+  },
+  "type": "module",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "webrtc",
+    "calls",
+    "durable-objects"
+  ],
+  "author": "Sunil Pai <spai@cloudflare.com>",
+  "license": "ISC",
+  "description": "Integrate Cloudflare Calls into your PartyServer app"
+}
