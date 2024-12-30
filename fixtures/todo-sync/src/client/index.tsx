@@ -7,13 +7,15 @@ import { useSync } from "partysync/react";
 
 import type { TodoAction, TodoRecord } from "../shared";
 
+// let's use a WeakSet to track which records are being updated optimistically
+
 const optimisticCache = new WeakSet<TodoRecord>();
 
-function isOptimistic(todo: TodoRecord) {
+function isOptimisticUpdate(todo: TodoRecord) {
   return optimisticCache.has(todo);
 }
 
-function setOptimistic(todo: TodoRecord) {
+function setIsOptimisticUpdate(todo: TodoRecord) {
   optimisticCache.add(todo);
   return todo;
 }
@@ -34,14 +36,28 @@ function App() {
           const { id, text, completed } = action.payload;
           return [
             ...todos,
-            setOptimistic([id, text, completed, Date.now(), Date.now(), null])
+            setIsOptimisticUpdate([
+              id,
+              text,
+              completed,
+              Date.now(),
+              Date.now(),
+              null
+            ])
           ];
         }
         case "update": {
           const { id, text, completed } = action.payload;
           return todos.map((todo) =>
             todo[0] === id
-              ? setOptimistic([id, text, completed, todo[3], Date.now(), null])
+              ? setIsOptimisticUpdate([
+                  id,
+                  text,
+                  completed,
+                  todo[3],
+                  Date.now(),
+                  null
+                ])
               : todo
           );
         }
@@ -119,7 +135,7 @@ function App() {
               key={todo[0]}
               className="flex items-center gap-2 p-2 border rounded"
               style={{
-                opacity: isOptimistic(todo) ? 0.5 : 1
+                opacity: isOptimisticUpdate(todo) ? 0.5 : 1
               }}
             >
               <input
