@@ -1,11 +1,6 @@
 import { startTransition, useEffect, useOptimistic, useState } from "react";
 
-import type {
-  BroadcastMessage,
-  RpcRequest,
-  RpcResponse,
-  SyncRequest
-} from "..";
+import type { BroadcastMessage, RpcAction, RpcResponse, SyncRequest } from "..";
 import type { WebSocket as PSWebSocket } from "partysocket";
 
 // we keep the actual cache external to the class
@@ -16,7 +11,7 @@ const rpcCaches = new Map<
   Map<string, ReturnType<typeof Promise.withResolvers>>
 >();
 
-class RPC<RecordType extends unknown[], Mutation> {
+class RPC<RecordType extends unknown[], Action> {
   private rpcCache: Map<string, ReturnType<typeof Promise.withResolvers>>;
   private controller = new AbortController();
   constructor(
@@ -54,15 +49,15 @@ class RPC<RecordType extends unknown[], Mutation> {
     return resolver.promise;
   }
 
-  public async call(request: Mutation, timeout = 10000): Promise<RecordType[]> {
+  public async call(action: Action, timeout = 10000): Promise<RecordType[]> {
     const id: string = crypto.randomUUID();
     this.socket.send(
       JSON.stringify({
         id,
         channel: this.channel,
         rpc: true,
-        request
-      } satisfies RpcRequest<Mutation>)
+        action
+      } satisfies RpcAction<Action>)
     );
     return this.rpc(id, timeout) as Promise<RecordType[]>;
   }
@@ -90,15 +85,18 @@ class RPC<RecordType extends unknown[], Mutation> {
   }
 }
 
-export function useSync<RecordType extends unknown[], Mutation>(
+export function useSync<RecordType extends unknown[], Action>(
   key: string,
   socket: PSWebSocket,
-  mutate: (currentState: RecordType[], request: Mutation) => RecordType[]
-): [RecordType[], (request: Mutation) => void] {
-  const [value, setValue] = useState<RecordType[]>([] as RecordType[]);
+  applyOptimisticAction: (
+    currentState: RecordType[],
+    action: Action
+  ) => RecordType[] = (currentState) => currentState
+): [RecordType[], (action: Action) => void] {
+  const [value, setValue] = useState<RecordType[]>([]);
 
-  const [rpc] = useState<RPC<RecordType, Mutation>>(
-    () => new RPC<RecordType, Mutation>(key, socket)
+  const [rpc] = useState<RPC<RecordType, Action>>(
+    () => new RPC<RecordType, Action>(key, socket)
   );
 
   useEffect(() => {
@@ -180,18 +178,18 @@ export function useSync<RecordType extends unknown[], Mutation>(
 
   const [optimisticValue, setOptimisticValue] = useOptimistic<
     RecordType[],
-    Mutation
-  >(value, (currentState, request) => {
-    return mutate(currentState, request);
+    Action
+  >(value, (currentState, action) => {
+    return applyOptimisticAction(currentState, action);
   });
 
   return [
     optimisticValue,
-    (request) => {
+    (action) => {
       startTransition(async () => {
-        setOptimisticValue(request);
+        setOptimisticValue(action);
 
-        const result = await rpc.call(request);
+        const result = await rpc.call(action);
         if (result.length === 0) {
           return;
         }

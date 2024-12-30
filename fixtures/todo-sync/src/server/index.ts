@@ -1,8 +1,7 @@
 import { routePartykitRequest } from "partyserver";
 import { SyncServer } from "partysync/server";
 
-import type { TodoRecord, TodoRpc } from "../shared";
-import type { RpcRequest } from "partysync";
+import type { TodoAction, TodoRecord } from "../shared";
 
 type Env = {
   ToDos: DurableObjectNamespace<ToDos>;
@@ -18,7 +17,7 @@ function assert(condition: unknown, message: string): asserts condition {
   }
 }
 
-export class ToDos extends SyncServer<Env, TodoRecord, TodoRpc> {
+export class ToDos extends SyncServer<Env, TodoRecord, TodoAction> {
   sql(sql: string, ...values: (string | number | null)[]) {
     if (
       ["insert", "update", "delete"].includes(
@@ -41,12 +40,12 @@ export class ToDos extends SyncServer<Env, TodoRecord, TodoRpc> {
       deleted_at INTEGER DEFAULT NULL
     )`);
   }
-  async handleRpcRequest(rpc: TodoRpc): Promise<TodoRecord[]> {
+  async onAction(action: TodoAction): Promise<TodoRecord[]> {
     await sleep(Math.random() * 2000);
 
-    switch (rpc.type) {
+    switch (action.type) {
       case "create": {
-        const { id, text, completed } = rpc.payload;
+        const { id, text, completed } = action.payload;
         const result = [
           ...this.sql(
             "INSERT INTO todos (id, text, completed) VALUES (?, ?, ?) RETURNING *",
@@ -59,7 +58,7 @@ export class ToDos extends SyncServer<Env, TodoRecord, TodoRpc> {
         return result as TodoRecord[];
       }
       case "update": {
-        const { id, text, completed } = rpc.payload;
+        const { id, text, completed } = action.payload;
 
         const result = [
           ...this.sql(
@@ -73,7 +72,7 @@ export class ToDos extends SyncServer<Env, TodoRecord, TodoRpc> {
         return result as TodoRecord[];
       }
       case "delete": {
-        const { id } = rpc.payload;
+        const { id } = action.payload;
         assert(id, "id is required");
         const result = [
           ...this.sql(

@@ -1,8 +1,8 @@
-export type RpcRequest<T> = {
+export type RpcAction<T> = {
   id: string;
   channel: string;
   rpc: true;
-  request: T;
+  action: T;
 };
 
 export type RpcResponse<RecordType extends unknown[]> =

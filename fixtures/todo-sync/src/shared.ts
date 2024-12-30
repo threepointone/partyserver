@@ -7,7 +7,7 @@ export type TodoRecord = [
   deleted_at: number | null
 ];
 
-export type TodoRpc =
+export type TodoAction =
   | {
       type: "create";
       payload: {

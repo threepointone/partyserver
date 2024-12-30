@@ -15,8 +15,8 @@ First, Setup your server.
 // server.ts
 import { SyncServer } from "partysync";
 
-// define your mutations
-type Mutations =
+// define your actions
+type Action =
   | {
       type: "create";
       payload: {
@@ -32,19 +32,19 @@ type Mutations =
 
 // define the shape of the records that are stored in the Durable Object database
 type RecordType = [
-  // always add id
+  // NOTE: _always_ add id
   string, // id
   string, // text
-  boolean, // completed
-  // always add created_at, updated_at, deleted_at
+  0 | 1, // completed
   number, // created_at
   number, // updated_at
+  // NOTE: _always_ add deleted_at
   number | null // deleted_at
 ];
 
-// note: we do soft deletes to be able to sync deleted records to the client
+// NOTE: we do soft deletes so we can sync deleted records to the client
 
-export class MyServer extends SyncServer<Env, Mutations, RecordType> {
+export class MyServer extends SyncServer<Env, Action, RecordType> {
   constructor(state: DurableObjectState, env: Env) {
     super(state, env);
     // setup a database table for your records
@@ -57,11 +57,11 @@ export class MyServer extends SyncServer<Env, Mutations, RecordType> {
       deleted_at INTEGER DEFAULT NULL
     )`);
   }
-  // setup a handler for rpc requests
-  handleRpcRequest(rpc) {
-    switch (rpc.type) {
+  // setup a handler for actions
+  onAction(action) {
+    switch (action.type) {
       case "create": {
-        const { id, text, completed } = rpc.payload;
+        const { id, text, completed } = action.payload;
         return this.ctx.storage.sql.exec(
           "INSERT INTO todos (id, text, completed) VALUES (?, ?, ?) RETURNING *",
           id,
@@ -82,13 +82,14 @@ Then, setup your client.
 import { useSync } from "partysync/react";
 
 // in your component...
-const [todos, mutate] = useSync<RecordType, Mutations>(
+const [todos, sendAction] = useSync<RecordType, Action>(
   "todos",
-  (todos, mutation) => {
-    // optionally do an optimistic update
-    switch (mutation.type) {
+  socket, // your websocket
+  // optionally do an optimistic update
+  (todos, action) => {
+    switch (action.type) {
       case "create": {
-        const { id, text, completed } = mutation.payload;
+        const { id, text, completed } = action.payload;
         return [...todos, [id, text, completed, Date.now(), Date.now(), null]];
       }
       // ... etc
@@ -96,9 +97,9 @@ const [todos, mutate] = useSync<RecordType, Mutations>(
   }
 );
 
-// call the mutation whenever
+// call the action whenever
 function onClick() {
-  mutate({
+  sendAction({
     type: "create",
     payload: { id: "1", text: "hello", completed: 0 }
   });

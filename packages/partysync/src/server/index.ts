@@ -2,7 +2,7 @@ import { Server } from "partyserver";
 
 import type {
   BroadcastMessage,
-  RpcRequest,
+  RpcAction,
   RpcResponse,
   SyncRequest,
   SyncResponse
@@ -12,14 +12,16 @@ import type { Connection, WSMessage } from "partyserver";
 export class SyncServer<
   Env,
   RecordType extends unknown[],
-  Mutations extends { type: string; payload: unknown }
+  Actions extends { type: string; payload: unknown }
 > extends Server<Env> {
   static options = {
     hibernate: true
   };
 
-  handleRpcRequest(rpc: Mutations): RecordType[] | Promise<RecordType[]> {
-    throw new Error("Not implemented");
+  onAction(action: Actions): RecordType[] | Promise<RecordType[]> {
+    throw new Error(
+      "onAction not implemented, you should implement this in your server"
+    );
   }
 
   // todo: store returns on a queue to flush back to client
@@ -28,7 +30,7 @@ export class SyncServer<
       console.error("Received non-string message");
       return;
     }
-    let json: RpcRequest<Mutations> | SyncRequest<RecordType>;
+    let json: RpcAction<Actions> | SyncRequest<RecordType>;
 
     try {
       json = JSON.parse(message);
@@ -58,10 +60,10 @@ export class SyncServer<
       return;
     }
 
-    const { channel, id, request } = json as RpcRequest<Mutations>;
+    const { channel, id, action } = json as RpcAction<Actions>;
 
     try {
-      const result = await this.handleRpcRequest(request);
+      const result = await this.onAction(action);
 
       connection.send(
         JSON.stringify({

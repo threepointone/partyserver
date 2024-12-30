@@ -5,7 +5,7 @@ import { createRoot } from "react-dom/client";
 import { usePartySocket } from "partysocket/react";
 import { useSync } from "partysync/react";
 
-import type { TodoRecord, TodoRpc } from "../shared";
+import type { TodoAction, TodoRecord } from "../shared";
 
 const optimisticCache = new WeakSet<TodoRecord>();
 
@@ -25,20 +25,20 @@ function App() {
     room: "default"
   });
 
-  const [todos, mutate] = useSync<TodoRecord, TodoRpc>(
+  const [todos, mutate] = useSync<TodoRecord, TodoAction>(
     "todos",
     socket,
-    (todos, request): TodoRecord[] => {
-      switch (request.type) {
+    (todos, action): TodoRecord[] => {
+      switch (action.type) {
         case "create": {
-          const { id, text, completed } = request.payload;
+          const { id, text, completed } = action.payload;
           return [
             ...todos,
             setOptimistic([id, text, completed, Date.now(), Date.now(), null])
           ];
         }
         case "update": {
-          const { id, text, completed } = request.payload;
+          const { id, text, completed } = action.payload;
           return todos.map((todo) =>
             todo[0] === id
               ? setOptimistic([id, text, completed, todo[3], Date.now(), null])
@@ -46,9 +46,9 @@ function App() {
           );
         }
         case "delete":
-          return todos.filter((todo) => todo[0] !== request.payload.id);
+          return todos.filter((todo) => todo[0] !== action.payload.id);
         default:
-          console.error("unknown request", request);
+          console.error("unknown action", action);
           return todos;
       }
     }
