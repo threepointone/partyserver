@@ -2,6 +2,7 @@ import { routePartykitRequest } from "partyserver";
 import { SyncServer } from "partysync/server";
 
 import type { TodoAction, TodoRecord } from "../shared";
+import type { Connection, ConnectionContext } from "partyserver";
 
 type Env = {
   ToDos: DurableObjectNamespace<ToDos>;
@@ -40,7 +41,14 @@ export class ToDos extends SyncServer<Env, TodoRecord, TodoAction> {
       deleted_at INTEGER DEFAULT NULL
     )`);
   }
+
+  onConnect(
+    connection: Connection,
+    ctx: ConnectionContext
+  ): void | Promise<void> {}
   async onAction(action: TodoAction): Promise<TodoRecord[]> {
+    // uncomment this if you want to run actions sequentially
+    // return this.ctx.blockConcurrencyWhile(async () => {
     await sleep(Math.random() * 2000);
 
     switch (action.type) {
@@ -49,7 +57,7 @@ export class ToDos extends SyncServer<Env, TodoRecord, TodoAction> {
         const result = [
           ...this.sql(
             "INSERT INTO todos (id, text, completed) VALUES (?, ?, ?) RETURNING *",
-            id || crypto.randomUUID(),
+            id,
             text,
             completed
           ).raw()
@@ -84,6 +92,7 @@ export class ToDos extends SyncServer<Env, TodoRecord, TodoAction> {
         return result as TodoRecord[];
       }
     }
+    // });
   }
   async alarm() {
     // delete any todos that have been deleted more than 24 hours ago

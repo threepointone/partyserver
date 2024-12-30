@@ -43,7 +43,9 @@
   "author": "Sunil Pai <spai@cloudflare.com>",
   "license": "ISC",
   "description": "",
-  "dependencies": {},
+  "dependencies": {
+    "nanoid": "^5.0.9"
+  },
   "peerDependencies": {
     "@cloudflare/workers-types": "^4.20240729.0",
     "partyserver": "workspace:*"

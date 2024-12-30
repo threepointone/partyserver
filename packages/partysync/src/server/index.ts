@@ -12,25 +12,24 @@ import type { Connection, WSMessage } from "partyserver";
 export class SyncServer<
   Env,
   RecordType extends unknown[],
-  Actions extends { type: string; payload: unknown }
+  Action extends { type: string; payload: unknown }
 > extends Server<Env> {
   static options = {
     hibernate: true
   };
 
-  onAction(action: Actions): RecordType[] | Promise<RecordType[]> {
+  onAction(action: Action): RecordType[] | Promise<RecordType[]> {
     throw new Error(
       "onAction not implemented, you should implement this in your server"
     );
   }
 
-  // todo: store returns on a queue to flush back to client
   async onMessage(connection: Connection, message: WSMessage): Promise<void> {
     if (typeof message !== "string") {
       console.error("Received non-string message");
       return;
     }
-    let json: RpcAction<Actions> | SyncRequest<RecordType>;
+    let json: RpcAction<Action> | SyncRequest<RecordType>;
 
     try {
       json = JSON.parse(message);
@@ -60,7 +59,7 @@ export class SyncServer<
       return;
     }
 
-    const { channel, id, action } = json as RpcAction<Actions>;
+    const { channel, id, action } = json as RpcAction<Action>;
 
     try {
       const result = await this.onAction(action);

@@ -8,6 +8,7 @@
   "dependencies": {
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
+    "nanoid": "^5.0.9",
     "partyserver": "workspace:*",
     "partysocket": "^1.0.3",
     "react": "^19.0.0",

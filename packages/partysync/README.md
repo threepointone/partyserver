@@ -7,7 +7,14 @@ An experimental library to synchronise state from a Durable Object to a client.
 
 See the [Todo fixture](/fixtures/todo-sync/) for a fully working example.
 
-## Usage
+### Why?
+
+- A common pattern is to use one DO per user (and/or entity), and you want to sync all it's state to the client.
+- This is a simple (tm) way to sync state from a Durable Object to a client.
+- Comes with all the other goodness of Durable Objects: consistency, hibernation, etc.
+- If you're looking for syncing slices of state from a database like postgres/mysql, then this library is probably not for you (yet). I recommend something more featureful likezero tinybase electric powersync etc (Lots of great options here - https://localfirstweb.dev/)
+
+### Usage
 
 First, Setup your server.
 
@@ -105,3 +112,10 @@ function onClick() {
   });
 }
 ```
+
+### TODO:
+
+- actually persist to disk/indexeddb on client
+- and then use deltas when syncing
+- multiple databases/DOs on a single socket
+- better error handling / messaging

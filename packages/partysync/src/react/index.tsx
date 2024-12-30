@@ -1,4 +1,5 @@
 import { startTransition, useEffect, useOptimistic, useState } from "react";
+import { nanoid } from "nanoid";
 
 import type { BroadcastMessage, RpcAction, RpcResponse, SyncRequest } from "..";
 import type { WebSocket as PSWebSocket } from "partysocket";
@@ -50,7 +51,7 @@ class RPC<RecordType extends unknown[], Action> {
   }
 
   public async call(action: Action, timeout = 10000): Promise<RecordType[]> {
-    const id: string = crypto.randomUUID();
+    const id: string = nanoid(8);
     this.socket.send(
       JSON.stringify({
         id,
@@ -85,16 +86,10 @@ class RPC<RecordType extends unknown[], Action> {
   }
 }
 
-export function useSync<RecordType extends unknown[], Action>(
+function useRPC<RecordType extends unknown[], Action>(
   key: string,
-  socket: PSWebSocket,
-  applyOptimisticAction: (
-    currentState: RecordType[],
-    action: Action
-  ) => RecordType[] = (currentState) => currentState
-): [RecordType[], (action: Action) => void] {
-  const [value, setValue] = useState<RecordType[]>([]);
-
+  socket: PSWebSocket
+) {
   const [rpc] = useState<RPC<RecordType, Action>>(
     () => new RPC<RecordType, Action>(key, socket)
   );
@@ -104,6 +99,21 @@ export function useSync<RecordType extends unknown[], Action>(
       rpc.destroy();
     };
   }, [rpc]);
+
+  return rpc;
+}
+
+export function useSync<RecordType extends unknown[], Action>(
+  key: string,
+  socket: PSWebSocket,
+  optimisticReducer: (
+    currentState: RecordType[],
+    action: Action
+  ) => RecordType[] = (currentState) => currentState
+): [RecordType[], (action: Action) => void] {
+  const [value, setValue] = useState<RecordType[]>([]);
+
+  const rpc = useRPC<RecordType, Action>(key, socket);
 
   useEffect(() => {
     // do initial sync
@@ -180,7 +190,7 @@ export function useSync<RecordType extends unknown[], Action>(
     RecordType[],
     Action
   >(value, (currentState, action) => {
-    return applyOptimisticAction(currentState, action);
+    return optimisticReducer(currentState, action);
   });
 
   return [
