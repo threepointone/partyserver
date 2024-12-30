@@ -195,24 +195,27 @@ export function useSync<RecordType extends unknown[], Mutation>(
         if (result.length === 0) {
           return;
         }
-        // let changed = false;
-        const newData = [...value];
-        for (const record of result) {
-          // if record is in data, update it
 
-          const index = value.findIndex((item) => item[0] === record[0]);
-          if (index !== -1) {
-            newData.splice(index, 1, record);
-            // changed = true;
-          }
-          // if record is not in data, add it
-          else if (index === -1) {
-            newData.push(record);
-            // changed = true;
-          }
-        }
         startTransition(() => {
-          setValue(newData);
+          setValue((value) => {
+            // let changed = false;
+            const newValue = [...value];
+            for (const record of result) {
+              // if record is in data, update it
+
+              const index = newValue.findIndex((item) => item[0] === record[0]);
+              if (index !== -1) {
+                newValue.splice(index, 1, record);
+                // changed = true;
+              }
+              // if record is not in data, add it
+              else if (index === -1) {
+                newValue.push(record);
+                // changed = true;
+              }
+            }
+            return newValue;
+          });
         });
       });
     }
