@@ -16,14 +16,25 @@ See the [Todo fixture](/fixtures/todo-sync/) for a fully working example.
 
 ### Usage
 
-First, Setup your server.
+First, define some types.
 
 ```ts
-// server.ts
-import { SyncServer } from "partysync";
+// shared.ts
+
+// define the shape of the records that are stored in the Durable Object database
+export type TodoRecord = [
+  // NOTE: _always_ add id
+  string, // id
+  string, // text
+  0 | 1, // completed
+  number, // created_at
+  number, // updated_at
+  // NOTE: _always_ add deleted_at
+  number | null // deleted_at
+];
 
 // define your actions
-type Action =
+export type TodoAction =
   | {
       type: "create";
       payload: {
@@ -36,45 +47,47 @@ type Action =
       type: "update";
       // ... etc
     };
+```
 
-// define the shape of the records that are stored in the Durable Object database
-type RecordType = [
-  // NOTE: _always_ add id
-  string, // id
-  string, // text
-  0 | 1, // completed
-  number, // created_at
-  number, // updated_at
-  // NOTE: _always_ add deleted_at
-  number | null // deleted_at
-];
+Then, setup your server.
 
-// NOTE: we do soft deletes so we can sync deleted records to the client
+```ts
+// server.ts
+import { SyncServer } from "partysync";
 
-export class MyServer extends SyncServer<Env, RecordType, Action> {
+import type { TodoAction, TodoRecord } from "./shared";
+
+export class MyServer extends SyncServer<Env, TodoRecord, TodoAction> {
   constructor(state: DurableObjectState, env: Env) {
     super(state, env);
     // setup a database table for your records
-    this.sql(`CREATE TABLE IF NOT EXISTS todos (
+    this.ctx.storage.sql.exec(
+      `CREATE TABLE IF NOT EXISTS todos (
       id TEXT PRIMARY KEY NOT NULL UNIQUE, 
       text TEXT NOT NULL, 
       completed INTEGER NOT NULL, 
       created_at INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP, 
       updated_at INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
       deleted_at INTEGER DEFAULT NULL
-    )`);
+    )`
+    );
   }
   // setup a handler for actions
   onAction(action) {
     switch (action.type) {
       case "create": {
         const { id, text, completed } = action.payload;
-        return this.ctx.storage.sql.exec(
-          "INSERT INTO todos (id, text, completed) VALUES (?, ?, ?) RETURNING *",
-          id,
-          text,
-          completed
-        );
+        // return any changed records
+        return [
+          ...this.ctx.storage.sql
+            .exec(
+              "INSERT INTO todos (id, text, completed) VALUES (?, ?, ?) RETURNING *",
+              id,
+              text,
+              completed
+            )
+            .raw()
+        ];
       }
       // etc
     }
@@ -82,14 +95,16 @@ export class MyServer extends SyncServer<Env, RecordType, Action> {
 }
 ```
 
-Then, setup your client.
+Finally, setup your client.
 
 ```tsx
 // client.tsx
 import { useSync } from "partysync/react";
 
+import type { TodoAction, TodoRecord } from "./shared";
+
 // in your component...
-const [todos, sendAction] = useSync<RecordType, Action>(
+const [todos, sendAction] = useSync<TodoRecord, TodoAction>(
   "todos",
   socket, // your websocket
   // optionally do an optimistic update
