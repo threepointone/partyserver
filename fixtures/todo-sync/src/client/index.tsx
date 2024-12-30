@@ -25,7 +25,7 @@ function App() {
     room: "default"
   });
 
-  const [todos, mutate] = useSync<TodoRecord, TodoAction>(
+  const [todos, sendAction] = useSync<TodoRecord, TodoAction>(
     "todos",
     socket,
     (todos, action): TodoRecord[] => {
@@ -58,7 +58,7 @@ function App() {
     e.preventDefault();
     if (newTodo.trim()) {
       setNewTodo("");
-      mutate({
+      sendAction({
         type: "create",
         payload: {
           id: crypto.randomUUID(),
@@ -72,7 +72,7 @@ function App() {
   const toggleTodo = (id: string) => {
     const todo = todos.find((todo) => todo[0] === id);
     if (!todo) return;
-    mutate({
+    sendAction({
       type: "update",
       payload: {
         id,
@@ -85,7 +85,7 @@ function App() {
   const deleteTodo = (id: string) => {
     const todo = todos.find((todo) => todo[0] === id);
     if (!todo) return;
-    mutate({
+    sendAction({
       type: "delete",
       payload: { id }
     });
