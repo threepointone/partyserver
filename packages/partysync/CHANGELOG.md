@@ -1,5 +1,11 @@
 # partysync
 
+## 0.0.5
+
+### Patch Changes
+
+- [`337c0c6`](https://github.com/threepointone/partyserver/commit/337c0c682a314064b13d19268fd129c08f30f71d) Thanks [@threepointone](https://github.com/threepointone)! - fix optimistic updates
+
 ## 0.0.4
 
 ### Patch Changes
