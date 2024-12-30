@@ -1,5 +1,11 @@
 # partysync
 
+## 0.0.7
+
+### Patch Changes
+
+- [`c441633`](https://github.com/threepointone/partyserver/commit/c44163396a8b22409b3370729f0d8e4c0f5f8b03) Thanks [@threepointone](https://github.com/threepointone)! - test bCE for consistency, use nanoid for ids, better styling for the todo example
+
 ## 0.0.6
 
 ### Patch Changes
