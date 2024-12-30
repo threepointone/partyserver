@@ -51,7 +51,7 @@ type RecordType = [
 
 // NOTE: we do soft deletes so we can sync deleted records to the client
 
-export class MyServer extends SyncServer<Env, Action, RecordType> {
+export class MyServer extends SyncServer<Env, RecordType, Action> {
   constructor(state: DurableObjectState, env: Env) {
     super(state, env);
     // setup a database table for your records

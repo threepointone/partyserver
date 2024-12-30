@@ -42,10 +42,6 @@ export class ToDos extends SyncServer<Env, TodoRecord, TodoAction> {
     )`);
   }
 
-  onConnect(
-    connection: Connection,
-    ctx: ConnectionContext
-  ): void | Promise<void> {}
   async onAction(action: TodoAction): Promise<TodoRecord[]> {
     // uncomment this if you want to run actions sequentially
     // return this.ctx.blockConcurrencyWhile(async () => {
@@ -95,7 +91,8 @@ export class ToDos extends SyncServer<Env, TodoRecord, TodoAction> {
     // });
   }
   async alarm() {
-    // delete any todos that have been deleted more than 24 hours ago
+    // actually delete any todos that have been
+    // marked as deleted more than 24 hours ago
     this.sql(
       "DELETE FROM todos WHERE deleted_at < ?",
       Date.now() - 24 * 60 * 60 * 1000
