@@ -1,5 +1,11 @@
 # partysync
 
+## 0.0.6
+
+### Patch Changes
+
+- [`4a9bcc3`](https://github.com/threepointone/partyserver/commit/4a9bcc36cf3a1bc6584bbd34f0e6d73a06182e63) Thanks [@threepointone](https://github.com/threepointone)! - partysync: use "action" verbiage
+
 ## 0.0.5
 
 ### Patch Changes
