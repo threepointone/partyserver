@@ -3,6 +3,7 @@ import { Server } from "partyserver";
 import type {
   BroadcastMessage,
   RpcAction,
+  RpcException,
   RpcResponse,
   SyncRequest,
   SyncResponse
@@ -45,7 +46,7 @@ export class SyncServer<
           type: "exception",
           rpc: true,
           exception: [`Failed to parse message: ${(err as Error).message}`]
-        })
+        } satisfies RpcException)
       );
       return;
     }
@@ -56,15 +57,15 @@ export class SyncServer<
       connection.send(
         JSON.stringify({
           sync: true,
-          channel: channel,
+          channel: channel as string,
           payload: [
             ...this.ctx.storage.sql
               .exec(
                 `SELECT * FROM ${channel as string} WHERE deleted_at IS NULL`
               )
               .raw()
-          ] as Channels[typeof channel][0]
-        })
+          ] as Channels[typeof channel][0][]
+        } satisfies SyncResponse<Channels[typeof channel][0]>)
       );
       return;
     }
@@ -78,30 +79,29 @@ export class SyncServer<
         JSON.stringify({
           type: "success",
           rpc: true,
-          channel: channel,
+          channel: channel as string,
           id: id,
           result: result
-        })
+        } satisfies RpcResponse<Channels[typeof channel][0]>)
       );
 
       this.broadcast(
         JSON.stringify({
           broadcast: true,
           type: "update",
-          channel: channel,
+          channel: channel as string,
           payload: result
-        }),
-        [connection.id]
+        } satisfies BroadcastMessage<Channels[typeof channel][0]>)
       );
     } catch (err) {
       connection.send(
         JSON.stringify({
           type: "error",
           rpc: true,
-          channel: channel,
+          channel: channel as string,
           id: id,
           error: [(err as Error).message]
-        })
+        } satisfies RpcResponse<Channels[typeof channel][0]>)
       );
     }
   }

@@ -1,7 +1,13 @@
 import { startTransition, useEffect, useOptimistic, useState } from "react";
 import { nanoid } from "nanoid";
 
-import type { BroadcastMessage, RpcAction, RpcResponse, SyncRequest } from "..";
+import type {
+  BroadcastMessage,
+  RpcAction,
+  RpcException,
+  RpcResponse,
+  SyncRequest
+} from "..";
 import type { WebSocket as PSWebSocket } from "partysocket";
 
 // we keep the actual cache external to the class
@@ -63,7 +69,7 @@ class RPC<RecordType extends unknown[], Action> {
     return this.rpc(id, timeout) as Promise<RecordType[]>;
   }
 
-  private async resolve(response: RpcResponse<RecordType>) {
+  private async resolve(response: RpcResponse<RecordType> | RpcException) {
     if (response.type === "exception") {
       throw new Error(response.exception.join("\n"));
     }

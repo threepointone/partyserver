@@ -19,12 +19,13 @@ export type RpcResponse<RecordType extends unknown[]> =
       rpc: true;
       type: "error";
       error: string[];
-    }
-  | {
-      rpc: true;
-      type: "exception";
-      exception: string[];
     };
+
+export type RpcException = {
+  rpc: true;
+  type: "exception";
+  exception: string[];
+};
 
 export type BroadcastMessage<T> = {
   broadcast: true;
