@@ -18,7 +18,10 @@ function assert(condition: unknown, message: string): asserts condition {
   }
 }
 
-export class ToDos extends SyncServer<Env, TodoRecord, TodoAction> {
+export class ToDos extends SyncServer<
+  Env,
+  { todos: [TodoRecord, TodoAction] }
+> {
   sql(sql: string, ...values: (string | number | null)[]) {
     if (
       ["insert", "update", "delete"].includes(
@@ -42,7 +45,7 @@ export class ToDos extends SyncServer<Env, TodoRecord, TodoAction> {
     )`);
   }
 
-  async onAction(action: TodoAction): Promise<TodoRecord[]> {
+  async onAction(channel: "todos", action: TodoAction): Promise<TodoRecord[]> {
     // uncomment this if you want to run actions sequentially
     // return this.ctx.blockConcurrencyWhile(async () => {
     await sleep(Math.random() * 2000);
@@ -52,7 +55,7 @@ export class ToDos extends SyncServer<Env, TodoRecord, TodoAction> {
         const { id, text, completed } = action.payload;
         const result = [
           ...this.sql(
-            "INSERT INTO todos (id, text, completed) VALUES (?, ?, ?) RETURNING *",
+            "INSERT INTO $todos (id, text, completed) VALUES (?, ?, ?) RETURNING *",
             id,
             text,
             completed
@@ -66,7 +69,7 @@ export class ToDos extends SyncServer<Env, TodoRecord, TodoAction> {
 
         const result = [
           ...this.sql(
-            "UPDATE todos SET text = ?, completed = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? RETURNING *",
+            "UPDATE $todos SET text = ?, completed = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? RETURNING *",
             text,
             completed,
             id
@@ -80,7 +83,7 @@ export class ToDos extends SyncServer<Env, TodoRecord, TodoAction> {
         assert(id, "id is required");
         const result = [
           ...this.sql(
-            "UPDATE todos SET deleted_at = CURRENT_TIMESTAMP WHERE id = ? RETURNING *",
+            "UPDATE $todos SET deleted_at = CURRENT_TIMESTAMP WHERE id = ? RETURNING *",
             id
           ).raw()
         ];

@@ -57,7 +57,10 @@ import { SyncServer } from "partysync";
 
 import type { TodoAction, TodoRecord } from "./shared";
 
-export class MyServer extends SyncServer<Env, TodoRecord, TodoAction> {
+export class MyServer extends SyncServer<
+  Env,
+  { todos: [TodoRecord, TodoAction] }
+> {
   constructor(state: DurableObjectState, env: Env) {
     super(state, env);
     // setup a database table for your records
@@ -73,7 +76,7 @@ export class MyServer extends SyncServer<Env, TodoRecord, TodoAction> {
     );
   }
   // setup a handler for actions
-  onAction(action) {
+  onAction(channel: "todos", action: TodoAction) {
     switch (action.type) {
       case "create": {
         const { id, text, completed } = action.payload;
@@ -132,5 +135,5 @@ function onClick() {
 
 - actually persist to disk/indexeddb on client
 - and then use deltas when syncing
-- multiple databases/DOs on a single socket
+- multiple DOs on a single socket
 - better error handling / messaging

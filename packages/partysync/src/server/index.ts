@@ -11,14 +11,18 @@ import type { Connection, WSMessage } from "partyserver";
 
 export class SyncServer<
   Env,
-  RecordType extends unknown[],
-  Action extends { type: string; payload: unknown }
+  Channels extends {
+    [Channel: string]: [unknown[], { type: string; payload: unknown }];
+  }
 > extends Server<Env> {
   static options = {
     hibernate: true
   };
 
-  onAction(action: Action): RecordType[] | Promise<RecordType[]> {
+  onAction<Channel extends keyof Channels>(
+    channel: Channel,
+    action: Channels[Channel][1]
+  ): Channels[Channel][0][] | Promise<Channels[Channel][0][]> {
     throw new Error(
       "onAction not implemented, you should implement this in your server"
     );
@@ -29,8 +33,10 @@ export class SyncServer<
       console.error("Received non-string message");
       return;
     }
-    let json: RpcAction<Action> | SyncRequest<RecordType>;
 
+    let json:
+      | RpcAction<Channels[keyof Channels][1]>
+      | SyncRequest<Channels[keyof Channels][0]>;
     try {
       json = JSON.parse(message);
     } catch (err) {
@@ -39,30 +45,34 @@ export class SyncServer<
           type: "exception",
           rpc: true,
           exception: [`Failed to parse message: ${(err as Error).message}`]
-        } satisfies RpcResponse<RecordType>)
+        })
       );
       return;
     }
+
+    const channel = json.channel as keyof Channels;
 
     if ("sync" in json && json.sync) {
       connection.send(
         JSON.stringify({
           sync: true,
-          channel: json.channel,
+          channel: channel,
           payload: [
             ...this.ctx.storage.sql
-              .exec(`SELECT * FROM ${json.channel} WHERE deleted_at IS NULL`)
+              .exec(
+                `SELECT * FROM ${channel as string} WHERE deleted_at IS NULL`
+              )
               .raw()
-          ] as RecordType[]
-        } satisfies SyncResponse<RecordType>)
+          ] as Channels[typeof channel][0]
+        })
       );
       return;
     }
 
-    const { channel, id, action } = json as RpcAction<Action>;
+    const { id, action } = json as RpcAction<Channels[typeof channel][1]>;
 
     try {
-      const result = await this.onAction(action);
+      const result = await this.onAction(channel, action);
 
       connection.send(
         JSON.stringify({
@@ -71,19 +81,18 @@ export class SyncServer<
           channel: channel,
           id: id,
           result: result
-        } satisfies RpcResponse<RecordType>)
+        })
       );
 
       this.broadcast(
         JSON.stringify({
           broadcast: true,
           type: "update",
-          channel: json.channel,
+          channel: channel,
           payload: result
-        } satisfies BroadcastMessage<RecordType>),
+        }),
         [connection.id]
       );
-      return;
     } catch (err) {
       connection.send(
         JSON.stringify({
@@ -92,9 +101,8 @@ export class SyncServer<
           channel: channel,
           id: id,
           error: [(err as Error).message]
-        } satisfies RpcResponse<RecordType>)
+        })
       );
-      return;
     }
   }
 }
