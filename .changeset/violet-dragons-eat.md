@@ -1,0 +1,5 @@
+---
+"partybase": patch
+---
+
+partybase stub
