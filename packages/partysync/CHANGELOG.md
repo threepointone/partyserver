@@ -1,5 +1,11 @@
 # partysync
 
+## 0.0.10
+
+### Patch Changes
+
+- [`ee3f205`](https://github.com/threepointone/partyserver/commit/ee3f205e8d50183bdac9640ee7c096543a4db064) Thanks [@threepointone](https://github.com/threepointone)! - experimental_sendAction
+
 ## 0.0.9
 
 ### Patch Changes
