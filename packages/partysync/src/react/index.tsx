@@ -1,12 +1,21 @@
-import { startTransition, useEffect, useOptimistic, useState } from "react";
+import {
+  startTransition,
+  useEffect,
+  useMemo,
+  useOptimistic,
+  useState
+} from "react";
 import { nanoid } from "nanoid";
+
+import { Persist } from "../client/persist";
 
 import type {
   BroadcastMessage,
   RpcAction,
   RpcException,
   RpcResponse,
-  SyncRequest
+  SyncRequest,
+  SyncResponse
 } from "..";
 import type { WebSocket as PSWebSocket } from "partysocket";
 
@@ -18,7 +27,10 @@ const rpcCaches = new Map<
   Map<string, ReturnType<typeof Promise.withResolvers>>
 >();
 
-class RPC<RecordType extends unknown[], Action> {
+class RPC<
+  RecordType extends unknown[],
+  Action extends { type: string; payload: unknown }
+> {
   private rpcCache: Map<string, ReturnType<typeof Promise.withResolvers>>;
   private controller = new AbortController();
   constructor(
@@ -92,10 +104,10 @@ class RPC<RecordType extends unknown[], Action> {
   }
 }
 
-function useRPC<RecordType extends unknown[], Action>(
-  key: string,
-  socket: PSWebSocket
-) {
+function useRPC<
+  RecordType extends unknown[],
+  Action extends { type: string; payload: unknown }
+>(key: string, socket: PSWebSocket) {
   const [rpc] = useState<RPC<RecordType, Action>>(
     () => new RPC<RecordType, Action>(key, socket)
   );
@@ -109,7 +121,10 @@ function useRPC<RecordType extends unknown[], Action>(
   return rpc;
 }
 
-export function useSync<RecordType extends unknown[], Action>(
+export function useSync<
+  RecordType extends unknown[],
+  Action extends { type: string; payload: unknown }
+>(
   key: string,
   socket: PSWebSocket,
   optimisticReducer: (
@@ -117,6 +132,7 @@ export function useSync<RecordType extends unknown[], Action>(
     action: Action
   ) => RecordType[] = (currentState) => currentState
 ): [RecordType[], (action: Action) => void] {
+  const persist = useMemo(() => new Persist<RecordType>(key), [key]);
   const [value, setValue] = useState<RecordType[]>([]);
 
   const rpc = useRPC<RecordType, Action>(key, socket);
@@ -124,19 +140,59 @@ export function useSync<RecordType extends unknown[], Action>(
   useEffect(() => {
     // do initial sync
     const controller = new AbortController();
-    socket.send(
-      JSON.stringify({
-        channel: key,
-        sync: true
-      } satisfies SyncRequest<RecordType>)
-    );
+
+    persist.getAll().then((records) => {
+      setValue(records.filter((r) => r.at(-1) === null));
+      // find the time of the latest record
+      let lastRecordTime: number | null = null;
+      for (const record of records) {
+        const recordDeletedAt = record[record.length - 1] as number | null;
+        const recordUpdatedAt = record[record.length - 2] as number | null;
+
+        // if the record is deleted, we want to sync up to the deleted time
+        if (
+          recordDeletedAt &&
+          (!lastRecordTime || recordDeletedAt > lastRecordTime)
+        ) {
+          lastRecordTime = recordDeletedAt;
+        }
+        // if the record is updated, we want to sync up to the updated time
+        if (
+          recordUpdatedAt &&
+          (!lastRecordTime || recordUpdatedAt > lastRecordTime)
+        ) {
+          lastRecordTime = recordUpdatedAt;
+        }
+      }
+      socket.send(
+        JSON.stringify({
+          channel: key,
+          sync: true,
+          from: lastRecordTime
+        } satisfies SyncRequest<RecordType>)
+      );
+    });
+
     socket.addEventListener(
       "message",
-      (event) => {
-        const message = JSON.parse(event.data);
+      async (event) => {
+        const message = JSON.parse(event.data) as SyncResponse<RecordType>;
         if (message.channel === key && message.sync === true) {
           // this is all the data for initial sync
-          setValue(message.payload);
+
+          setValue((value) => {
+            const updatedRecords = [...value];
+            for (const record of message.payload) {
+              const index = updatedRecords.findIndex((r) => r[0] === record[0]);
+              if (index !== -1) {
+                updatedRecords.splice(index, 1, record);
+              } else {
+                updatedRecords.push(record);
+              }
+            }
+            persist.set(message.payload);
+            return updatedRecords;
+          });
         }
       },
       { signal: controller.signal }
@@ -144,7 +200,7 @@ export function useSync<RecordType extends unknown[], Action>(
     return () => {
       controller.abort();
     };
-  }, [socket, key]);
+  }, [socket, key, persist]);
 
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
@@ -155,11 +211,10 @@ export function useSync<RecordType extends unknown[], Action>(
             const updates = message.payload;
             const updatedRecords = [...records];
             for (const update of updates) {
-              if (update.at(-1) == null) {
+              const index = updatedRecords.findIndex((r) => r[0] === update[0]);
+              if (update.at(-1) === null) {
                 // doesn't have deleted_at, so it's not a delete
-                const index = updatedRecords.findIndex(
-                  (r) => r[0] === update[0]
-                );
+
                 if (index !== -1) {
                   // update the record
                   updatedRecords.splice(index, 1, update);
@@ -169,14 +224,16 @@ export function useSync<RecordType extends unknown[], Action>(
                 }
               } else {
                 // this is a delete
-                const index = updatedRecords.findIndex(
-                  (r) => r[0] === update[0]
-                );
+
                 if (index !== -1) {
                   updatedRecords.splice(index, 1);
+                } else {
+                  // this is a delete for a record that doesn't exist
+                  // so let's just ignore it
                 }
               }
             }
+            persist.set(updates);
             return updatedRecords;
           });
         } else if (message.type === "delete-all") {
@@ -190,7 +247,7 @@ export function useSync<RecordType extends unknown[], Action>(
     return () => {
       socket.removeEventListener("message", handleMessage);
     };
-  }, [socket, key]);
+  }, [socket, key, persist]);
 
   const [optimisticValue, setOptimisticValue] = useOptimistic<
     RecordType[],
@@ -216,18 +273,27 @@ export function useSync<RecordType extends unknown[], Action>(
             const newValue = [...value];
             for (const record of result) {
               // if record is in data, update it
-
               const index = newValue.findIndex((item) => item[0] === record[0]);
               if (index !== -1) {
-                newValue.splice(index, 1, record);
-                // changed = true;
+                if (record.at(-1) !== null) {
+                  // this is a delete
+                  newValue.splice(index, 1);
+                } else {
+                  newValue.splice(index, 1, record);
+                }
               }
               // if record is not in data, add it
               else if (index === -1) {
-                newValue.push(record);
-                // changed = true;
+                if (record.at(-1) === null) {
+                  // this is not a delete
+                  newValue.push(record);
+                } else {
+                  // this is a delete for a record that doesn't exist
+                  // so let's just ignore it
+                }
               }
             }
+            persist.set(result);
             return newValue;
           });
         });

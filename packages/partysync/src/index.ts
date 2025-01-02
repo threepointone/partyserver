@@ -43,6 +43,7 @@ export type BroadcastMessage<T> = {
 export type SyncRequest<T> = {
   channel: string;
   sync: true;
+  from: number | null;
 };
 
 export type SyncResponse<T> = {

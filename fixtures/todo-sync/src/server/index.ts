@@ -33,8 +33,8 @@ export class ToDos extends SyncServer<
     }
     return this.ctx.storage.sql.exec(sql, ...values);
   }
-  constructor(state: DurableObjectState, env: Env) {
-    super(state, env);
+
+  onStart() {
     this.sql(`CREATE TABLE IF NOT EXISTS todos (
       id TEXT PRIMARY KEY NOT NULL UNIQUE, 
       text TEXT NOT NULL, 
@@ -53,42 +53,37 @@ export class ToDos extends SyncServer<
     switch (action.type) {
       case "create": {
         const { id, text, completed } = action.payload;
-        const result = [
+        return [
           ...this.sql(
             "INSERT INTO todos (id, text, completed) VALUES (?, ?, ?) RETURNING *",
             id,
             text,
             completed
           ).raw()
-        ];
-
-        return result as TodoRecord[];
+        ] as TodoRecord[];
       }
       case "update": {
+        console.log("update", action.payload);
         const { id, text, completed } = action.payload;
 
-        const result = [
+        return [
           ...this.sql(
             "UPDATE todos SET text = ?, completed = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? RETURNING *",
             text,
             completed,
             id
           ).raw()
-        ];
-
-        return result as TodoRecord[];
+        ] as TodoRecord[];
       }
       case "delete": {
         const { id } = action.payload;
         assert(id, "id is required");
-        const result = [
+        return [
           ...this.sql(
             "UPDATE todos SET deleted_at = CURRENT_TIMESTAMP WHERE id = ? RETURNING *",
             id
           ).raw()
-        ];
-
-        return result as TodoRecord[];
+        ] as TodoRecord[];
       }
     }
     // });

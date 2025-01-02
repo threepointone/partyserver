@@ -54,16 +54,24 @@ export class SyncServer<
     const channel = json.channel as keyof Channels;
 
     if ("sync" in json && json.sync) {
+      console.log("syncing from", json.from);
       connection.send(
         JSON.stringify({
           sync: true,
           channel: channel as string,
           payload: [
-            ...this.ctx.storage.sql
-              .exec(
-                `SELECT * FROM ${channel as string} WHERE deleted_at IS NULL`
-              )
-              .raw()
+            ...(json.from
+              ? this.ctx.storage.sql
+                  .exec(
+                    `SELECT * FROM ${channel as string} WHERE deleted_at IS NULL AND updated_at > ?`,
+                    json.from
+                  )
+                  .raw()
+              : this.ctx.storage.sql
+                  .exec(
+                    `SELECT * FROM ${channel as string} WHERE deleted_at IS NULL`
+                  )
+                  .raw())
           ] as Channels[typeof channel][0][]
         } satisfies SyncResponse<Channels[typeof channel][0]>)
       );

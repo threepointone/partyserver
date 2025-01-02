@@ -61,8 +61,7 @@ export class MyServer extends SyncServer<
   Env,
   { todos: [TodoRecord, TodoAction] }
 > {
-  constructor(state: DurableObjectState, env: Env) {
-    super(state, env);
+  onStart() {
     // setup a database table for your records
     this.ctx.storage.sql.exec(
       `CREATE TABLE IF NOT EXISTS todos (
@@ -90,7 +89,7 @@ export class MyServer extends SyncServer<
               completed
             )
             .raw()
-        ];
+        ] as TodoRecord[];
       }
       // etc
     }
@@ -133,7 +132,14 @@ function onClick() {
 
 ### TODO:
 
-- actually persist to disk/indexeddb on client
-- and then use deltas when syncing
 - multiple DOs on a single socket
 - better error handling / messaging
+- update from server
+- what do migrations look like?
+- sync with other databases?
+- sync with api endpoints
+- add a higher level abstraction instead of using database records directly
+
+### Maybe won't do
+
+- what if the client/server is offline?

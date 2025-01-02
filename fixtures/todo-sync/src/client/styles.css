@@ -119,3 +119,25 @@ body {
 .todo-delete-button:hover {
   color: #b91c1c;
 }
+
+.todo-clear-button {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  padding: 0.75rem 1.5rem;
+  background-color: rgba(239, 68, 68, 0.7);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4px);
+}
+
+.todo-clear-button:hover {
+  background-color: rgba(239, 68, 68, 0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
