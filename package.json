@@ -32,7 +32,7 @@
     "@types/bun": "^1.1.14",
     "@vitest/runner": "2.1.8",
     "@vitest/snapshot": "2.1.8",
-    "concurrently": "^9.1.0",
+    "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
     "prettier": "^3.4.2",
     "tsup": "^8.3.5",

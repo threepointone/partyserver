@@ -55,7 +55,7 @@ export class ToDos extends SyncServer<
         const { id, text, completed } = action.payload;
         const result = [
           ...this.sql(
-            "INSERT INTO $todos (id, text, completed) VALUES (?, ?, ?) RETURNING *",
+            "INSERT INTO todos (id, text, completed) VALUES (?, ?, ?) RETURNING *",
             id,
             text,
             completed
@@ -69,7 +69,7 @@ export class ToDos extends SyncServer<
 
         const result = [
           ...this.sql(
-            "UPDATE $todos SET text = ?, completed = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? RETURNING *",
+            "UPDATE todos SET text = ?, completed = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? RETURNING *",
             text,
             completed,
             id
@@ -83,7 +83,7 @@ export class ToDos extends SyncServer<
         assert(id, "id is required");
         const result = [
           ...this.sql(
-            "UPDATE $todos SET deleted_at = CURRENT_TIMESTAMP WHERE id = ? RETURNING *",
+            "UPDATE todos SET deleted_at = CURRENT_TIMESTAMP WHERE id = ? RETURNING *",
             id
           ).raw()
         ];
