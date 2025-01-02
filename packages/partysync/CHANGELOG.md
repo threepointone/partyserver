@@ -1,5 +1,18 @@
 # partysync
 
+## 0.0.8
+
+### Patch Changes
+
+- [`fff7945`](https://github.com/threepointone/partyserver/commit/fff79459fbacb2b1151619f6dcc1c8b86f6a9786) Thanks [@threepointone](https://github.com/threepointone)! - fix double message / key mismatch
+
+- [`b5acc8e`](https://github.com/threepointone/partyserver/commit/b5acc8ebd55830239d5188bb114b718019e850b1) Thanks [@threepointone](https://github.com/threepointone)! - Update dependencies
+
+- [`9d55e7b`](https://github.com/threepointone/partyserver/commit/9d55e7b140360890f85d021a2b76e52d08b6fd4a) Thanks [@threepointone](https://github.com/threepointone)! - partysync: support multiple databases in a single DO
+
+- Updated dependencies [[`b5acc8e`](https://github.com/threepointone/partyserver/commit/b5acc8ebd55830239d5188bb114b718019e850b1)]:
+  - partyserver@0.0.59
+
 ## 0.0.7
 
 ### Patch Changes
