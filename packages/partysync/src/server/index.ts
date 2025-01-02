@@ -91,7 +91,8 @@ export class SyncServer<
           type: "update",
           channel: channel as string,
           payload: result
-        } satisfies BroadcastMessage<Channels[typeof channel][0]>)
+        } satisfies BroadcastMessage<Channels[typeof channel][0]>),
+        [connection.id]
       );
     } catch (err) {
       connection.send(
