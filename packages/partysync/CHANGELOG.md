@@ -1,5 +1,11 @@
 # partysync
 
+## 0.0.9
+
+### Patch Changes
+
+- [#108](https://github.com/threepointone/partyserver/pull/108) [`1e95f93`](https://github.com/threepointone/partyserver/commit/1e95f93c92813d7e74c1eef14c69b6c782c92669) Thanks [@threepointone](https://github.com/threepointone)! - persist in browser with indexeddb
+
 ## 0.0.8
 
 ### Patch Changes
