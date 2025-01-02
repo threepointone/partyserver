@@ -157,7 +157,29 @@ function App() {
             </li>
           ))}
       </ul>
+      <div className="todo-controls">
+        <button
+          type="button"
+          onClick={clearDatabase}
+          className="todo-clear-button"
+        >
+          Clear Local Data
+        </button>
+      </div>
     </div>
   );
 }
 createRoot(document.getElementById("root")!).render(<App />);
+
+// clear the local database
+function clearDatabase() {
+  if (window.confirm("Are you sure you want to clear all local data?")) {
+    const db = window.indexedDB.open("partysync");
+    db.onsuccess = () => {
+      const deleteRequest = window.indexedDB.deleteDatabase("partysync");
+      deleteRequest.onsuccess = () => {
+        window.location.reload();
+      };
+    };
+  }
+}

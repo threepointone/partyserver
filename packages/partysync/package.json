@@ -44,6 +44,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "idb": "^8.0.1",
     "nanoid": "^5.0.9"
   },
   "peerDependencies": {
