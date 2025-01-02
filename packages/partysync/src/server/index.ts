@@ -29,6 +29,26 @@ export class SyncServer<
     );
   }
 
+  async experimental_sendAction(
+    channel: keyof Channels,
+    action: Channels[keyof Channels][1]
+  ): Promise<Channels[typeof channel][0]> {
+    console.warn(
+      "experimental_sendAction is experimental and may change or be removed"
+    );
+    const result = await this.onAction(channel, action);
+    // broadcast
+    this.broadcast(
+      JSON.stringify({
+        broadcast: true,
+        type: "update",
+        channel: channel as string,
+        payload: result
+      } satisfies BroadcastMessage<Channels[typeof channel][0]>)
+    );
+    return result;
+  }
+
   async onMessage(connection: Connection, message: WSMessage): Promise<void> {
     if (typeof message !== "string") {
       console.error("Received non-string message");
@@ -78,7 +98,9 @@ export class SyncServer<
       return;
     }
 
-    const { id, action } = json as RpcAction<Channels[typeof channel][1]>;
+    const { id: messageId, action } = json as RpcAction<
+      Channels[typeof channel][1]
+    >;
 
     try {
       const result = await this.onAction(channel, action);
@@ -88,7 +110,7 @@ export class SyncServer<
           type: "success",
           rpc: true,
           channel: channel as string,
-          id: id,
+          id: messageId,
           result: result
         } satisfies RpcResponse<Channels[typeof channel][0]>)
       );
@@ -108,7 +130,7 @@ export class SyncServer<
           type: "error",
           rpc: true,
           channel: channel as string,
-          id: id,
+          id: messageId,
           error: [(err as Error).message]
         } satisfies RpcResponse<Channels[typeof channel][0]>)
       );

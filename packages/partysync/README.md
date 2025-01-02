@@ -130,11 +130,25 @@ function onClick() {
 }
 ```
 
+EXPERIMENTAL: You can also call the action directly on the server (like, via an ai agent or some other process).
+
+```ts
+// server.ts
+
+// get a reference to the server, for eg:
+const stub = await getServerByName("todos", "some-room-name");
+
+// call the action
+const result = await stub.sendAction("todos", {
+  type: "create",
+  payload: { id: "1", text: "hello", completed: 0 }
+});
+```
+
 ### TODO:
 
 - multiple DOs on a single socket
 - better error handling / messaging
-- update from server
 - what do migrations look like?
 - sync with other databases?
 - sync with api endpoints
