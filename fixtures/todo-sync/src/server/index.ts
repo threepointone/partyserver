@@ -20,7 +20,7 @@ function assert(condition: unknown, message: string): asserts condition {
 
 export class ToDos extends SyncServer<
   Env,
-  { todos: { record: TodoRecord[]; action: TodoAction } }
+  { todos: { record: TodoRecord; action: TodoAction } }
 > {
   sql(sql: string, ...values: (string | number | null)[]) {
     if (
