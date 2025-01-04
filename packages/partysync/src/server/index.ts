@@ -1,52 +1,38 @@
 import { Server } from "partyserver";
 
-import type {
-  BroadcastMessage,
-  RpcAction,
-  RpcException,
-  RpcResponse,
-  SyncRequest,
-  SyncResponse
-} from "../index.ts";
+import type { BroadcastMessage, SyncRequest, SyncResponse } from "../types.js";
+import type { RpcAction, RpcException, RpcResponse } from "partyfn";
 import type { Connection, WSMessage } from "partyserver";
+
+type ActionType = {
+  type: string;
+  payload: unknown;
+};
+
+type RecordType = unknown[];
+
+type Channels = {
+  [Channel: string]: {
+    record: RecordType;
+    action: ActionType;
+  };
+};
 
 export class SyncServer<
   Env,
-  Channels extends {
-    [Channel: string]: [unknown[], { type: string; payload: unknown }];
-  }
+  TChannels extends Channels = Channels
 > extends Server<Env> {
   static options = {
     hibernate: true
   };
 
-  onAction<Channel extends keyof Channels>(
+  onAction<Channel extends keyof TChannels>(
     channel: Channel,
-    action: Channels[Channel][1]
-  ): Channels[Channel][0][] | Promise<Channels[Channel][0][]> {
+    action: TChannels[typeof channel]["action"]
+  ): TChannels[Channel]["record"][] | Promise<TChannels[Channel]["record"][]> {
     throw new Error(
       "onAction not implemented, you should implement this in your server"
     );
-  }
-
-  async experimental_sendAction(
-    channel: keyof Channels,
-    action: Channels[keyof Channels][1]
-  ): Promise<Channels[typeof channel][0]> {
-    console.warn(
-      "experimental_sendAction is experimental and may change or be removed"
-    );
-    const result = await this.onAction(channel, action);
-    // broadcast
-    this.broadcast(
-      JSON.stringify({
-        broadcast: true,
-        type: "update",
-        channel: channel as string,
-        payload: result
-      } satisfies BroadcastMessage<Channels[typeof channel][0]>)
-    );
-    return result;
   }
 
   async onMessage(connection: Connection, message: WSMessage): Promise<void> {
@@ -56,8 +42,8 @@ export class SyncServer<
     }
 
     let json:
-      | RpcAction<Channels[keyof Channels][1]>
-      | SyncRequest<Channels[keyof Channels][0]>;
+      | RpcAction<TChannels[keyof TChannels]["action"]>
+      | SyncRequest<TChannels[keyof TChannels]["record"]>;
     try {
       json = JSON.parse(message);
     } catch (err) {
@@ -71,7 +57,7 @@ export class SyncServer<
       return;
     }
 
-    const channel = json.channel as keyof Channels;
+    const channel = json.channel as keyof TChannels;
 
     if ("sync" in json && json.sync) {
       console.log("syncing from", json.from);
@@ -92,14 +78,14 @@ export class SyncServer<
                     `SELECT * FROM ${channel as string} WHERE deleted_at IS NULL`
                   )
                   .raw())
-          ] as Channels[typeof channel][0][]
-        } satisfies SyncResponse<Channels[typeof channel][0]>)
+          ] as TChannels[typeof channel]["record"][]
+        } satisfies SyncResponse<TChannels[typeof channel]["record"]>)
       );
       return;
     }
 
     const { id: messageId, action } = json as RpcAction<
-      Channels[typeof channel][1]
+      TChannels[typeof channel]["action"]
     >;
 
     try {
@@ -112,7 +98,7 @@ export class SyncServer<
           channel: channel as string,
           id: messageId,
           result: result
-        } satisfies RpcResponse<Channels[typeof channel][0]>)
+        } satisfies RpcResponse<TChannels[typeof channel]["record"]>)
       );
 
       this.broadcast(
@@ -121,7 +107,7 @@ export class SyncServer<
           type: "update",
           channel: channel as string,
           payload: result
-        } satisfies BroadcastMessage<Channels[typeof channel][0]>),
+        } satisfies BroadcastMessage<TChannels[typeof channel]["record"]>),
         [connection.id]
       );
     } catch (err) {
@@ -132,7 +118,7 @@ export class SyncServer<
           channel: channel as string,
           id: messageId,
           error: [(err as Error).message]
-        } satisfies RpcResponse<Channels[typeof channel][0]>)
+        } satisfies RpcResponse<TChannels[typeof channel]["record"]>)
       );
     }
   }

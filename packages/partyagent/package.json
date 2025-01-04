@@ -1,0 +1,20 @@
+{
+  "name": "partyagent",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/threepointone/partyserver.git"
+  },
+  "type": "module",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "durable-objects",
+    "ai-agents"
+  ],
+  "author": "Sunil Pai <spai@cloudflare.com>",
+  "license": "ISC",
+  "description": "AI agents on Durable Objects"
+}

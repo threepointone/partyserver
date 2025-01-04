@@ -5,111 +5,19 @@ import {
   useOptimistic,
   useState
 } from "react";
-import { nanoid } from "nanoid";
+import { RPCClient } from "partyfn";
 
 import { Persist } from "../client/persist";
 
-import type {
-  BroadcastMessage,
-  RpcAction,
-  RpcException,
-  RpcResponse,
-  SyncRequest,
-  SyncResponse
-} from "..";
+import type { BroadcastMessage, SyncRequest, SyncResponse } from "../types";
 import type { WebSocket as PSWebSocket } from "partysocket";
 
-// we keep the actual cache external to the class
-// so it can be reused across instances/rerenders
-
-const rpcCaches = new Map<
-  string,
-  Map<string, ReturnType<typeof Promise.withResolvers>>
->();
-
-class RPC<
-  RecordType extends unknown[],
-  Action extends { type: string; payload: unknown }
-> {
-  private rpcCache: Map<string, ReturnType<typeof Promise.withResolvers>>;
-  private controller = new AbortController();
-  constructor(
-    private channel: string,
-    private socket: PSWebSocket
-  ) {
-    const cache = rpcCaches.get(channel);
-    if (!cache) {
-      rpcCaches.set(channel, new Map());
-    }
-    this.rpcCache = rpcCaches.get(channel)!;
-    this.socket.addEventListener(
-      "message",
-      (event) => {
-        const message = JSON.parse(event.data) as RpcResponse<RecordType>;
-        if (
-          (message.type === "success" || message.type === "error") &&
-          message.channel === this.channel &&
-          message.rpc === true
-        ) {
-          this.resolve(message);
-        }
-      },
-      { signal: this.controller.signal }
-    );
-  }
-
-  private rpc(id: string, timeout = 10000) {
-    const resolver = Promise.withResolvers();
-    this.rpcCache.set(id, resolver);
-    setTimeout(() => {
-      this.rpcCache.delete(id);
-      resolver.reject(new Error(`RPC call ${id} timed out`));
-    }, timeout);
-    return resolver.promise;
-  }
-
-  public async call(action: Action, timeout = 10000): Promise<RecordType[]> {
-    const id: string = nanoid(8);
-    this.socket.send(
-      JSON.stringify({
-        id,
-        channel: this.channel,
-        rpc: true,
-        action
-      } satisfies RpcAction<Action>)
-    );
-    return this.rpc(id, timeout) as Promise<RecordType[]>;
-  }
-
-  private async resolve(response: RpcResponse<RecordType> | RpcException) {
-    if (response.type === "exception") {
-      throw new Error(response.exception.join("\n"));
-    }
-    const resolver = this.rpcCache.get(response.id);
-    if (!resolver) {
-      console.warn(`No resolver found for id: ${response.id}`);
-      return;
-    }
-    if (response.type === "success") {
-      resolver.resolve(response.result);
-    } else {
-      resolver.reject(new Error(response.error.join("\n")));
-    }
-  }
-
-  destroy() {
-    // this.rpcCache.clear();
-    // cancel the signal
-    this.controller.abort();
-  }
-}
-
 function useRPC<
-  RecordType extends unknown[],
-  Action extends { type: string; payload: unknown }
+  Action extends { type: string; payload: unknown },
+  RecordType extends unknown[]
 >(key: string, socket: PSWebSocket) {
-  const [rpc] = useState<RPC<RecordType, Action>>(
-    () => new RPC<RecordType, Action>(key, socket)
+  const [rpc] = useState<RPCClient<Action, RecordType>>(
+    () => new RPCClient<Action, RecordType>(key, socket)
   );
 
   useEffect(() => {
@@ -135,7 +43,7 @@ export function useSync<
   const persist = useMemo(() => new Persist<RecordType>(key), [key]);
   const [value, setValue] = useState<RecordType[]>([]);
 
-  const rpc = useRPC<RecordType, Action>(key, socket);
+  const rpc = useRPC<Action, RecordType[]>(key, socket);
 
   useEffect(() => {
     // do initial sync

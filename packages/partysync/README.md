@@ -12,7 +12,13 @@ See the [Todo fixture](/fixtures/todo-sync/) for a fully working example.
 - A common pattern is to use one DO per user (and/or entity), and you want to sync all it's state to the client.
 - This is a simple (tm) way to sync state from a Durable Object to a client.
 - Comes with all the other goodness of Durable Objects: consistency, hibernation, etc.
-- If you're looking for syncing slices of state from a database like postgres/mysql, then this library is probably not for you (yet). I recommend something more featureful likezero tinybase electric powersync etc (Lots of great options here - https://localfirstweb.dev/)
+- If you're looking for syncing slices of state from a database like postgres/mysql, then this library is probably not for you (yet). I recommend something more featureful like zero tinybase electric powersync etc (Lots of great options here - https://localfirstweb.dev/)
+
+### Why not?
+
+- Not a good fit when the entire state is too large to fit in a client's memory.
+- Missing features (right now): migrations, multiple DOs on a single socket, better error handling / messaging, etc.
+- a higher level abstraction (than just using database records directly) would make this more useful.
 
 ### Usage
 
@@ -128,21 +134,6 @@ function onClick() {
     payload: { id: "1", text: "hello", completed: 0 }
   });
 }
-```
-
-EXPERIMENTAL: You can also call the action directly on the server (like, via an ai agent or some other process).
-
-```ts
-// server.ts
-
-// get a reference to the server, for eg:
-const stub = await getServerByName("todos", "some-room-name");
-
-// call the action
-const result = await stub.sendAction("todos", {
-  type: "create",
-  payload: { id: "1", text: "hello", completed: 0 }
-});
 ```
 
 ### TODO:

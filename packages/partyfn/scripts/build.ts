@@ -2,18 +2,11 @@ import { $ } from "bun";
 import { build } from "tsup";
 
 await build({
-  entry: [
-    "src/index.ts",
-    "src/server/index.ts",
-    "src/client/index.ts",
-    "src/react/index.tsx",
-    "src/agent/index.ts",
-    "src/rpc.ts"
-  ],
+  entry: ["src/index.ts"],
   splitting: true,
   sourcemap: true,
   clean: true,
-  external: ["cloudflare:workers", "partyserver", "react"],
+  external: ["cloudflare:workers", "partyserver", "react", "nanoid"],
   format: "esm",
   dts: true
 });

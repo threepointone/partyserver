@@ -6,10 +6,24 @@
     "url": "git://github.com/threepointone/partyserver.git"
   },
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.js"
+    }
+  },
   "files": [
     "dist",
     "README.md"
   ],
+  "dependencies": {
+    "nanoid": "^5.0.9",
+    "partysocket": "^1.0.3"
+  },
+  "scripts": {
+    "build": "bun scripts/build.ts"
+  },
   "keywords": [
     "durable-objects",
     "rpc"

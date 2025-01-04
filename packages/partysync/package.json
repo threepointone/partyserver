@@ -12,6 +12,16 @@
       "require": "./dist/index.js",
       "import": "./dist/index.js"
     },
+    "./rpc": {
+      "types": "./dist/rpc.d.ts",
+      "require": "./dist/rpc.js",
+      "import": "./dist/rpc.js"
+    },
+    "./agent": {
+      "types": "./dist/agent/index.d.ts",
+      "require": "./dist/agent/index.js",
+      "import": "./dist/agent/index.js"
+    },
     "./client": {
       "types": "./dist/client/index.d.ts",
       "require": "./dist/client/index.js",
