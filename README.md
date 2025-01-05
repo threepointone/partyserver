@@ -14,6 +14,8 @@ This is the main repository for PartyServer. It contains the following packages:
 
 [partysync](/packages/partysync/README.md) - An experimental library to synchronise state from a Durable Object to a client.
 
+[⏱️ partywhen](/packages/partywhen/README.md) - A library for scheduling tasks at scale.
+
 ### Fixtures
 
 We have a set of small examples for PartyServer in the [`fixtures`](/fixtures/) directory. These are small, self-contained examples that demonstrate how to use PartyServer in different ways. We will expand this repository with broader (and deeper!) examples in the future.
