@@ -1,5 +1,11 @@
 # partysync
 
+## 0.0.11
+
+### Patch Changes
+
+- [`5e6cf60`](https://github.com/threepointone/partyserver/commit/5e6cf60e5321dfdda1fba8acbb7b3c4047736a12) Thanks [@threepointone](https://github.com/threepointone)! - pull out some stuff for partyfn, start work on the rpc agent, etc
+
 ## 0.0.10
 
 ### Patch Changes
