@@ -7,7 +7,8 @@
   },
   "type": "module",
   "scripts": {
-    "build": "bun scripts/build.ts"
+    "build": "bun scripts/build.ts",
+    "check:test": "(cd tests; vitest --no-watch)"
   },
   "files": [
     "dist",
@@ -21,5 +22,8 @@
   ],
   "author": "Sunil Pai <spai@cloudflare.com>",
   "license": "ISC",
-  "description": "A library for scheduling and running tasks in Cloudflare Workers"
+  "description": "A library for scheduling and running tasks in Cloudflare Workers",
+  "dependencies": {
+    "cron-parser": "^4.9.0"
+  }
 }
