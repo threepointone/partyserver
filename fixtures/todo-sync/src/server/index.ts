@@ -2,7 +2,6 @@ import { routePartykitRequest } from "partyserver";
 import { SyncServer } from "partysync/server";
 
 import type { TodoAction, TodoRecord } from "../shared";
-import type { Connection, ConnectionContext } from "partyserver";
 
 type Env = {
   ToDos: DurableObjectNamespace<ToDos>;
