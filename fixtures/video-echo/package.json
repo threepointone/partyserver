@@ -1,0 +1,29 @@
+{
+  "name": "@partyserver/fixture-video-echo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "remix build",
+    "deploy": "wrangler deploy",
+    "start": "remix dev -c \"wrangler dev\""
+  },
+  "dependencies": {
+    "@remix-run/cloudflare": "^2.15.2",
+    "@remix-run/css-bundle": "^2.15.2",
+    "@remix-run/react": "^2.15.2",
+    "@remix-run/server-runtime": "^2.15.2",
+    "isbot": "^5.1.19",
+    "partysocket": "^1.0.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241230.0",
+    "@remix-run/dev": "^2.15.2",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
