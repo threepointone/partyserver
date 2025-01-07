@@ -1,0 +1,33 @@
+{
+  "name": "partytracks",
+  "version": "0.0.2",
+  "scripts": {
+    "dev": "bun run build -- --watch",
+    "prebuild": "rm -rf dist",
+    "build": "tsup ./src/index.ts --format esm --dts",
+    "postbuild": "prettier --write ./dist/*.d.ts"
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/threepointone/partyserver.git"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "webrtc",
+    "calls",
+    "durable-objects"
+  ],
+  "author": "Sunil Pai <spai@cloudflare.com>",
+  "license": "ISC",
+  "description": "Integrate Cloudflare Calls into your PartyServer app",
+  "dependencies": {
+    "tiny-invariant": "^1.3.3"
+  }
+}
