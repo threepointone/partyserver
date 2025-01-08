@@ -6,8 +6,8 @@
     "start": "wrangler dev"
   },
   "dependencies": {
-    "@tailwindcss/forms": "^0.5.9",
-    "@tailwindcss/typography": "^0.5.15",
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.16",
     "@tiptap/extension-collaboration": "^2.11.0",
     "@tiptap/extension-collaboration-cursor": "^2.11.0",
     "@tiptap/react": "^2.11.0",
@@ -20,7 +20,7 @@
     "y-partyserver": "workspace:*"
   },
   "devDependencies": {
-    "@types/react": "^19.0.2",
+    "@types/react": "^19.0.4",
     "@types/react-dom": "^19.0.2"
   }
 }
