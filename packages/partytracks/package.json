@@ -24,7 +24,7 @@
     "calls",
     "durable-objects"
   ],
-  "author": "Sunil Pai <spai@cloudflare.com>",
+  "author": "Kevin Kipp <kkipp@cloudflare.com>",
   "license": "ISC",
   "description": "Integrate Cloudflare Calls into your PartyServer app",
   "dependencies": {
