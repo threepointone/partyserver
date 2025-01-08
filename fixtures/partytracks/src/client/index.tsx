@@ -13,7 +13,9 @@ invariant(remoteVideo instanceof HTMLVideoElement);
 
 form.addEventListener("submit", async function setup(ev) {
   ev.preventDefault();
-  const { apiToken, appId } = Object.fromEntries(new FormData(form));
+  const formData = new FormData(form);
+  const apiToken = formData.get("apiToken") as string;
+  const appId = formData.get("appId") as string;
 
   const webcamTrack = await navigator.mediaDevices
     .getUserMedia({ video: true })

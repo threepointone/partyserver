@@ -50,6 +50,7 @@ export function getPacketLoss$(
 
       newStatsReport.forEach((report) => {
         if (!relevantMids.has(report.mid)) return;
+        // @ts-expect-error RTCStatsReport types are busted
         const previous = previousStatsReport.get(report.id);
         if (!previous) return;
 
@@ -60,12 +61,18 @@ export function getPacketLoss$(
         } else if (report.type === "outbound-rtp") {
           const packetsSent = report.packetsSent - previous.packetsSent;
           // Find the corresponding remote-inbound-rtp report
-          const remoteInboundReport = Array.from(newStatsReport.values()).find(
+          const remoteInboundReport = Array.from(
+            // @ts-expect-error RTCStatsReport types are busted
+            newStatsReport.values()
+          ).find(
+            // @ts-expect-error RTCStatsReport types are busted
             (r) => r.type === "remote-inbound-rtp" && r.ssrc === report.ssrc
           );
           const previousRemoteInboundReport = Array.from(
+            // @ts-expect-error RTCStatsReport types are busted
             previousStatsReport.values()
           ).find(
+            // @ts-expect-error RTCStatsReport types are busted
             (r) => r.type === "remote-inbound-rtp" && r.ssrc === previous.ssrc
           );
           if (
@@ -75,7 +82,9 @@ export function getPacketLoss$(
           ) {
             outboundPacketsSent += report.packetsSent - previous.packetsSent;
             outboundPacketsLost +=
+              // @ts-expect-error RTCStatsReport types are busted
               remoteInboundReport.packetsLost -
+              // @ts-expect-error RTCStatsReport types are busted
               previousRemoteInboundReport.packetsLost;
           }
         }
