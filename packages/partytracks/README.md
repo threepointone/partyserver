@@ -1,4 +1,4 @@
-## partycalls 🎶
+## partytracks 🎶
 
 ```js
 import { PartyTracks } from "partytracks";
