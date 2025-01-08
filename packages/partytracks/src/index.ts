@@ -1,2 +1,2 @@
 export { PartyTracks } from "./PartyTracks";
-export { TrackMetadata } from "./callsTypes";
+export type { TrackMetadata } from "./callsTypes";

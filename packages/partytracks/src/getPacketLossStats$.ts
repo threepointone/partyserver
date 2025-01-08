@@ -1,6 +1,7 @@
-import Ewma from "~/utils/ewma";
-import { mode } from "~/utils/mode";
+// import { mode } from "~/utils/mode";
 import { combineLatest, interval, map, pairwise, switchMap } from "rxjs";
+
+import { Ewma } from "./ewma";
 
 import type { Observable } from "rxjs";
 
@@ -45,7 +46,7 @@ export function getPacketLossStats$(
           console.warn(
             "PeerConnection doesn't appear to be connected to anycast 141.101.90.0"
           );
-          if (mode === "production" && !anycastWarned) {
+          if (process.env.NODE_ENV === "production" && !anycastWarned) {
             alert("You are not connected to CF anycast address");
             anycastWarned = true;
           }
