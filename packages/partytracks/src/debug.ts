@@ -1,8 +1,10 @@
 import { tap } from "rxjs";
 
+import { logger } from "./logging";
+
 export function debugTap<T>(message: string) {
   return tap<T>({
-    next: (...args) => console.log(message, ...args),
-    complete: () => console.log("COMPLETED ", message)
+    next: (...args) => logger.debug(message, ...args),
+    complete: () => logger.debug("COMPLETED ", message)
   });
 }

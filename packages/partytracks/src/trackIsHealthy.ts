@@ -1,7 +1,9 @@
+import { logger } from "./logging";
+
 export async function trackIsHealthy(
   track: MediaStreamTrack
 ): Promise<boolean> {
-  console.info("👩🏻‍⚕️ Checking track health...");
+  logger.info("👩🏻‍⚕️ Checking track health...");
 
   if (track.enabled) {
     // TODO:
@@ -20,7 +22,7 @@ export async function trackIsHealthy(
   const randomFailure = randomFailuresEnabled && Math.random() < 0.2;
 
   if (randomFailure) {
-    console.log("🎲 Random track failure!");
+    logger.info("🎲 Random track failure!");
   }
 
   const healthy = !track.muted && track.readyState === "live" && !randomFailure;
@@ -31,18 +33,18 @@ export async function trackIsHealthy(
       const deviceFromTrack = devices.find(
         (device) => device.deviceId === track.getSettings().deviceId
       );
-      console.warn(
+      logger.info(
         `👩🏻‍⚕️ Track from ${deviceFromTrack?.label ?? "unkonwn device (enumerateDevices didn't find a matching device id)"} is unhealthy!`
       );
-      console.warn(
+      logger.info(
         `👩🏻‍⚕️ track.readyState: ${track.readyState} and track.muted: ${track.muted}`,
         track
       );
     }
   } catch (e) {
-    console.error("Error getting device info for unhealthy track", e, track);
+    logger.error("Error getting device info for unhealthy track", e, track);
   }
 
-  console.info(`👩🏻‍⚕️ track is ${healthy ? "healthy" : "unhealthy"}!`);
+  logger.info(`👩🏻‍⚕️ track is ${healthy ? "healthy" : "unhealthy"}!`);
   return healthy;
 }
