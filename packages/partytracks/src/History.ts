@@ -15,7 +15,12 @@ export class History<T> extends EventTarget {
       | null,
     options?: boolean | AddEventListenerOptions | undefined
   ): void {
-    super.addEventListener(type, callback, options);
+    super.addEventListener(
+      type,
+      // @ts-expect-error
+      callback,
+      options
+    );
     return;
   }
 
@@ -27,7 +32,12 @@ export class History<T> extends EventTarget {
       | null,
     options?: boolean | AddEventListenerOptions | undefined
   ): void {
-    super.removeEventListener(type, callback, options);
+    super.removeEventListener(
+      type,
+      // @ts-expect-error
+      callback,
+      options
+    );
     return;
   }
 

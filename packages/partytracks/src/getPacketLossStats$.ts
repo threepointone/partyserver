@@ -29,6 +29,7 @@ export function getPacketLossStats$(
       let remoteAddress: string | undefined = undefined;
 
       newStatsReport.forEach((report) => {
+        // @ts-expect-error RTCStatsReport types are busted
         const previous = previousStatsReport.get(report.id);
         if (!previous) return;
 
@@ -37,9 +38,11 @@ export function getPacketLossStats$(
         }
         if (candidatePairID) {
           remoteCandidateID =
+            // @ts-expect-error RTCStatsReport types are busted
             newStatsReport.get(candidatePairID)?.remoteCandidateId;
         }
         if (remoteCandidateID) {
+          // @ts-expect-error RTCStatsReport types are busted
           remoteAddress = newStatsReport.get(remoteCandidateID).address;
         }
         if (remoteAddress !== undefined && remoteAddress !== "141.101.90.0") {
@@ -59,14 +62,21 @@ export function getPacketLossStats$(
         } else if (report.type === "outbound-rtp") {
           const packetsSent = report.packetsSent - previous.packetsSent;
           // Find the corresponding remote-inbound-rtp report
-          const remoteInboundReport = Array.from(newStatsReport.values()).find(
-            (r) => r.type === "remote-inbound-rtp" && r.ssrc === report.ssrc
-          );
+
+          const remoteInboundReport = Array.from(
+            // @ts-expect-error RTCStatsReport types are busted
+            newStatsReport.values()
+          ).find((r) => {
+            // @ts-expect-error RTCStatsReport types are busted
+            return r.type === "remote-inbound-rtp" && r.ssrc === report.ssrc;
+          });
           const previousRemoteInboundReport = Array.from(
+            // @ts-expect-error RTCStatsReport types are busted
             previousStatsReport.values()
-          ).find(
-            (r) => r.type === "remote-inbound-rtp" && r.ssrc === previous.ssrc
-          );
+          ).find((r) => {
+            // @ts-expect-error RTCStatsReport types are busted
+            return r.type === "remote-inbound-rtp" && r.ssrc === previous.ssrc;
+          });
           if (
             remoteInboundReport &&
             previousRemoteInboundReport &&
@@ -74,7 +84,9 @@ export function getPacketLossStats$(
           ) {
             outboundPacketsSent += report.packetsSent - previous.packetsSent;
             outboundPacketsLost +=
+              // @ts-expect-error RTCStatsReport types are busted
               remoteInboundReport.packetsLost -
+              // @ts-expect-error RTCStatsReport types are busted
               previousRemoteInboundReport.packetsLost;
           }
         }
