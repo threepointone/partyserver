@@ -27,7 +27,7 @@ import type {
   TracksResponse
 } from "./callsTypes";
 
-export interface PeerConfig {
+export interface PartyTracksConfig {
   apiExtraParams?: string;
   iceServers?: RTCIceServer[];
   apiBase: string;
@@ -57,9 +57,9 @@ export class PartyTracks {
   }>;
   sessionError$: Observable<string>;
   peerConnectionState$: Observable<RTCPeerConnectionState>;
-  config: PeerConfig;
+  config: PartyTracksConfig;
 
-  constructor(config: PeerConfig) {
+  constructor(config: PartyTracksConfig) {
     this.config = config;
     this.history = new History<ApiHistoryEntry>(config.maxApiHistory);
     this.peerConnection$ = new Observable<RTCPeerConnection>((subscribe) => {
