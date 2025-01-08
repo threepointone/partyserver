@@ -1,6 +1,6 @@
 import { combineLatest, interval, map, switchMap } from "rxjs";
 
-import Ewma from "../ewma";
+import { Ewma } from "./ewma";
 
 import type { Observable } from "rxjs";
 
