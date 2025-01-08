@@ -195,10 +195,12 @@ export class PartyTracks {
     }
 
     try {
-      const { sessionId } = (await response.clone().json()) as any;
+      const { sessionId } = (await response.clone().json()) as {
+        sessionId: string;
+      };
       return { peerConnection, sessionId };
     } catch (error) {
-      throw new Error(response.status + ": " + (await response.text()));
+      throw new Error(`${response.status}: ${await response.text()}`);
     }
   }
 
@@ -212,7 +214,7 @@ export class PartyTracks {
           ? JSON.parse(requestInit.body)
           : undefined
     });
-    let headers = new Headers(requestInit?.headers);
+    const headers = new Headers(requestInit?.headers);
     const additionalHeaders = this.config.headers;
 
     if (additionalHeaders) {
@@ -389,6 +391,7 @@ export class PartyTracks {
         const cleanedTrackData = { ...trackData };
         // explicitly remove mid since it
         // cannot be used by anyone else
+        // biome-ignore lint/performance/noDelete: <explanation>
         delete cleanedTrackData.mid;
         return cleanedTrackData;
       }),
@@ -436,7 +439,7 @@ export class PartyTracks {
                     t.sessionId === track.sessionId
                 );
 
-                if (pulledTrackData && pulledTrackData.mid) {
+                if (pulledTrackData?.mid) {
                   acc.set(track, {
                     mid: pulledTrackData.mid,
                     resolvedTrack: resolveTrack(
