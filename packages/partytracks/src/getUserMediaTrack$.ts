@@ -13,6 +13,7 @@ import {
   removeDeviceFromDeprioritizeList
 } from "./devicePrioritization";
 import { getSortedDeviceListObservable } from "./getDeviceListObservable";
+import { logger } from "./logging";
 import { trackIsHealthy } from "./trackIsHealthy";
 
 import type { Subscriber } from "rxjs";
@@ -67,7 +68,7 @@ function acquireTrack(
   cleanupRef: { current: () => void }
 ) {
   const { deviceId, label } = device;
-  console.log(`🙏🏻 Requesting ${label}`);
+  logger.log(`🙏🏻 Requesting ${label}`);
   navigator.mediaDevices
     .getUserMedia(
       device.kind === "videoinput"
@@ -81,15 +82,15 @@ function acquireTrack(
           : mediaStream.getAudioTracks()[0];
       if (await trackIsHealthy(track)) {
         const cleanup = () => {
-          console.log("🛑 Stopping track");
+          logger.log("🛑 Stopping track");
           track.stop();
           document.removeEventListener("visibilitychange", onVisibleHandler);
         };
         const onVisibleHandler = async () => {
           if (document.visibilityState !== "visible") return;
-          console.log("Tab is foregrounded, checking health...");
+          logger.log("Tab is foregrounded, checking health...");
           if (await trackIsHealthy(track)) return;
-          console.log("Reacquiring track");
+          logger.log("Reacquiring track");
           cleanup();
           acquireTrack(subscriber, device, constraints, cleanupRef);
         };
@@ -98,13 +99,13 @@ function acquireTrack(
         subscriber.next(track);
         removeDeviceFromDeprioritizeList(device);
       } else {
-        console.log("☠️ track is not healthy, stopping");
+        logger.log("☠️ track is not healthy, stopping");
         appendDeviceToDeprioritizeList(device);
         track.stop();
         subscriber.complete();
       }
       track.addEventListener("ended", () => {
-        console.log("🔌 Track ended abrubptly");
+        logger.log("🔌 Track ended abrubptly");
         subscriber.complete();
       });
     })
