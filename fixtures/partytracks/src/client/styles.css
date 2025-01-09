@@ -48,3 +48,7 @@ a {
   text-underline-offset: 3px;
   text-decoration-color: #555;
 }
+
+video {
+  width: 400px;
+}
