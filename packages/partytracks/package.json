@@ -4,12 +4,23 @@
   "scripts": {
     "dev": "bun run build -- --watch",
     "prebuild": "rm -rf dist",
-    "build": "tsup ./src/index.ts --format esm --dts",
-    "postbuild": "prettier --write ./dist/*.d.ts"
+    "build": "tsup src/client/index.ts src/server/index.ts --format esm --dts",
+    "postbuild": "prettier --write ./dist/*/**.d.ts"
   },
-  "main": "dist/index.js",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "exports": {
+    "./client": {
+      "import": {
+        "types": "./dist/client/index.d.ts",
+        "default": "./dist/client/index.js"
+      }
+    },
+    "./server": {
+      "import": {
+        "types": "./dist/server/index.d.ts",
+        "default": "./dist/server/index.js"
+      }
+    }
+  },
   "type": "module",
   "repository": {
     "type": "git",
