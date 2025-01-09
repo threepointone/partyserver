@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.5
+
+### Patch Changes
+
+- [#118](https://github.com/threepointone/partyserver/pull/118) [`b650dd8`](https://github.com/threepointone/partyserver/commit/b650dd8c4c32d7e1d19987d4693ec09ff702d39c) Thanks [@third774](https://github.com/third774)! - Put logging behind logger util w/ log level
+
 ## 0.0.4
 
 ### Patch Changes
