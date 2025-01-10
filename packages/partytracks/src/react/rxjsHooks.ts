@@ -57,7 +57,7 @@ export function useOnEmit<T>(
 export function useValueAsObservable<T>(value: T): Observable<T> {
   const ref = useRef(new BehaviorSubject(value));
   const observableRef = useRef(ref.current.asObservable());
-  const previousValue = useRef<T>(null);
+  const previousValue = useRef<T>(undefined);
   if (previousValue.current !== value) {
     previousValue.current = value;
     ref.current.next(value);
