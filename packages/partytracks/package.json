@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "bun run build -- --watch",
     "prebuild": "rm -rf dist",
-    "build": "tsup src/client/index.ts src/react/index.ts src/server/index.ts --format esm --dts",
+    "build": "tsup src/client/index.ts src/react/index.ts src/server/index.ts --format esm --dts --external react",
     "postbuild": "prettier --write ./dist/*/**.d.ts"
   },
   "exports": {
