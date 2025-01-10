@@ -1,7 +1,6 @@
 import { Hono } from "hono";
-import { makeCallsProxyHandler } from "partytracks/server";
+import { proxyToCallsApi } from "partytracks/server";
 
-// biome-ignore lint/complexity/noBannedTypes: <explanation>
 type Bindings = {
   CALLS_APP_ID: string;
   CALLS_APP_TOKEN: string;
@@ -10,11 +9,12 @@ type Bindings = {
 const app = new Hono<{ Bindings: Bindings }>();
 
 app.all("/api/calls/*", (c) =>
-  makeCallsProxyHandler({
+  proxyToCallsApi({
+    replaceProxyPathname: "/api/calls",
     appId: c.env.CALLS_APP_ID,
     token: c.env.CALLS_APP_TOKEN,
-    proxyPath: "/api/calls"
-  })(c.req.raw)
+    request: c.req.raw
+  })
 );
 
 export default app;

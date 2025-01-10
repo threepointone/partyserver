@@ -1,1 +1,1 @@
-export { makeCallsProxyHandler } from "./callsProxy";
+export { proxyToCallsApi } from "./callsProxy";
