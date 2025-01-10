@@ -1,5 +1,13 @@
 # partytracks
 
+## 0.0.6
+
+### Patch Changes
+
+- [#120](https://github.com/threepointone/partyserver/pull/120) [`f5e72e5`](https://github.com/threepointone/partyserver/commit/f5e72e58ed0f01cdb30b3c65489d49dc9bd24b22) Thanks [@third774](https://github.com/third774)! - Add client/server entrypoints
+
+- [#122](https://github.com/threepointone/partyserver/pull/122) [`8e99325`](https://github.com/threepointone/partyserver/commit/8e993250de211ab00882e0e5d5c22b23fd375c2a) Thanks [@third774](https://github.com/third774)! - Rename server export and add comments to config params
+
 ## 0.0.5
 
 ### Patch Changes
