@@ -84,6 +84,33 @@ app.all("/api/callsProxy/*", (c) =>
 export default app;
 ```
 
+### React utils
+
+If you're building using React, there are a few utilities you may find helpful.
+
+By convention, Observables have a $ suffix to indicate that they're an Observable.
+
+```ts
+import {
+  useObservableAsValue,
+  useOnEmit,
+  useValueAsObservable
+} from "partytracks/react";
+
+function SomeComponent({ value }) {
+  // creates a stable observable that will
+  // emit when a new value is passed in
+  const value$ = useValueAsObservable(value);
+  // subscribes and gives you the latest value
+  // second arg is the default value if nothing
+  // has been emitted yet
+  const latestValue = useObservableAsValue(value$, "default value");
+  // calls the callback whenever a value
+  // is emitted
+  useOnEmit(value$, (v) => console.log(v));
+}
+```
+
 ### Why Observables?
 
 A promise based API (push a track, get a promise of metadata) seems simpler,

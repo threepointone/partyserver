@@ -1,8 +1,8 @@
 import { useMemo, useRef, useState } from "react";
-import { useObservableEffect, useSubscribedState } from "~/hooks/rxjsHooks";
 import { useIsServer } from "~/hooks/useIsServer";
 import { getUserMediaTrack$ } from "~/utils/rxjs/getUserMediaTrack$";
 import { PartyTracks } from "partytracks/client";
+import { useObservableAsValue, useOnEmit } from "partytracks/react";
 import { map, shareReplay } from "rxjs";
 
 import type { ComponentProps, ComponentRef } from "react";
@@ -25,12 +25,12 @@ function ClientOnlyDemo() {
     []
   );
 
-  const peerConnectionState = useSubscribedState(
+  const peerConnectionState = useObservableAsValue(
     client.peerConnectionState$,
     "new"
   );
 
-  const sessionId = useSubscribedState(
+  const sessionId = useObservableAsValue(
     useMemo(
       () => client.session$.pipe(map((x) => x.sessionId)),
       [client.session$]
@@ -84,7 +84,7 @@ function Button(props: ComponentProps<"button">) {
 
 function Video(props: { videoTrack$: Observable<MediaStreamTrack | null> }) {
   const ref = useRef<ComponentRef<"video">>(null);
-  useObservableEffect(props.videoTrack$, (track) => {
+  useOnEmit(props.videoTrack$, (track) => {
     if (!ref.current) return;
     if (track) {
       const mediaStream = new MediaStream();
@@ -102,7 +102,7 @@ function Video(props: { videoTrack$: Observable<MediaStreamTrack | null> }) {
 
 function Audio(props: { audioTrack$: Observable<MediaStreamTrack | null> }) {
   const ref = useRef<ComponentRef<"audio">>(null);
-  useObservableEffect(props.audioTrack$, (track) => {
+  useOnEmit(props.audioTrack$, (track) => {
     if (!ref.current) return;
     if (track) {
       const mediaStream = new MediaStream();
