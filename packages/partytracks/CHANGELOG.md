@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.10
+
+### Patch Changes
+
+- [#129](https://github.com/threepointone/partyserver/pull/129) [`3088712`](https://github.com/threepointone/partyserver/commit/30887129eb3eb0a6d80798447aded96089dd46ef) Thanks [@third774](https://github.com/third774)! - Don't include react in bundle
+
 ## 0.0.9
 
 ### Patch Changes
