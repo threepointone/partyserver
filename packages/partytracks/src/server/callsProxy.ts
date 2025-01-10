@@ -1,17 +1,36 @@
 import invariant from "tiny-invariant";
 
 interface Config {
-  proxyPath: string;
+  /**
+   * Cloudflare Calls App ID. Can be created here https://dash.cloudflare.com/?to=/:account/calls/create-sfu-application
+   */
   appId: string;
+  /**
+   * Cloudflare Calls App Token. Can be created here https://dash.cloudflare.com/?to=/:account/calls/create-sfu-application
+   */
   token: string;
+  /**
+   * The part of the pathname in the original request URL that should be replaced.
+   * For example, if your proxy path is /api/calls/*, the value should be "/api/calls"
+   */
+  replaceProxyPathname: string;
+  /**
+   * The original request
+   */
+  request: Request;
 }
 
-export const makeCallsProxyHandler = (config: Config) => (request: Request) => {
+export const proxyToCallsApi = ({
+  appId,
+  token,
+  replaceProxyPathname,
+  request
+}: Config) => {
   const { headers, body, url, method } = request;
 
   // Forward headers while adding auth
   const newHeaders = new Headers(headers);
-  newHeaders.set("Authorization", `Bearer ${config.token}`);
+  newHeaders.set("Authorization", `Bearer ${token}`);
   const callsInit: RequestInit = {
     headers: newHeaders,
     method
@@ -32,8 +51,8 @@ export const makeCallsProxyHandler = (config: Config) => (request: Request) => {
   const previousUrl = new URL(url);
   const callsUrl = new URL("https://rtc.live.cloudflare.com");
   callsUrl.pathname = previousUrl.pathname.replace(
-    config.proxyPath,
-    `/v1/apps/${config.appId}`
+    replaceProxyPathname,
+    `/v1/apps/${appId}`
   );
   callsUrl.search = previousUrl.search;
 
