@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.9
+
+### Patch Changes
+
+- [#127](https://github.com/threepointone/partyserver/pull/127) [`6f624ab`](https://github.com/threepointone/partyserver/commit/6f624abff1278c64a2550d9a211807472b553644) Thanks [@third774](https://github.com/third774)! - Fix bug in useObservableAsValue
+
 ## 0.0.8
 
 ### Patch Changes
