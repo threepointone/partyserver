@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.8
+
+### Patch Changes
+
+- [#125](https://github.com/threepointone/partyserver/pull/125) [`5240f79`](https://github.com/threepointone/partyserver/commit/5240f798a64b3f3dabece62bb3d0587a703ae875) Thanks [@third774](https://github.com/third774)! - Add react utils and update readme
+
 ## 0.0.7
 
 ### Patch Changes
