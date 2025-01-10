@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.7
+
+### Patch Changes
+
+- [#123](https://github.com/threepointone/partyserver/pull/123) [`2fe93ca`](https://github.com/threepointone/partyserver/commit/2fe93ca38d70fd333ba61ef6122b9df070e6e8c8) Thanks [@third774](https://github.com/third774)! - Update readme
+
 ## 0.0.6
 
 ### Patch Changes
