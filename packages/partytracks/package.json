@@ -2,6 +2,7 @@
   "name": "partytracks",
   "version": "0.0.13",
   "scripts": {
+    "check:test": "(cd tests; vitest --no-watch)",
     "dev": "bun run build -- --watch",
     "prebuild": "rm -rf dist",
     "build": "tsup src/client/index.ts src/react/index.ts src/server/index.ts --format esm --dts --external react",
