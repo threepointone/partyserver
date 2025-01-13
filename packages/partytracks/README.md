@@ -26,10 +26,7 @@ localMediaStream.addTrack(webcamTrack);
 localVideo.srcObject = localMediaStream;
 
 // Instantiate PartyTracks
-const partyTracks = new PartyTracks({
-  // this should point at the Calls API proxy shown below in the server code.
-  apiBase: "/api/callsProxy"
-});
+const partyTracks = new PartyTracks();
 
 // When pushing, you supply an Observable of a MediaStreamTrack, and you will
 // receive an Observable of the metadata needed for someone else to pull that
@@ -74,9 +71,8 @@ type Bindings = {
 
 const app = new Hono<{ Bindings: Bindings }>();
 
-app.all("/api/callsProxy/*", (c) =>
+app.all("/partytracks/*", (c) =>
   proxyToCallsApi({
-    replaceProxyPathname: "/api/callsProxy",
     appId: c.env.CALLS_APP_ID,
     token: c.env.CALLS_APP_TOKEN,
     request: c.req.raw

@@ -17,8 +17,7 @@ const localMediaStream = new MediaStream();
 localMediaStream.addTrack(webcamTrack);
 localVideo.srcObject = localMediaStream;
 
-const partyTracks = new PartyTracks({ apiBase: "/api/calls" });
-
+const partyTracks = new PartyTracks();
 const pushedTrack$ = partyTracks.push(of(webcamTrack));
 const pulledTrack$ = partyTracks.pull(pushedTrack$);
 

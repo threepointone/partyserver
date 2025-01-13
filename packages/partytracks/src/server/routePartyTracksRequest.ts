@@ -11,22 +11,27 @@ interface Config {
   token: string;
   /**
    * The part of the pathname in the original request URL that should be replaced.
-   * For example, if your proxy path is /api/calls/*, the value should be "/api/calls"
+   * For example, if your proxy path is /api/partytracks/*, the value should be "/api/partytracks"
    */
-  replaceProxyPathname: string;
+  prefix?: string;
   /**
    * The original request
    */
   request: Request;
 }
 
-export const proxyToCallsApi = ({
+export const routePartyTracksRequest = ({
   appId,
   token,
-  replaceProxyPathname,
+  prefix = "/partytracks",
   request
 }: Config) => {
   const { headers, body, url, method } = request;
+  const previousUrl = new URL(url);
+
+  if (!previousUrl.pathname.startsWith(prefix)) {
+    return new Response(null, { status: 404 });
+  }
 
   // Forward headers while adding auth
   const newHeaders = new Headers(headers);
@@ -48,12 +53,8 @@ export const proxyToCallsApi = ({
     }
   }
 
-  const previousUrl = new URL(url);
   const callsUrl = new URL("https://rtc.live.cloudflare.com");
-  callsUrl.pathname = previousUrl.pathname.replace(
-    replaceProxyPathname,
-    `/v1/apps/${appId}`
-  );
+  callsUrl.pathname = previousUrl.pathname.replace(prefix, `/v1/apps/${appId}`);
   callsUrl.search = previousUrl.search;
 
   return fetch(callsUrl, callsInit);

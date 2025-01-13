@@ -17,23 +17,17 @@ export default function Component() {
 function ClientOnlyDemo() {
   const [localFeedOn, setLocalFeedOn] = useState(true);
   const [remoteFeedOn, setRemoteFeedOn] = useState(false);
-  const client = useMemo(
-    () =>
-      new PartyTracks({
-        apiBase: "/api/calls"
-      }),
-    []
-  );
+  const partyTracks = useMemo(() => new PartyTracks(), []);
 
   const peerConnectionState = useObservableAsValue(
-    client.peerConnectionState$,
+    partyTracks.peerConnectionState$,
     "new"
   );
 
   const sessionId = useObservableAsValue(
     useMemo(
-      () => client.session$.pipe(map((x) => x.sessionId)),
-      [client.session$]
+      () => partyTracks.session$.pipe(map((x) => x.sessionId)),
+      [partyTracks.session$]
     ),
     null
   );
@@ -42,12 +36,12 @@ function ClientOnlyDemo() {
   const localMicTrack$ = useMicTrack$(localFeedOn);
   const remoteVideoTrack$ = useMemo(() => {
     if (!localVideoTrack$ || !remoteFeedOn) return null;
-    return client.pull(client.push(localVideoTrack$));
-  }, [client, remoteFeedOn, localVideoTrack$]);
+    return partyTracks.pull(partyTracks.push(localVideoTrack$));
+  }, [partyTracks, remoteFeedOn, localVideoTrack$]);
   const remoteAudioTrack$ = useMemo(() => {
     if (!localMicTrack$ || !remoteFeedOn) return null;
-    return client.pull(client.push(localMicTrack$));
-  }, [client, remoteFeedOn, localMicTrack$]);
+    return partyTracks.pull(partyTracks.push(localMicTrack$));
+  }, [partyTracks, remoteFeedOn, localMicTrack$]);
 
   return (
     <div className="p-2 flex flex-col gap-3">
