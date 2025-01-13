@@ -540,7 +540,6 @@ export class PartyTracks {
     ) {
       return;
     }
-    transceiver.direction = "inactive";
     // create an offer
     const offer = await peerConnection.createOffer();
     // Turn on Opus DTX to save bandwidth
