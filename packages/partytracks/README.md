@@ -7,6 +7,8 @@ A utility library for [Cloudflare Calls](https://developers.cloudflare.com/calls
 #### Client code:
 
 ```js
+import "webrtc-adapter";
+
 import { PartyTracks } from "partytracks/client";
 import { of } from "rxjs";
 
