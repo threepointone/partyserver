@@ -1,5 +1,13 @@
 # partytracks
 
+## 0.0.11
+
+### Patch Changes
+
+- [#131](https://github.com/threepointone/partyserver/pull/131) [`3251b18`](https://github.com/threepointone/partyserver/commit/3251b181abd72e14a064427d66ae32400580749d) Thanks [@third774](https://github.com/third774)! - Remove setting transceivers to inactive when closing tracks
+
+- [#131](https://github.com/threepointone/partyserver/pull/131) [`62553c4`](https://github.com/threepointone/partyserver/commit/62553c407eff604cca7586da633896148178cbdd) Thanks [@third774](https://github.com/third774)! - Add webrtc shim to readme
+
 ## 0.0.10
 
 ### Patch Changes
