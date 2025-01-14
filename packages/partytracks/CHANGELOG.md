@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.13
+
+### Patch Changes
+
+- [#136](https://github.com/threepointone/partyserver/pull/136) [`de57577`](https://github.com/threepointone/partyserver/commit/de575776132b3c4a256d072342d18c4731fc2333) Thanks [@third774](https://github.com/third774)! - Set default for maxApiHistory to 100
+
 ## 0.0.12
 
 ### Patch Changes
