@@ -77,33 +77,29 @@ type Callback =
     };
 
 export class Scheduler<Env> extends Server<Env> {
-  // constructor(state: DurableObjectState, env: Env) {
-  //   super(state, env);
-  //   void this.ctx.blockConcurrencyWhile(async () => {
-  //     // Create tasks table if it doesn't exist
+  constructor(state: DurableObjectState, env: Env) {
+    super(state, env);
+    void this.ctx.blockConcurrencyWhile(async () => {
+      // Create tasks table if it doesn't exist
+      this.ctx.storage.sql.exec(
+        `
+      CREATE TABLE IF NOT EXISTS tasks (
+        id TEXT PRIMARY KEY,
+        description TEXT,
+        payload TEXT,
+        callback TEXT,
+        type TEXT NOT NULL CHECK(type IN ('scheduled', 'delayed', 'cron', 'no-schedule')),
+        time INTEGER,
+        delayInSeconds INTEGER,
+        cron TEXT,
+        created_at INTEGER DEFAULT (unixepoch())
+      )
+    `
+      );
 
-  //   });
-  // }
-
-  async onStart() {
-    this.ctx.storage.sql.exec(
-      `
-    CREATE TABLE IF NOT EXISTS tasks (
-      id TEXT PRIMARY KEY,
-      description TEXT,
-      payload TEXT,
-      callback TEXT,
-      type TEXT NOT NULL CHECK(type IN ('scheduled', 'delayed', 'cron', 'no-schedule')),
-      time INTEGER,
-      delayInSeconds INTEGER,
-      cron TEXT,
-      created_at INTEGER DEFAULT (unixepoch())
-    )
-  `
-    );
-
-    // execute any pending tasks and schedule the next alarm
-    await this.alarm();
+      // execute any pending tasks and schedule the next alarm
+      await this.alarm();
+    });
   }
 
   status() {
