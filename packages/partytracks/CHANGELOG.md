@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.14
+
+### Patch Changes
+
+- [#138](https://github.com/threepointone/partyserver/pull/138) [`e1bd62f`](https://github.com/threepointone/partyserver/commit/e1bd62f025c038213d9f9083819f9a2b97842ce6) Thanks [@third774](https://github.com/third774)! - Add utils for track acquisition
+
 ## 0.0.13
 
 ### Patch Changes
