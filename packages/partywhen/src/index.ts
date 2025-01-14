@@ -1,5 +1,5 @@
-import { DurableObject } from "cloudflare:workers";
 import cronParser from "cron-parser";
+import { Server } from "partyserver";
 
 export type RawTask = {
   id: string;
@@ -76,30 +76,34 @@ type Callback =
       function: string;
     };
 
-export class Scheduler<Env> extends DurableObject<Env> {
-  constructor(state: DurableObjectState, env: Env) {
-    super(state, env);
-    void this.ctx.blockConcurrencyWhile(async () => {
-      // Create tasks table if it doesn't exist
-      this.ctx.storage.sql.exec(
-        `
-      CREATE TABLE IF NOT EXISTS tasks (
-        id TEXT PRIMARY KEY,
-        description TEXT,
-        payload TEXT,
-        callback TEXT,
-        type TEXT NOT NULL CHECK(type IN ('scheduled', 'delayed', 'cron', 'no-schedule')),
-        time INTEGER,
-        delayInSeconds INTEGER,
-        cron TEXT,
-        created_at INTEGER DEFAULT (unixepoch())
-      )
-    `
-      );
+export class Scheduler<Env> extends Server<Env> {
+  // constructor(state: DurableObjectState, env: Env) {
+  //   super(state, env);
+  //   void this.ctx.blockConcurrencyWhile(async () => {
+  //     // Create tasks table if it doesn't exist
 
-      // execute any pending tasks and schedule the next alarm
-      await this.alarm();
-    });
+  //   });
+  // }
+
+  async onStart() {
+    this.ctx.storage.sql.exec(
+      `
+    CREATE TABLE IF NOT EXISTS tasks (
+      id TEXT PRIMARY KEY,
+      description TEXT,
+      payload TEXT,
+      callback TEXT,
+      type TEXT NOT NULL CHECK(type IN ('scheduled', 'delayed', 'cron', 'no-schedule')),
+      time INTEGER,
+      delayInSeconds INTEGER,
+      cron TEXT,
+      created_at INTEGER DEFAULT (unixepoch())
+    )
+  `
+    );
+
+    // execute any pending tasks and schedule the next alarm
+    await this.alarm();
   }
 
   status() {
