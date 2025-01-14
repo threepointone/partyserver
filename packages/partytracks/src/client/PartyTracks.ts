@@ -19,6 +19,7 @@ import {
 import invariant from "tiny-invariant";
 
 import { History } from "./History";
+import { logger } from "./logging";
 import { BulkRequestDispatcher, FIFOScheduler } from "./Peer.utils";
 
 import type {
@@ -77,7 +78,7 @@ export class PartyTracks {
             peerConnection.connectionState === "failed" ||
             peerConnection.connectionState === "closed"
           ) {
-            console.debug(
+            logger.debug(
               `💥 Peer connectionState is ${peerConnection.connectionState}`
             );
             subscribe.next(setup());
@@ -91,7 +92,7 @@ export class PartyTracks {
             peerConnection.iceConnectionState === "failed" ||
             peerConnection.iceConnectionState === "closed"
           ) {
-            console.debug(
+            logger.debug(
               `💥 Peer iceConnectionState is ${peerConnection.iceConnectionState}`
             );
             subscribe.next(setup());
@@ -102,20 +103,11 @@ export class PartyTracks {
             const timeoutSeconds = 7;
             iceTimeout = window.setTimeout(() => {
               if (peerConnection.iceConnectionState === "connected") return;
-              console.debug(
+              logger.debug(
                 `💥 Peer iceConnectionState was ${peerConnection.iceConnectionState} for more than ${timeoutSeconds} seconds`
               );
               subscribe.next(setup());
             }, timeoutSeconds * 1000);
-          }
-        });
-
-        // TODO: Remove this
-        Object.assign(window, {
-          explode: () => {
-            console.debug("💥 Manually exploding connection");
-            peerConnection.close();
-            peerConnection.dispatchEvent(new Event("connectionstatechange"));
           }
         });
 
@@ -184,7 +176,7 @@ export class PartyTracks {
   closeTrackDispatcher = new BulkRequestDispatcher(32);
 
   async createSession(peerConnection: RTCPeerConnection) {
-    console.debug("🆕 creating new session");
+    logger.debug("🆕 creating new session");
     const { apiBase } = this.config;
     const response = await this.fetchWithRecordedHistory(
       `${apiBase}/sessions/new?CreatingSession&${this.config.apiExtraParams}`,
@@ -254,7 +246,7 @@ export class PartyTracks {
       // is unsubscribed from immediately after subscribing. This will prevent
       // React's StrictMode from causing extra API calls to push/pull tracks.
       const timeout = setTimeout(() => {
-        console.debug("📤 pushing track ", trackName);
+        logger.debug("📤 pushing track ", trackName);
         pushedTrackPromise = this.pushTrackDispatcher
           .doBulkRequest({ trackName, transceiver }, (tracks) =>
             this.taskScheduler.schedule(async () => {
@@ -318,7 +310,7 @@ export class PartyTracks {
         clearTimeout(timeout);
         pushedTrackPromise?.then(() => {
           this.taskScheduler.schedule(async () => {
-            console.debug("🔚 Closing pushed track ", trackName);
+            logger.debug("🔚 Closing pushed track ", trackName);
             return this.closeTrack(peerConnection, transceiver.mid, sessionId);
           });
         });
@@ -343,7 +335,7 @@ export class PartyTracks {
         const transceiver = session.peerConnection.addTransceiver(track, {
           direction: "sendonly"
         });
-        console.debug("🌱 creating transceiver!");
+        logger.debug("🌱 creating transceiver!");
 
         return {
           transceiver,
@@ -383,7 +375,7 @@ export class PartyTracks {
         });
         transceiver.sender.setParameters(parameters);
         if (transceiver.sender.transport !== null) {
-          console.debug("♻︎ replacing track");
+          logger.debug("♻︎ replacing track");
           transceiver.sender.replaceTrack(track);
         }
       }),
@@ -414,7 +406,7 @@ export class PartyTracks {
       // is unsubscribed from immediately after subscribing. This will prevent
       // React's StrictMode from causing extra API calls to push/pull tracks.
       const timeout = setTimeout(() => {
-        console.debug("📥 pulling track ", trackData.trackName);
+        logger.debug("📥 pulling track ", trackData.trackName);
         pulledTrackPromise = this.pullTrackDispatcher
           .doBulkRequest(trackData, (tracks) =>
             this.taskScheduler.schedule(async () => {
@@ -503,7 +495,7 @@ export class PartyTracks {
         clearTimeout(timeout);
         pulledTrackPromise?.then((trackName) => {
           if (mid) {
-            console.debug("🔚 Closing pulled track ", trackName);
+            logger.debug("🔚 Closing pulled track ", trackName);
             this.taskScheduler.schedule(async () =>
               this.closeTrack(peerConnection, mid, sessionId)
             );
@@ -548,7 +540,6 @@ export class PartyTracks {
     ) {
       return;
     }
-    transceiver.direction = "inactive";
     // create an offer
     const offer = await peerConnection.createOffer();
     // Turn on Opus DTX to save bandwidth

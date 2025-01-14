@@ -10,6 +10,8 @@ if (process.env.NODE_ENV === "development") {
 
 type Env = {
   MyPartyServer: DurableObjectNamespace<MyPartyServer<Env>>;
+  CALLS_APP_ID: string;
+  CALLS_APP_TOKEN: string;
 };
 
 declare module "@remix-run/cloudflare" {

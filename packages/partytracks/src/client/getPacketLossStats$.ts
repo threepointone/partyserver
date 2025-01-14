@@ -2,6 +2,7 @@
 import { combineLatest, interval, map, pairwise, switchMap } from "rxjs";
 
 import { Ewma } from "./ewma";
+import { logger } from "./logging";
 
 import type { Observable } from "rxjs";
 
@@ -46,7 +47,7 @@ export function getPacketLossStats$(
           remoteAddress = newStatsReport.get(remoteCandidateID).address;
         }
         if (remoteAddress !== undefined && remoteAddress !== "141.101.90.0") {
-          console.warn(
+          logger.warn(
             "PeerConnection doesn't appear to be connected to anycast 141.101.90.0"
           );
           if (process.env.NODE_ENV === "production" && !anycastWarned) {

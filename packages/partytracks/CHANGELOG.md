@@ -1,5 +1,51 @@
 # partytracks
 
+## 0.0.11
+
+### Patch Changes
+
+- [#131](https://github.com/threepointone/partyserver/pull/131) [`3251b18`](https://github.com/threepointone/partyserver/commit/3251b181abd72e14a064427d66ae32400580749d) Thanks [@third774](https://github.com/third774)! - Remove setting transceivers to inactive when closing tracks
+
+- [#131](https://github.com/threepointone/partyserver/pull/131) [`62553c4`](https://github.com/threepointone/partyserver/commit/62553c407eff604cca7586da633896148178cbdd) Thanks [@third774](https://github.com/third774)! - Add webrtc shim to readme
+
+## 0.0.10
+
+### Patch Changes
+
+- [#129](https://github.com/threepointone/partyserver/pull/129) [`3088712`](https://github.com/threepointone/partyserver/commit/30887129eb3eb0a6d80798447aded96089dd46ef) Thanks [@third774](https://github.com/third774)! - Don't include react in bundle
+
+## 0.0.9
+
+### Patch Changes
+
+- [#127](https://github.com/threepointone/partyserver/pull/127) [`6f624ab`](https://github.com/threepointone/partyserver/commit/6f624abff1278c64a2550d9a211807472b553644) Thanks [@third774](https://github.com/third774)! - Fix bug in useObservableAsValue
+
+## 0.0.8
+
+### Patch Changes
+
+- [#125](https://github.com/threepointone/partyserver/pull/125) [`5240f79`](https://github.com/threepointone/partyserver/commit/5240f798a64b3f3dabece62bb3d0587a703ae875) Thanks [@third774](https://github.com/third774)! - Add react utils and update readme
+
+## 0.0.7
+
+### Patch Changes
+
+- [#123](https://github.com/threepointone/partyserver/pull/123) [`2fe93ca`](https://github.com/threepointone/partyserver/commit/2fe93ca38d70fd333ba61ef6122b9df070e6e8c8) Thanks [@third774](https://github.com/third774)! - Update readme
+
+## 0.0.6
+
+### Patch Changes
+
+- [#120](https://github.com/threepointone/partyserver/pull/120) [`f5e72e5`](https://github.com/threepointone/partyserver/commit/f5e72e58ed0f01cdb30b3c65489d49dc9bd24b22) Thanks [@third774](https://github.com/third774)! - Add client/server entrypoints
+
+- [#122](https://github.com/threepointone/partyserver/pull/122) [`8e99325`](https://github.com/threepointone/partyserver/commit/8e993250de211ab00882e0e5d5c22b23fd375c2a) Thanks [@third774](https://github.com/third774)! - Rename server export and add comments to config params
+
+## 0.0.5
+
+### Patch Changes
+
+- [#118](https://github.com/threepointone/partyserver/pull/118) [`b650dd8`](https://github.com/threepointone/partyserver/commit/b650dd8c4c32d7e1d19987d4693ec09ff702d39c) Thanks [@third774](https://github.com/third774)! - Put logging behind logger util w/ log level
+
 ## 0.0.4
 
 ### Patch Changes

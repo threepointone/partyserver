@@ -6,6 +6,7 @@
     "start": "wrangler dev"
   },
   "dependencies": {
+    "hono": "^4.6.16",
     "partytracks": "workspace:*"
   },
   "devDependencies": {

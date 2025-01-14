@@ -1,33 +1,142 @@
-import { useLoaderData } from "@remix-run/react";
+import { useMemo, useRef, useState } from "react";
+import { useIsServer } from "~/hooks/useIsServer";
+import { getUserMediaTrack$ } from "~/utils/rxjs/getUserMediaTrack$";
+import { PartyTracks } from "partytracks/client";
+import { useObservableAsValue, useOnEmit } from "partytracks/react";
+import { map, shareReplay } from "rxjs";
 
-import type {
-  LoaderFunction,
-  LoaderFunctionArgs,
-  MetaFunction
-} from "@remix-run/cloudflare";
+import type { ComponentProps, ComponentRef } from "react";
+import type { Observable } from "rxjs";
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: "New Remix App" },
-    {
-      name: "description",
-      content: "Welcome to Remix! Using Vite and Cloudflare Workers!"
-    }
-  ];
-};
+export default function Component() {
+  const isServer = useIsServer();
+  if (isServer) return null;
+  return <ClientOnlyDemo />;
+}
 
-export const loader: LoaderFunction = async ({
-  // request,
-  context
-}: LoaderFunctionArgs) => {
-  return Response.json({ hello: "world" });
-};
+function ClientOnlyDemo() {
+  const [localFeedOn, setLocalFeedOn] = useState(true);
+  const [remoteFeedOn, setRemoteFeedOn] = useState(false);
+  const client = useMemo(
+    () =>
+      new PartyTracks({
+        apiBase: "/api/calls"
+      }),
+    []
+  );
 
-export default function Index() {
-  const data = useLoaderData<typeof loader>();
+  const peerConnectionState = useObservableAsValue(
+    client.peerConnectionState$,
+    "new"
+  );
+
+  const sessionId = useObservableAsValue(
+    useMemo(
+      () => client.session$.pipe(map((x) => x.sessionId)),
+      [client.session$]
+    ),
+    null
+  );
+
+  const localVideoTrack$ = useWebcamTrack$(localFeedOn);
+  const localMicTrack$ = useMicTrack$(localFeedOn);
+  const remoteVideoTrack$ = useMemo(() => {
+    if (!localVideoTrack$ || !remoteFeedOn) return null;
+    return client.pull(client.push(localVideoTrack$));
+  }, [client, remoteFeedOn, localVideoTrack$]);
+  const remoteAudioTrack$ = useMemo(() => {
+    if (!localMicTrack$ || !remoteFeedOn) return null;
+    return client.pull(client.push(localMicTrack$));
+  }, [client, remoteFeedOn, localMicTrack$]);
+
   return (
-    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-      {JSON.stringify(data)}
+    <div className="p-2 flex flex-col gap-3">
+      <div className="flex gap-2">
+        <Button onClick={() => setLocalFeedOn(!localFeedOn)}>
+          Turn Local {localFeedOn ? "Off" : "On"}
+        </Button>
+        <Button onClick={() => setRemoteFeedOn(!remoteFeedOn)}>
+          Turn Remote {remoteFeedOn ? "Off" : "On"}
+        </Button>
+      </div>
+      <div className="grid xl:grid-cols-2">
+        {localVideoTrack$ && localFeedOn && (
+          <Video videoTrack$={localVideoTrack$} />
+        )}
+        {localMicTrack$ && localFeedOn && (
+          <Audio audioTrack$={localMicTrack$} />
+        )}
+        {remoteVideoTrack$ && remoteFeedOn && (
+          <Video videoTrack$={remoteVideoTrack$} />
+        )}
+        {remoteAudioTrack$ && remoteFeedOn && (
+          <Audio audioTrack$={remoteAudioTrack$} />
+        )}
+      </div>
+      <pre>{JSON.stringify({ peerConnectionState, sessionId }, null, 2)}</pre>
     </div>
   );
+}
+
+function Button(props: ComponentProps<"button">) {
+  return <button className="border px-1" {...props} />;
+}
+
+function Video(props: { videoTrack$: Observable<MediaStreamTrack | null> }) {
+  const ref = useRef<ComponentRef<"video">>(null);
+  useOnEmit(props.videoTrack$, (track) => {
+    if (!ref.current) return;
+    if (track) {
+      const mediaStream = new MediaStream();
+      mediaStream.addTrack(track);
+      ref.current.srcObject = mediaStream;
+    } else {
+      ref.current.srcObject = null;
+    }
+  });
+
+  return (
+    <video className="h-full w-full" ref={ref} autoPlay muted playsInline />
+  );
+}
+
+function Audio(props: { audioTrack$: Observable<MediaStreamTrack | null> }) {
+  const ref = useRef<ComponentRef<"audio">>(null);
+  useOnEmit(props.audioTrack$, (track) => {
+    if (!ref.current) return;
+    if (track) {
+      const mediaStream = new MediaStream();
+      mediaStream.addTrack(track);
+      ref.current.srcObject = mediaStream;
+    } else {
+      ref.current.srcObject = null;
+    }
+  });
+
+  // biome-ignore lint/a11y/useMediaCaption: Not able to generate captions for this currently.
+  return <audio className="h-full w-full" ref={ref} autoPlay playsInline />;
+}
+
+function useWebcamTrack$(enabled: boolean) {
+  return useMemo(() => {
+    if (!enabled) return null;
+    return getUserMediaTrack$("videoinput").pipe(
+      shareReplay({
+        refCount: true,
+        bufferSize: 1
+      })
+    );
+  }, [enabled]);
+}
+
+function useMicTrack$(enabled: boolean) {
+  return useMemo(() => {
+    if (!enabled) return null;
+    return getUserMediaTrack$("audioinput").pipe(
+      shareReplay({
+        refCount: true,
+        bufferSize: 1
+      })
+    );
+  }, [enabled]);
 }

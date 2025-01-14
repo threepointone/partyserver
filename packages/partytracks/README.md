@@ -1,13 +1,17 @@
 ## partytracks 🎶
 
+A utility library for [Cloudflare Calls](https://developers.cloudflare.com/calls/) built with RxJS Observables.
+
+### Example
+
+#### Client code:
+
 ```js
-import { PartyTracks } from "partytracks";
+import "webrtc-adapter";
+
+import { PartyTracks } from "partytracks/client";
 import { of } from "rxjs";
 
-// NOTE: >>>DO NOT<<< talk directly to the Calls API in your front-end in
-// prod. You should run a proxy that will add the appropriate auth headers.
-const CALLS_APP_ID = "YOUR_APP_ID_HERE";
-const CALLS_APP_TOKEN = "YOUR_APP_TOKEN_HERE";
 const localVideo = document.querySelector("video.local-video");
 const remoteVideo = document.querySelector("video.remote-video");
 
@@ -23,10 +27,8 @@ localVideo.srcObject = localMediaStream;
 
 // Instantiate PartyTracks
 const partyTracks = new PartyTracks({
-  // NOTE: >>>DO NOT<<< talk directly to the Calls API in your front-end in
-  // prod. You should run a proxy that will add the appropriate auth headers.
-  apiBase: `https://rtc.live.cloudflare.com/v1/apps/${CALLS_APP_ID}`,
-  headers: new Headers({ Authorization: `Bearer ${CALLS_APP_TOKEN}` })
+  // this should point at the Calls API proxy shown below in the server code.
+  apiBase: "/api/callsProxy"
 });
 
 // When pushing, you supply an Observable of a MediaStreamTrack, and you will
@@ -54,3 +56,68 @@ setTimeout(() => {
   subscription.unsubscribe();
 }, 20000);
 ```
+
+#### Server code:
+
+In your server, you need to have a path that proxies all requests over to
+the Cloudflare Calls API and provides your app id and token. In a worker,
+it will look something like this:
+
+```ts
+import { Hono } from "hono";
+import { proxyToCallsApi } from "partytracks/server";
+
+type Bindings = {
+  CALLS_APP_ID: string;
+  CALLS_APP_TOKEN: string;
+};
+
+const app = new Hono<{ Bindings: Bindings }>();
+
+app.all("/api/callsProxy/*", (c) =>
+  proxyToCallsApi({
+    replaceProxyPathname: "/api/callsProxy",
+    appId: c.env.CALLS_APP_ID,
+    token: c.env.CALLS_APP_TOKEN,
+    request: c.req.raw
+  })
+);
+
+export default app;
+```
+
+### React utils
+
+If you're building using React, there are a few utilities you may find helpful.
+
+By convention, Observables have a $ suffix to indicate that they're an Observable.
+
+```ts
+import {
+  useObservableAsValue,
+  useOnEmit,
+  useValueAsObservable
+} from "partytracks/react";
+
+function SomeComponent({ value }) {
+  // creates a stable observable that will
+  // emit when a new value is passed in
+  const value$ = useValueAsObservable(value);
+  // subscribes and gives you the latest value
+  // second arg is the default value if nothing
+  // has been emitted yet
+  const latestValue = useObservableAsValue(value$, "default value");
+  // calls the callback whenever a value
+  // is emitted
+  useOnEmit(value$, (v) => console.log(v));
+}
+```
+
+### Why Observables?
+
+A promise based API (push a track, get a promise of metadata) seems simpler,
+but proved to be a leaky abstraction when things go wrong. Sometimes a webcam
+is unplugged, or your peer connection drops when switching networks. Observables
+allow all of the logic of replacing/repairing tracks and connections to be
+contained within the library, allowing your application code to not be concerned
+with the details of WebRTC.
