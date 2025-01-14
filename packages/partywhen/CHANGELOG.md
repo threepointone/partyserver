@@ -1,5 +1,11 @@
 # partywhen
 
+## 0.0.5
+
+### Patch Changes
+
+- [`342e531`](https://github.com/threepointone/partyserver/commit/342e53159265247c3f21fb98fc014e2e6b64aee7) Thanks [@threepointone](https://github.com/threepointone)! - extend from partyserver
+
 ## 0.0.4
 
 ### Patch Changes
