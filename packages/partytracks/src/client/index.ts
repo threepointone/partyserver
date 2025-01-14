@@ -1,10 +1,9 @@
 export { PartyTracks } from "./PartyTracks";
 export {
-  ideallyGetTrack$,
+  resilientTrack$,
   DevicesExhaustedError,
   devices$
-} from "./getUserMediaTrack$";
-export type { InputMediaDeviceKind } from "./getUserMediaTrack$";
+} from "./resilientTrack$";
 export { getScreenshare$ } from "./getScreenshare$";
 export { setLogLevel } from "./logging";
 export type { PartyTracksConfig, ApiHistoryEntry } from "./PartyTracks";

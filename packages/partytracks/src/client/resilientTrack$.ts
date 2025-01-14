@@ -1,5 +1,4 @@
 import {
-  combineLatest,
   concat,
   debounceTime,
   defer,
@@ -9,7 +8,7 @@ import {
   map,
   merge,
   Observable,
-  of,
+  shareReplay,
   switchMap
 } from "rxjs";
 
@@ -25,7 +24,7 @@ export class DevicesExhaustedError extends Error {
   }
 }
 
-// Using defer so that this doesn't blow up if it ends
+// Using defer here so that this doesn't blow up if it ends
 // up in a server js bundle since navigator is browser api
 export const devices$ = defer(() =>
   merge(
@@ -37,63 +36,63 @@ export const devices$ = defer(() =>
   )
 );
 
-export type InputMediaDeviceKind = Exclude<MediaDeviceKind, "audiooutput">;
+export interface ResilientTrackOptions {
+  kind: "audioinput" | "videoinput";
+  constraints?: MediaTrackConstraints;
+  devicePriority$?: Observable<MediaDeviceInfo[]>;
+  onDeviceFailure?: (device: MediaDeviceInfo) => void;
+}
 
-export const ideallyGetTrack$ = ({
+export const resilientTrack$ = ({
   kind,
-  constraints$ = of({}),
-  prioritizedDeviceList$ = devices$,
-  onDeviceUnhealthy = () => {}
-}: {
-  kind?: InputMediaDeviceKind;
-  constraints$?: Observable<MediaTrackConstraints>;
-  prioritizedDeviceList$?: Observable<MediaDeviceInfo[]>;
-  onDeviceUnhealthy?: (device: MediaDeviceInfo) => void;
-}): Observable<MediaStreamTrack> =>
-  combineLatest([
-    prioritizedDeviceList$.pipe(
-      map((list) =>
-        // only apply filter when kind is defined
-        list.filter((d) => (kind === undefined ? true : d.kind === kind))
-      ),
+  constraints = {},
+  devicePriority$ = devices$,
+  onDeviceFailure = () => {}
+}: ResilientTrackOptions): Observable<MediaStreamTrack> =>
+  devicePriority$
+    .pipe(
+      map((list) => list.filter((d) => d.kind === kind)),
       distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
-    ),
-    constraints$
-  ]).pipe(
-    // switchMap on the outside here will cause the previous queue to stop
-    // when the inputs change
-    switchMap(([deviceList, constraints]) =>
-      // concat here is going to make these be subscribed to sequentially
-      concat(
-        ...deviceList.map(
-          (device) =>
-            new Observable<MediaStreamTrack>((subscriber) => {
-              const cleanupRef = { current: () => {} };
-              acquireTrack(
-                subscriber,
-                device,
-                constraints,
-                cleanupRef,
-                onDeviceUnhealthy
-              );
-              return () => {
-                cleanupRef.current();
-              };
-            })
-        ),
-        new Observable<MediaStreamTrack>((sub) =>
-          sub.error(new DevicesExhaustedError())
-        )
-      )
     )
-  );
+    .pipe(
+      // switchMap on the outside here will cause the previous queue to stop
+      // when the inputs change
+      switchMap((deviceList) =>
+        // concat here is going to make these be subscribed to sequentially
+        concat(
+          ...deviceList.map(
+            (device) =>
+              new Observable<MediaStreamTrack>((subscriber) => {
+                const cleanupRef = { current: () => {} };
+                acquireTrack(
+                  subscriber,
+                  device,
+                  constraints,
+                  cleanupRef,
+                  onDeviceFailure
+                );
+                return () => {
+                  cleanupRef.current();
+                };
+              })
+          ),
+          new Observable<MediaStreamTrack>((sub) =>
+            sub.error(new DevicesExhaustedError())
+          )
+        )
+      ),
+      shareReplay({
+        refCount: true,
+        bufferSize: 1
+      })
+    );
 
 function acquireTrack(
   subscriber: Subscriber<MediaStreamTrack>,
   device: MediaDeviceInfo,
   constraints: MediaTrackConstraints,
   cleanupRef: { current: () => void },
-  onDeviceUnhealthy: (device: MediaDeviceInfo) => void
+  onDeviceFailure: (device: MediaDeviceInfo) => void
 ) {
   const { deviceId, groupId, label } = device;
   logger.log(`🙏🏻 Requesting ${label}`);
@@ -125,7 +124,7 @@ function acquireTrack(
             device,
             constraints,
             cleanupRef,
-            onDeviceUnhealthy
+            onDeviceFailure
           );
         };
         document.addEventListener("visibilitychange", onVisibleHandler);
@@ -133,7 +132,7 @@ function acquireTrack(
         subscriber.next(track);
       } else {
         logger.log("☠️ track is not healthy, stopping");
-        onDeviceUnhealthy(device);
+        onDeviceFailure(device);
         track.stop();
         subscriber.complete();
       }

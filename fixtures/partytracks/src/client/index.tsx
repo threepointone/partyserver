@@ -1,7 +1,6 @@
 import "./styles.css";
 
-import { PartyTracks } from "partytracks/client";
-import { of } from "rxjs";
+import { PartyTracks, resilientTrack$ } from "partytracks/client";
 import invariant from "tiny-invariant";
 
 const localVideo = document.getElementById("local-video");
@@ -9,16 +8,16 @@ const remoteVideo = document.getElementById("remote-video");
 invariant(localVideo instanceof HTMLVideoElement);
 invariant(remoteVideo instanceof HTMLVideoElement);
 
-const webcamTrack = await navigator.mediaDevices
-  .getUserMedia({ video: true })
-  .then((ms) => ms.getVideoTracks()[0]);
+const track$ = resilientTrack$({ kind: "videoinput" });
 
-const localMediaStream = new MediaStream();
-localMediaStream.addTrack(webcamTrack);
-localVideo.srcObject = localMediaStream;
+track$.subscribe((track) => {
+  const localMediaStream = new MediaStream();
+  localMediaStream.addTrack(track);
+  localVideo.srcObject = localMediaStream;
+});
 
 const partyTracks = new PartyTracks();
-const pushedTrack$ = partyTracks.push(of(webcamTrack));
+const pushedTrack$ = partyTracks.push(track$);
 const pulledTrack$ = partyTracks.pull(pushedTrack$);
 
 pulledTrack$.subscribe((track) => {
