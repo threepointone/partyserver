@@ -67,7 +67,7 @@ it will look something like this:
 
 ```ts
 import { Hono } from "hono";
-import { proxyToCallsApi } from "partytracks/server";
+import { routePartyTracksRequest } from "partytracks/server";
 
 type Bindings = {
   CALLS_APP_ID: string;
@@ -77,7 +77,7 @@ type Bindings = {
 const app = new Hono<{ Bindings: Bindings }>();
 
 app.all("/partytracks/*", (c) =>
-  proxyToCallsApi({
+  routePartyTracksRequest({
     appId: c.env.CALLS_APP_ID,
     token: c.env.CALLS_APP_TOKEN,
     request: c.req.raw
