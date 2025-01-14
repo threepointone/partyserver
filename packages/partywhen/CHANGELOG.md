@@ -1,5 +1,11 @@
 # partywhen
 
+## 0.0.4
+
+### Patch Changes
+
+- [`aa39a76`](https://github.com/threepointone/partyserver/commit/aa39a760cb1dc55a4b22bdad508f0e48c2b93e71) Thanks [@threepointone](https://github.com/threepointone)! - fix exports
+
 ## 0.0.3
 
 ### Patch Changes
