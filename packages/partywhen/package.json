@@ -6,6 +6,9 @@
     "url": "git://github.com/threepointone/partyserver.git"
   },
   "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "module": "dist/index.js",
   "scripts": {
     "build": "bun scripts/build.ts",
     "check:test": "(cd tests; vitest --no-watch)"
