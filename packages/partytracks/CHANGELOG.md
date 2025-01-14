@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.15
+
+### Patch Changes
+
+- [#141](https://github.com/threepointone/partyserver/pull/141) [`e2d2d92`](https://github.com/threepointone/partyserver/commit/e2d2d925ccc75dc4ec84005c854768961885a93b) Thanks [@third774](https://github.com/third774)! - Update partytracks readme w/ new api
+
 ## 0.0.14
 
 ### Patch Changes
