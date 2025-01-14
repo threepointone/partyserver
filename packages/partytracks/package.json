@@ -1,6 +1,6 @@
 {
   "name": "partytracks",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "scripts": {
     "dev": "bun run build -- --watch",
     "prebuild": "rm -rf dist",
