@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from "react";
-import { devices$, ideallyGetTrack$, PartyTracks } from "partytracks/client";
+import { devices$, PartyTracks, resilientTrack$ } from "partytracks/client";
 import { useObservableAsValue, useOnEmit } from "partytracks/react";
-import { map, of, shareReplay } from "rxjs";
+import { map } from "rxjs";
 
 import type { ComponentProps, ComponentRef } from "react";
 import type { Observable } from "rxjs";
@@ -11,13 +11,7 @@ export function Demo() {
   const [remoteFeedOn, setRemoteFeedOn] = useState(false);
   const [preferredWebcamDeviceId, setPreferredWebcamDeviceId] = useState("");
   const devices = useObservableAsValue(devices$);
-  const client = useMemo(
-    () =>
-      new PartyTracks({
-        apiBase: "/api/calls"
-      }),
-    []
-  );
+  const client = useMemo(() => new PartyTracks(), []);
 
   const peerConnectionState = useObservableAsValue(
     client.peerConnectionState$,
@@ -133,23 +127,13 @@ function Audio(props: { audioTrack$: Observable<MediaStreamTrack | null> }) {
 function useWebcamTrack$(enabled: boolean) {
   return useMemo(() => {
     if (!enabled) return null;
-    return ideallyGetTrack$({ kind: "videoinput" }).pipe(
-      shareReplay({
-        refCount: true,
-        bufferSize: 1
-      })
-    );
+    return resilientTrack$({ kind: "videoinput" });
   }, [enabled]);
 }
 
 function useMicTrack$(enabled: boolean) {
   return useMemo(() => {
     if (!enabled) return null;
-    return ideallyGetTrack$({ kind: "audioinput" }).pipe(
-      shareReplay({
-        refCount: true,
-        bufferSize: 1
-      })
-    );
+    return resilientTrack$({ kind: "audioinput" });
   }, [enabled]);
 }
