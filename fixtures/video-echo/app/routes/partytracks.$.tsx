@@ -1,4 +1,4 @@
-import { proxyToCallsApi } from "partytracks/server";
+import { routePartyTracksRequest } from "partytracks/server";
 
 import type {
   ActionFunctionArgs,
@@ -6,8 +6,7 @@ import type {
 } from "@remix-run/server-runtime";
 
 export const loader = ({ context, request }: LoaderFunctionArgs) => {
-  return proxyToCallsApi({
-    replaceProxyPathname: "/api/calls",
+  return routePartyTracksRequest({
     appId: context.env.CALLS_APP_ID,
     token: context.env.CALLS_APP_TOKEN,
     request
@@ -15,8 +14,7 @@ export const loader = ({ context, request }: LoaderFunctionArgs) => {
 };
 
 export const action = ({ context, request }: ActionFunctionArgs) => {
-  return proxyToCallsApi({
-    replaceProxyPathname: "/api/calls",
+  return routePartyTracksRequest({
     appId: context.env.CALLS_APP_ID,
     token: context.env.CALLS_APP_TOKEN,
     request

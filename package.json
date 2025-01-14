@@ -9,7 +9,7 @@
     "check:format": "prettier . --check --ignore-unknown",
     "check:lint": "biome check",
     "check:repo": "manypkg check",
-    "check:test": "npm run check:test -w partyserver -w partysub -w partywhen",
+    "check:test": "npm run check:test -w partyserver -w partysub -w partywhen -w partytracks",
     "check:type": "bun scripts/typecheck.ts",
     "ncu": "bunx npm-check-updates",
     "all": "bun i && npm run build && npm run check",

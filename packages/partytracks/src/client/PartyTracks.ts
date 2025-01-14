@@ -31,7 +31,11 @@ import type {
 export interface PartyTracksConfig {
   apiExtraParams?: string;
   iceServers?: RTCIceServer[];
-  apiBase: string;
+  /**
+   * The part of the pathname in the original request URL that should be replaced.
+   * For example, if your proxy path is /api/partytracks/*, the value should be "/api/partytracks"
+   */
+  prefix?: string;
   maxApiHistory?: number;
   headers?: Headers;
 }
@@ -60,8 +64,12 @@ export class PartyTracks {
   peerConnectionState$: Observable<RTCPeerConnectionState>;
   config: PartyTracksConfig;
 
-  constructor(config: PartyTracksConfig) {
-    this.config = config;
+  constructor(config: PartyTracksConfig = {}) {
+    this.config = {
+      prefix: "/partytracks",
+      maxApiHistory: 100,
+      ...config
+    };
     this.history = new History<ApiHistoryEntry>(config.maxApiHistory);
     this.peerConnection$ = new Observable<RTCPeerConnection>((subscribe) => {
       let peerConnection: RTCPeerConnection;
@@ -177,9 +185,8 @@ export class PartyTracks {
 
   async createSession(peerConnection: RTCPeerConnection) {
     logger.debug("🆕 creating new session");
-    const { apiBase } = this.config;
     const response = await this.fetchWithRecordedHistory(
-      `${apiBase}/sessions/new?CreatingSession&${this.config.apiExtraParams}`,
+      `${this.config.prefix}/sessions/new?CreatingSession&${this.config.apiExtraParams}`,
       { method: "POST" }
     );
     if (response.status > 400) {
@@ -272,7 +279,7 @@ export class PartyTracks {
                 }))
               };
               const response = await this.fetchWithRecordedHistory(
-                `${this.config.apiBase}/sessions/${sessionId}/tracks/new?PushingTrack&${this.config.apiExtraParams}`,
+                `${this.config.prefix}/sessions/${sessionId}/tracks/new?PushingTrack&${this.config.apiExtraParams}`,
                 {
                   method: "POST",
                   body: JSON.stringify(requestBody)
@@ -412,7 +419,7 @@ export class PartyTracks {
             this.taskScheduler.schedule(async () => {
               const newTrackResponse: TracksResponse =
                 await this.fetchWithRecordedHistory(
-                  `${this.config.apiBase}/sessions/${sessionId}/tracks/new?PullingTrack&${this.config.apiExtraParams}`,
+                  `${this.config.prefix}/sessions/${sessionId}/tracks/new?PullingTrack&${this.config.apiExtraParams}`,
                   {
                     method: "POST",
                     body: JSON.stringify({
@@ -453,7 +460,7 @@ export class PartyTracks {
 
                 const renegotiationResponse =
                   await this.fetchWithRecordedHistory(
-                    `${this.config.apiBase}/sessions/${sessionId}/renegotiate?${this.config.apiExtraParams}`,
+                    `${this.config.prefix}/sessions/${sessionId}/renegotiate?${this.config.apiExtraParams}`,
                     {
                       method: "PUT",
                       body: JSON.stringify({
@@ -530,7 +537,6 @@ export class PartyTracks {
     sessionId: string
   ) {
     // TODO: Close tracks in bulk
-    const { apiBase } = this.config;
     const transceiver = peerConnection
       .getTransceivers()
       .find((t) => t.mid === mid);
@@ -555,7 +561,7 @@ export class PartyTracks {
       force: false
     };
     const response = await this.fetchWithRecordedHistory(
-      `${apiBase}/sessions/${sessionId}/tracks/close?${this.config.apiExtraParams}`,
+      `${this.config.prefix}/sessions/${sessionId}/tracks/close?${this.config.apiExtraParams}`,
       {
         method: "PUT",
         body: JSON.stringify(requestBody)

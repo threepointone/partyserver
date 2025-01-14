@@ -1,5 +1,23 @@
 # partytracks
 
+## 0.0.14
+
+### Patch Changes
+
+- [#138](https://github.com/threepointone/partyserver/pull/138) [`e1bd62f`](https://github.com/threepointone/partyserver/commit/e1bd62f025c038213d9f9083819f9a2b97842ce6) Thanks [@third774](https://github.com/third774)! - Add utils for track acquisition
+
+## 0.0.13
+
+### Patch Changes
+
+- [#136](https://github.com/threepointone/partyserver/pull/136) [`de57577`](https://github.com/threepointone/partyserver/commit/de575776132b3c4a256d072342d18c4731fc2333) Thanks [@third774](https://github.com/third774)! - Set default for maxApiHistory to 100
+
+## 0.0.12
+
+### Patch Changes
+
+- [#133](https://github.com/threepointone/partyserver/pull/133) [`abc383a`](https://github.com/threepointone/partyserver/commit/abc383a33850e0110b5f3f861a7b4db9ec41f40e) Thanks [@third774](https://github.com/third774)! - Remove apiBase config option and replace with optional prefix config option, also renamed server proxy to handlePartyTracksRequest
+
 ## 0.0.11
 
 ### Patch Changes
