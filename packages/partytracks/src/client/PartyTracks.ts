@@ -67,6 +67,7 @@ export class PartyTracks {
   constructor(config: PartyTracksConfig = {}) {
     this.config = {
       prefix: "/partytracks",
+      maxApiHistory: 100,
       ...config
     };
     this.history = new History<ApiHistoryEntry>(config.maxApiHistory);
