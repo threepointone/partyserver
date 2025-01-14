@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.12
+
+### Patch Changes
+
+- [#133](https://github.com/threepointone/partyserver/pull/133) [`abc383a`](https://github.com/threepointone/partyserver/commit/abc383a33850e0110b5f3f861a7b4db9ec41f40e) Thanks [@third774](https://github.com/third774)! - Remove apiBase config option and replace with optional prefix config option, also renamed server proxy to handlePartyTracksRequest
+
 ## 0.0.11
 
 ### Patch Changes
