@@ -7,23 +7,28 @@ A utility library for [Cloudflare Calls](https://developers.cloudflare.com/calls
 #### Client code:
 
 ```js
+// needed to smooth out cross browser behavior inconsistencies
 import "webrtc-adapter";
 
-import { PartyTracks } from "partytracks/client";
+import { PartyTracks, resilientTrack$ } from "partytracks/client";
 import { of } from "rxjs";
 
 const localVideo = document.querySelector("video.local-video");
 const remoteVideo = document.querySelector("video.remote-video");
 
-// Get webcam MediaStreamTrack from user
-const webcamTrack = await navigator.mediaDevices
-  .getUserMedia({ video: true })
-  .then((ms) => ms.getVideoTracks()[0]);
+// resilientTrack$ will follow a prioritized list of devices and
+// try them in order, checking track health and re-evaluating
+// when available devices change
+const track$ = resilientTrack$({ kind: "videoinput" });
 
-// Attach the webcam MediaStreamTrack to the "local video" for display
-const localMediaStream = new MediaStream();
-localMediaStream.addTrack(webcamTrack);
-localVideo.srcObject = localMediaStream;
+// Subscribe so that we can receive updates if the track changes,
+// for example if a webcam is unplugged.
+track$.subscribe((track) => {
+  // Attach the webcam MediaStreamTrack to the "local video" for display
+  const localMediaStream = new MediaStream();
+  localMediaStream.addTrack(track);
+  localVideo.srcObject = localMediaStream;
+});
 
 // Instantiate PartyTracks
 const partyTracks = new PartyTracks();
@@ -32,7 +37,7 @@ const partyTracks = new PartyTracks();
 // receive an Observable of the metadata needed for someone else to pull that
 // track. This metadata is a small POJO (Plain Old JavaScript Object) that can
 // be serialized and sent to another user (usually via websocket).
-const pushedTrackMetadata$ = partyTracks.push(of(webcamTrack));
+const pushedTrackMetadata$ = partyTracks.push(track$);
 // When pulling, you supply an Observable of the track metadata (from another
 // user), and you will receive an Observable of that pulled MediaStreamTrack.
 const pulledTrack$ = partyTracks.pull(pushedTrackMetadata$);
