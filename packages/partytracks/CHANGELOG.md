@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.16
+
+### Patch Changes
+
+- [#143](https://github.com/threepointone/partyserver/pull/143) [`13bb57b`](https://github.com/threepointone/partyserver/commit/13bb57bd9fe3610b04ab947a138ae9b5475ecc42) Thanks [@third774](https://github.com/third774)! - Add sender$ and receiver$ APIs
+
 ## 0.0.15
 
 ### Patch Changes
