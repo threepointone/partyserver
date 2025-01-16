@@ -8,6 +8,7 @@ import {
   map,
   Observable,
   of,
+  ReplaySubject,
   retry,
   share,
   shareReplay,
@@ -27,6 +28,7 @@ import type {
   TrackMetadata,
   TracksResponse
 } from "./callsTypes";
+import type { Subject } from "rxjs";
 
 export interface PartyTracksConfig {
   apiExtraParams?: string;
@@ -60,6 +62,10 @@ export class PartyTracks {
     peerConnection: RTCPeerConnection;
     sessionId: string;
   }>;
+  #sender$: Subject<RTCRtpSender> = new ReplaySubject();
+  sender$: Observable<RTCRtpSender> = this.#sender$.asObservable();
+  #receiver$: Subject<RTCRtpReceiver> = new ReplaySubject();
+  receiver$: Observable<RTCRtpReceiver> = this.#receiver$.asObservable();
   sessionError$: Observable<string>;
   peerConnectionState$: Observable<RTCPeerConnectionState>;
   config: PartyTracksConfig;
@@ -343,6 +349,7 @@ export class PartyTracks {
           direction: "sendonly"
         });
         logger.debug("🌱 creating transceiver!");
+        this.#sender$.next(transceiver.sender);
 
         return {
           transceiver,
@@ -441,10 +448,13 @@ export class PartyTracks {
                 if (pulledTrackData?.mid) {
                   acc.set(track, {
                     mid: pulledTrackData.mid,
-                    resolvedTrack: resolveTrack(
+                    resolvedTrack: resolveTransceiver(
                       peerConnection,
                       (t) => t.mid === pulledTrackData.mid
-                    )
+                    ).then((transceiver) => {
+                      this.#receiver$.next(transceiver.receiver);
+                      return transceiver.receiver.track;
+                    })
                   });
                 }
 
@@ -573,17 +583,17 @@ export class PartyTracks {
   }
 }
 
-async function resolveTrack(
+async function resolveTransceiver(
   peerConnection: RTCPeerConnection,
   compare: (t: RTCRtpTransceiver) => boolean,
   timeout = 5000
 ) {
-  return new Promise<MediaStreamTrack>((resolve, reject) => {
+  return new Promise<RTCRtpTransceiver>((resolve, reject) => {
     setTimeout(reject, timeout);
     const handler = () => {
       const transceiver = peerConnection.getTransceivers().find(compare);
       if (transceiver) {
-        resolve(transceiver.receiver.track);
+        resolve(transceiver);
         peerConnection.removeEventListener("track", handler);
       }
     };
