@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.17
+
+### Patch Changes
+
+- [#145](https://github.com/threepointone/partyserver/pull/145) [`200cc1a`](https://github.com/threepointone/partyserver/commit/200cc1a7758b1217a3491e73c26737667fe47395) Thanks [@third774](https://github.com/third774)! - Add baseUrl option to server route handler
+
 ## 0.0.16
 
 ### Patch Changes
