@@ -15,6 +15,10 @@ interface Config {
    */
   prefix?: string;
   /**
+   * The base URL for the Cloudflare Calls API
+   */
+  baseUrl?: string;
+  /**
    * The original request
    */
   request: Request;
@@ -23,6 +27,7 @@ interface Config {
 export const routePartyTracksRequest = ({
   appId,
   token,
+  baseUrl = "https://rtc.live.cloudflare.com",
   prefix = "/partytracks",
   request
 }: Config) => {
@@ -53,7 +58,7 @@ export const routePartyTracksRequest = ({
     }
   }
 
-  const callsUrl = new URL("https://rtc.live.cloudflare.com");
+  const callsUrl = new URL(baseUrl);
   callsUrl.pathname = previousUrl.pathname.replace(prefix, `/v1/apps/${appId}`);
   callsUrl.search = previousUrl.search;
 
