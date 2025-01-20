@@ -1,0 +1,21 @@
+{
+  "name": "partyflow",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/threepointone/partyserver.git"
+  },
+  "type": "module",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "durable-objects",
+    "ai-agents",
+    "workflows"
+  ],
+  "author": "Sunil Pai <spai@cloudflare.com>",
+  "license": "ISC",
+  "description": "Lightweight workflows on Durable Objects"
+}
