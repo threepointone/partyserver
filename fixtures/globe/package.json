@@ -6,8 +6,8 @@
     "start": "wrangler dev"
   },
   "dependencies": {
-    "@types/react": "^19.0.4",
-    "@types/react-dom": "^19.0.2",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
     "cobe": "^0.6.3",
     "partyserver": "workspace:*",
     "partysocket": "^1.0.3",
@@ -15,6 +15,6 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20241230.0"
+    "@cloudflare/workers-types": "^4.20250121.0"
   }
 }

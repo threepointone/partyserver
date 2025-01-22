@@ -26,10 +26,10 @@
     "@biomejs/biome": "^1.9.4",
     "@changesets/changelog-github": "^0.5.0",
     "@changesets/cli": "^2.27.11",
-    "@cloudflare/vitest-pool-workers": "^0.5.41",
-    "@ianvs/prettier-plugin-sort-imports": "^4.4.0",
+    "@cloudflare/vitest-pool-workers": "^0.6.6",
+    "@ianvs/prettier-plugin-sort-imports": "^4.4.1",
     "@manypkg/cli": "^0.23.0",
-    "@types/bun": "^1.1.15",
+    "@types/bun": "^1.2.0",
     "@vitest/runner": "2.1.8",
     "@vitest/snapshot": "2.1.8",
     "concurrently": "^9.1.2",
@@ -38,7 +38,7 @@
     "tsup": "^8.3.5",
     "typescript": "^5.7.3",
     "vitest": "2.1.8",
-    "wrangler": "^3.100.0"
+    "wrangler": "^3.105.0"
   },
   "overrides": {
     "esbuild": "0.24.2",
@@ -51,6 +51,6 @@
     "esbuild",
     "workerd"
   ],
-  "packageManager": "bun@1.1.43",
+  "packageManager": "bun@1.2.0",
   "type": "module"
 }
