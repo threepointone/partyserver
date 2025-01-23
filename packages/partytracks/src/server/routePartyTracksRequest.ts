@@ -17,7 +17,7 @@ interface Config {
   /**
    * The base URL for the Cloudflare Calls API
    */
-  baseUrl?: string;
+  callsApiBaseUrl?: string;
   /**
    * The original request
    */
@@ -27,7 +27,7 @@ interface Config {
 export const routePartyTracksRequest = ({
   appId,
   token,
-  baseUrl = "https://rtc.live.cloudflare.com",
+  callsApiBaseUrl = `https://rtc.live.cloudflare.com/v1/apps/${appId}`,
   prefix = "/partytracks",
   request
 }: Config) => {
@@ -58,8 +58,8 @@ export const routePartyTracksRequest = ({
     }
   }
 
-  const callsUrl = new URL(baseUrl);
-  callsUrl.pathname = previousUrl.pathname.replace(prefix, `/v1/apps/${appId}`);
+  const callsUrl = new URL(callsApiBaseUrl);
+  callsUrl.pathname = previousUrl.pathname.replace(prefix, callsUrl.pathname);
   callsUrl.search = previousUrl.search;
 
   return fetch(callsUrl, callsInit);
