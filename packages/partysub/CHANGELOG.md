@@ -1,5 +1,14 @@
 # partysub
 
+## 0.0.16
+
+### Patch Changes
+
+- [`ce768f7`](https://github.com/threepointone/partyserver/commit/ce768f757c881461d0e2c7f64dacc2685340c4fb) Thanks [@threepointone](https://github.com/threepointone)! - update dependencies
+
+- Updated dependencies [[`ce768f7`](https://github.com/threepointone/partyserver/commit/ce768f757c881461d0e2c7f64dacc2685340c4fb)]:
+  - partyserver@0.0.60
+
 ## 0.0.15
 
 ### Patch Changes
