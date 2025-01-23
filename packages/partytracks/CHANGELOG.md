@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.18
+
+### Patch Changes
+
+- [#149](https://github.com/threepointone/partyserver/pull/149) [`b0b4ce7`](https://github.com/threepointone/partyserver/commit/b0b4ce703b1daacb7506a19003b91c34e1be13c0) Thanks [@third774](https://github.com/third774)! - Rename baseUrl to callsApiBaseUrl and allow pathname
+
 ## 0.0.17
 
 ### Patch Changes
