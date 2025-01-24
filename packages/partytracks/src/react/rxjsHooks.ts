@@ -60,7 +60,9 @@ export function useValueAsObservable<T>(value: T): Observable<T> {
   const previousValue = useRef<T>(undefined);
   if (previousValue.current !== value) {
     previousValue.current = value;
-    ref.current.next(value);
+    // since subscribers might call a setState, we don't want to
+    // do this in the render path.
+    queueMicrotask(() => ref.current.next(value));
   }
 
   useEffect(() => {
