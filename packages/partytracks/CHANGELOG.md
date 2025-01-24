@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.19
+
+### Patch Changes
+
+- [#150](https://github.com/threepointone/partyserver/pull/150) [`b0ad94b`](https://github.com/threepointone/partyserver/commit/b0ad94b665a07793efed318eb46f854158534657) Thanks [@third774](https://github.com/third774)! - Emit useValueAsObservable next values in microtask
+
 ## 0.0.18
 
 ### Patch Changes
