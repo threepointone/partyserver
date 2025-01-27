@@ -64,8 +64,32 @@ export class OnStartServer extends Server<Env> {
 export default {
   async fetch(request: Request, env: Env, _ctx: ExecutionContext) {
     return (
-      (await routePartykitRequest(request, env)) ||
-      new Response("Not Found", { status: 404 })
+      (await routePartykitRequest(request, env, {
+        onBeforeConnect: async (_request, { party, name }) => {
+          if (party === "on-start-server") {
+            if (name === "is-error") {
+              return new Response("Error", { status: 503 });
+            } else if (name === "is-redirect") {
+              return new Response("Redirect", {
+                status: 302,
+                headers: { Location: "https://example2.com" }
+              });
+            }
+          }
+        },
+        onBeforeRequest: async (_request, { party, name }) => {
+          if (party === "on-start-server") {
+            if (name === "is-error") {
+              return new Response("Error", { status: 504 });
+            } else if (name === "is-redirect") {
+              return new Response("Redirect", {
+                status: 302,
+                headers: { Location: "https://example3.com" }
+              });
+            }
+          }
+        }
+      })) || new Response("Not Found", { status: 404 })
     );
   }
 } satisfies ExportedHandler<Env>;

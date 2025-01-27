@@ -87,6 +87,24 @@ export async function routePartykitRequest<
     prefix?: string;
     jurisdiction?: DurableObjectJurisdiction;
     locationHint?: DurableObjectLocationHint;
+    onBeforeConnect?: (
+      req: Request,
+      lobby: {
+        party: keyof typeof env;
+        name: string;
+      }
+    ) => Response | Request | void | Promise<Response | Request | void>;
+    onBeforeRequest?: (
+      req: Request,
+      lobby: {
+        party: keyof typeof env;
+        name: string;
+      }
+    ) =>
+      | Response
+      | Request
+      | void
+      | Promise<Response | Request | undefined | void>;
   }
 ): Promise<Response | null> {
   if (!serverMapCache.has(env)) {
@@ -151,6 +169,32 @@ Did you forget to add a durable object binding to the class in your wrangler.tom
     req.headers.set("x-partykit-namespace", namespace);
     if (options?.jurisdiction) {
       req.headers.set("x-partykit-jurisdiction", options.jurisdiction);
+    }
+
+    if (req.headers.get("Upgrade")?.toLowerCase() === "websocket") {
+      if (options?.onBeforeConnect) {
+        const reqOrRes = await options.onBeforeConnect(req, {
+          party: namespace,
+          name
+        });
+        if (reqOrRes instanceof Request) {
+          req = reqOrRes;
+        } else if (reqOrRes instanceof Response) {
+          return reqOrRes;
+        }
+      }
+    } else {
+      if (options?.onBeforeRequest) {
+        const reqOrRes = await options.onBeforeRequest(req, {
+          party: namespace,
+          name
+        });
+        if (reqOrRes instanceof Request) {
+          req = reqOrRes;
+        } else if (reqOrRes instanceof Response) {
+          return reqOrRes;
+        }
+      }
     }
 
     return stub.fetch(req);

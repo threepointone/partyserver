@@ -100,6 +100,55 @@ describe("Server", () => {
     const response = await worker.fetch(request, env, ctx);
     expect(response.status).toBe(200);
   });
+
+  it("can return an error in onBeforeConnect", async () => {
+    const ctx = createExecutionContext();
+    const request = new Request(
+      "http://example.com/parties/on-start-server/is-error",
+      {
+        headers: {
+          Upgrade: "websocket"
+        }
+      }
+    );
+    const response = await worker.fetch(request, env, ctx);
+    expect(response.status).toBe(503);
+  });
+
+  it("can return a redirect in onBeforeConnect", async () => {
+    const ctx = createExecutionContext();
+    const request = new Request(
+      "http://example.com/parties/on-start-server/is-redirect",
+      {
+        headers: {
+          Upgrade: "websocket"
+        }
+      }
+    );
+    const response = await worker.fetch(request, env, ctx);
+    expect(response.status).toBe(302);
+    expect(response.headers.get("Location")).toBe("https://example2.com");
+  });
+
+  it("can return an error in onBeforeRequest", async () => {
+    const ctx = createExecutionContext();
+    const request = new Request(
+      "http://example.com/parties/on-start-server/is-error"
+    );
+    const response = await worker.fetch(request, env, ctx);
+    expect(response.status).toBe(504);
+  });
+
+  it("can return a redirect in onBeforeRequest", async () => {
+    const ctx = createExecutionContext();
+    const request = new Request(
+      "http://example.com/parties/on-start-server/is-redirect"
+    );
+    const response = await worker.fetch(request, env, ctx);
+    expect(response.status).toBe(302);
+    expect(response.headers.get("Location")).toBe("https://example3.com");
+  });
+
   // it("can be connected with a query parameter");
   // it("can be connected with a header");
 
