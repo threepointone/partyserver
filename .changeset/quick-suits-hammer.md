@@ -1,5 +1,0 @@
----
-"partyserver": patch
----
-
-fix readme
