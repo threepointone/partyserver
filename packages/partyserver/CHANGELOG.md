@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.61
+
+### Patch Changes
+
+- [#152](https://github.com/threepointone/partyserver/pull/152) [`b1307d2`](https://github.com/threepointone/partyserver/commit/b1307d286272140bb905ae6315c9a69ecbd136c1) Thanks [@threepointone](https://github.com/threepointone)! - implement onBeforeConnect/onBeforeRequest
+
 ## 0.0.60
 
 ### Patch Changes
