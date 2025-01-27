@@ -33,7 +33,8 @@
         "noUselessElse": "off"
       },
       "suspicious": {
-        "noRedeclare": "off"
+        "noRedeclare": "off",
+        "noConfusingVoidType": "off"
       },
       "complexity": {
         "noForEach": "off"
