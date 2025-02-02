@@ -60,7 +60,6 @@ export class SyncServer<
     const channel = json.channel as keyof TChannels;
 
     if ("sync" in json && json.sync) {
-      console.log("syncing from", json.from);
       connection.send(
         JSON.stringify({
           sync: true,
