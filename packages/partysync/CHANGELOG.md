@@ -1,5 +1,11 @@
 # partysync
 
+## 0.0.16
+
+### Patch Changes
+
+- [`97cccbb`](https://github.com/threepointone/partyserver/commit/97cccbbd4402586ed89a9938eb09472d7924711c) Thanks [@threepointone](https://github.com/threepointone)! - stray console statement
+
 ## 0.0.15
 
 ### Patch Changes
