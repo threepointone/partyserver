@@ -16,7 +16,7 @@ export class Persist<RecordType extends unknown[]> {
 
   private async getDb() {
     const channel = this.channel;
-    return idb.openDB(this.dbName, this.version, {
+    return idb.openDB(`${this.dbName}-${channel}`, this.version, {
       upgrade(db) {
         if (!db.objectStoreNames.contains(channel)) {
           db.createObjectStore(channel, { keyPath: "key" });
