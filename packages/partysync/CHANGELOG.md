@@ -1,5 +1,11 @@
 # partysync
 
+## 0.0.15
+
+### Patch Changes
+
+- [`b233b8f`](https://github.com/threepointone/partyserver/commit/b233b8fe2991a4ef19bc1469adde12f4e71ea857) Thanks [@threepointone](https://github.com/threepointone)! - fix multiple syncs on same page
+
 ## 0.0.14
 
 ### Patch Changes
