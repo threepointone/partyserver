@@ -73,7 +73,29 @@ function camelCaseToKebabCase(str: string): string {
   // also remove any trailing -'s
   return kebabified.replace(/-$/, "");
 }
-
+export interface PartykitOptions<Env> {
+  prefix?: string;
+  jurisdiction?: DurableObjectJurisdiction;
+  locationHint?: DurableObjectLocationHint;
+  onBeforeConnect?: (
+    req: Request,
+    lobby: {
+      party: keyof Env;
+      name: string;
+    }
+  ) => Response | Request | void | Promise<Response | Request | void>;
+  onBeforeRequest?: (
+    req: Request,
+    lobby: {
+      party: keyof Env;
+      name: string;
+    }
+  ) =>
+    | Response
+    | Request
+    | void
+    | Promise<Response | Request | undefined | void>;
+}
 /**
  * A utility function for PartyKit style routing.
  */
@@ -83,29 +105,7 @@ export async function routePartykitRequest<
 >(
   req: Request,
   env: Record<string, unknown>,
-  options?: {
-    prefix?: string;
-    jurisdiction?: DurableObjectJurisdiction;
-    locationHint?: DurableObjectLocationHint;
-    onBeforeConnect?: (
-      req: Request,
-      lobby: {
-        party: keyof typeof env;
-        name: string;
-      }
-    ) => Response | Request | void | Promise<Response | Request | void>;
-    onBeforeRequest?: (
-      req: Request,
-      lobby: {
-        party: keyof typeof env;
-        name: string;
-      }
-    ) =>
-      | Response
-      | Request
-      | void
-      | Promise<Response | Request | undefined | void>;
-  }
+  options?: PartykitOptions<typeof env>
 ): Promise<Response | null> {
   if (!serverMapCache.has(env)) {
     serverMapCache.set(
