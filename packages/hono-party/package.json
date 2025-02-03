@@ -1,0 +1,40 @@
+{
+  "name": "hono-party",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/threepointone/partyserver.git"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "bun scripts/build.ts"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "hono",
+    "party"
+  ],
+  "author": "Thomas Osmonson <hello@ineffable.co>",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "hono": "^4",
+    "partyserver": "workspace:*"
+  },
+  "peerDependencies": {
+    "@cloudflare/workers-types": "^4.20240729.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250121.0"
+  }
+}
