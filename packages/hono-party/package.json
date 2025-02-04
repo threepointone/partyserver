@@ -22,19 +22,20 @@
   ],
   "keywords": [
     "hono",
-    "party"
+    "partykit",
+    "partyserver"
   ],
   "author": "Thomas Osmonson <hello@ineffable.co>",
   "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "hono": "^4",
+  "description": "Use PartyServer with Hono",
+  "peerDependencies": {
+    "@cloudflare/workers-types": "^4.20240729.0",
+    "hono": "^4.6.17",
     "partyserver": "workspace:*"
   },
-  "peerDependencies": {
-    "@cloudflare/workers-types": "^4.20240729.0"
-  },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250121.0"
+    "@cloudflare/workers-types": "^4.20250121.0",
+    "hono": "^4.6.17",
+    "partyserver": "workspace:*"
   }
 }

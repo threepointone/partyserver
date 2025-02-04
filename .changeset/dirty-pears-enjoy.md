@@ -2,4 +2,4 @@
 "partyserver": patch
 ---
 
-Extract and export PartykitOptions interface for use in other packages.
+Extract and export PartyServerOptions interface for use in other packages.

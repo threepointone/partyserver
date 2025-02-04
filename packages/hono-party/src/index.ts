@@ -3,24 +3,24 @@ import { createMiddleware } from "hono/factory";
 import { routePartykitRequest } from "partyserver";
 
 import type { Context, Env } from "hono";
-import type { PartykitOptions } from "partyserver";
+import type { PartyServerOptions } from "partyserver";
 
 /**
- * Configuration options for the PartyKit middleware
+ * Configuration options for the PartyServer middleware
  */
-type PartyKitMiddlewareContext<E extends Env> = {
-  /** PartyKit-specific configuration options */
-  options?: PartykitOptions<E>;
+type PartyServerMiddlewareContext<E extends Env> = {
+  /** PartyServer-specific configuration options */
+  options?: PartyServerOptions<E>;
   /** Optional error handler for caught errors */
   onError?: (error: Error) => void;
 };
 
 /**
- * Creates a middleware for handling PartyKit WebSocket and HTTP requests
- * Processes both WebSocket upgrades and standard HTTP requests, delegating them to PartyKit
+ * Creates a middleware for handling PartyServer WebSocket and HTTP requests
+ * Processes both WebSocket upgrades and standard HTTP requests, delegating them to PartyServer
  */
-export function partyKitMiddleware<E extends Env = Env>(
-  ctx?: PartyKitMiddlewareContext<E>
+export function partyserverMiddleware<E extends Env = Env>(
+  ctx?: PartyServerMiddlewareContext<E>
 ) {
   return createMiddleware(async (c, next) => {
     try {
@@ -66,7 +66,7 @@ function createRequestFromContext(c: Context) {
  */
 async function handleWebSocketUpgrade<E extends Env>(
   c: Context<E>,
-  options?: PartykitOptions<E>
+  options?: PartyServerOptions<E>
 ) {
   const req = createRequestFromContext(c);
   const response = await routePartykitRequest(req, env(c), options);
@@ -83,11 +83,11 @@ async function handleWebSocketUpgrade<E extends Env>(
 
 /**
  * Handles standard HTTP requests
- * Forwards the request to PartyKit and returns the response
+ * Forwards the request to PartyServer and returns the response
  */
 async function handleHttpRequest<E extends Env>(
   c: Context<E>,
-  options?: PartykitOptions<E>
+  options?: PartyServerOptions<E>
 ) {
   const req = createRequestFromContext(c);
   return routePartykitRequest(req, env(c), options);
