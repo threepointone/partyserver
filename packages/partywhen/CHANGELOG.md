@@ -1,5 +1,12 @@
 # partywhen
 
+## 0.0.9
+
+### Patch Changes
+
+- Updated dependencies [[`7710635`](https://github.com/threepointone/partyserver/commit/7710635d7fd0ca68047d966e0d1640a9fd3c09bc)]:
+  - partyserver@0.0.63
+
 ## 0.0.8
 
 ### Patch Changes
