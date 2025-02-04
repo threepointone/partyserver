@@ -1,5 +1,11 @@
 # hono-party
 
+## 0.0.4
+
+### Patch Changes
+
+- [`31fd65a`](https://github.com/threepointone/partyserver/commit/31fd65ad4239bf02a564d0fd2759b4bdd8529ac4) Thanks [@threepointone](https://github.com/threepointone)! - again
+
 ## 0.0.3
 
 ### Patch Changes
