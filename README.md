@@ -16,6 +16,8 @@ This is the main repository for PartyServer. It contains the following packages:
 
 [⏱️ partywhen](/packages/partywhen/README.md) - A library for scheduling tasks at scale.
 
+[hono-party](/packages/hono-party/README.md) - A middleware for Hono to handle PartyServer requests.
+
 ### Fixtures
 
 We have a set of small examples for PartyServer in the [`fixtures`](/fixtures/) directory. These are small, self-contained examples that demonstrate how to use PartyServer in different ways. We will expand this repository with broader (and deeper!) examples in the future.

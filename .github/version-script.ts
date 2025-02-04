@@ -13,7 +13,8 @@ try {
     "./packages/partyfn/package.json",
     "./packages/partysync/package.json",
     "./packages/partywhen/package.json",
-    "./packages/partytracks/package.json"
+    "./packages/partytracks/package.json",
+    "./packages/hono-party/package.json"
   ]) {
     const packageJson = JSON.parse(fs.readFileSync(path, "utf-8"));
     packageJson.version = `0.0.0-${stdout.trim()}`;
