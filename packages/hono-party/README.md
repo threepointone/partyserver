@@ -2,7 +2,7 @@
 
 🔥 [Hono](https://hono.dev) ⨉ 🎈 [PartyServer](https://github.com/threepointone/partyserver)
 
-Websockets from the future, now in Hono. Add multiplayer, collaborative document editing, build a game, or anything else you want.
+Websockets from the future, now in Hono. Add collaborative editing, multiplayer games, local-first apps, ai agents, (or whatever!) into your Hono app today.
 
 ```bash
 npm install hono-party hono partyserver
@@ -63,8 +63,6 @@ export default app;
 
 ```typescript
 import { usePartySocket } from "partysocket/react";
-
-const honoUrl = "http://localhost:3000";
 
 // Basic connection
 const socket = usePartySocket({
