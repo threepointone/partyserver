@@ -70,6 +70,22 @@
         "@cloudflare/workers-types": "^4.20250121.0",
       },
     },
+    "fixtures/hono": {
+      "name": "@partyserver/fixture-hono",
+      "version": "0.0.0",
+      "dependencies": {
+        "hono": "^4.6.17",
+        "hono-party": "workspace:*",
+        "partyserver": "workspace:*",
+        "partysocket": "^1.0.3",
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0",
+      },
+      "devDependencies": {
+        "@types/react": "^19.0.7",
+        "@types/react-dom": "^19.0.3",
+      },
+    },
     "fixtures/lexical-yjs": {
       "name": "@partyserver/fixture-lexical-yjs",
       "version": "0.0.0",
@@ -659,6 +675,8 @@
     "@partyserver/fixture-chat": ["@partyserver/fixture-chat@workspace:fixtures/chat"],
 
     "@partyserver/fixture-globe": ["@partyserver/fixture-globe@workspace:fixtures/globe"],
+
+    "@partyserver/fixture-hono": ["@partyserver/fixture-hono@workspace:fixtures/hono"],
 
     "@partyserver/fixture-lexical-yjs": ["@partyserver/fixture-lexical-yjs@workspace:fixtures/lexical-yjs"],
 

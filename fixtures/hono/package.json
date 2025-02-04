@@ -1,0 +1,20 @@
+{
+  "name": "@partyserver/fixture-hono",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "wrangler dev"
+  },
+  "dependencies": {
+    "hono": "^4.6.17",
+    "hono-party": "workspace:*",
+    "partyserver": "workspace:*",
+    "partysocket": "^1.0.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3"
+  }
+}

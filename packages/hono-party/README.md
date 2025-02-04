@@ -3,7 +3,7 @@
 A middleware for [Hono](https://hono.dev) to handle [PartyServer](https://github.com/threepointone/partyserver) requests. Useful for exposing many PartyServer servers within a single Hono app.
 
 ```bash
-npm install hono-party
+npm install hono-party hono partyserver
 ```
 
 ## Usage
@@ -14,13 +14,13 @@ import { partyserverMiddleware } from "hono-party";
 import { Server } from "partyserver";
 
 // Multiple party servers
-class Chat extends Server {}
-class Game extends Server {}
-class Document extends Server {}
+export class Chat extends Server {}
+export class Game extends Server {}
+export class Document extends Server {}
 
 // Basic setup
 const app = new Hono();
-app.use("*", partyserverMiddleware({}));
+app.use("*", partyserverMiddleware());
 
 // or with authentication
 app.use(
@@ -55,7 +55,6 @@ app.use(
 );
 
 export default app;
-export { Chat, Game, Document };
 ```
 
 ## React Usage
