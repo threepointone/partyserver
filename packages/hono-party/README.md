@@ -16,9 +16,9 @@ import { partyserverMiddleware } from "hono-party";
 import { Server } from "partyserver";
 
 // Multiple party servers
-class Chat extends Server {}
-class Game extends Server {}
-class Document extends Server {}
+export class Chat extends Server {}
+export class Game extends Server {}
+export class Document extends Server {}
 
 // Basic setup
 const app = new Hono();
