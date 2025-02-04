@@ -1,6 +1,8 @@
 # hono-party
 
-A middleware for [Hono](https://hono.dev) to handle [PartyServer](https://github.com/threepointone/partyserver) requests. Useful for exposing many PartyServer servers within a single Hono app.
+🔥 [Hono](https://hono.dev) ⨉ 🎈 [PartyServer](https://github.com/threepointone/partyserver)
+
+Websockets from the future, now in Hono. Add multiplayer, collaborative document editing, build a game, or anything else you want.
 
 ```bash
 npm install hono-party hono partyserver
@@ -14,9 +16,9 @@ import { partyserverMiddleware } from "hono-party";
 import { Server } from "partyserver";
 
 // Multiple party servers
-export class Chat extends Server {}
-export class Game extends Server {}
-export class Document extends Server {}
+class Chat extends Server {}
+class Game extends Server {}
+class Document extends Server {}
 
 // Basic setup
 const app = new Hono();
@@ -94,16 +96,25 @@ const socket = usePartySocket({
 
 ## Configuration
 
-```toml
-# wrangler.toml
-[durable_objects]
-bindings = [
-  { name = "Chat", class_name = "Chat" },
-  { name = "Game", class_name = "Game" },
-  { name = "Document", class_name = "Document" }
-]
-
-[[migrations]]
-tag = "v1"
-new_classes = ["Chat", "Game", "Document"]
+```jsonc
+// wrangler.json
+{
+  "durable_objects": {
+    "bindings": [
+      { "name": "Chat", "class_name": "Chat" },
+      { "name": "Game", "class_name": "Game" },
+      { "name": "Document", "class_name": "Document" }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_classes": ["Chat", "Game", "Document"]
+    }
+  ]
+}
 ```
+
+## Thanks
+
+Thanks to [Thomas Osmonson](https://x.com/aulneau_) for building this!
