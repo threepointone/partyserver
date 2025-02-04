@@ -73,7 +73,7 @@ function camelCaseToKebabCase(str: string): string {
   // also remove any trailing -'s
   return kebabified.replace(/-$/, "");
 }
-export interface PartykitOptions<Env> {
+export interface PartyServerOptions<Env> {
   prefix?: string;
   jurisdiction?: DurableObjectJurisdiction;
   locationHint?: DurableObjectLocationHint;
@@ -105,7 +105,7 @@ export async function routePartykitRequest<
 >(
   req: Request,
   env: Record<string, unknown>,
-  options?: PartykitOptions<typeof env>
+  options?: PartyServerOptions<typeof env>
 ): Promise<Response | null> {
   if (!serverMapCache.has(env)) {
     serverMapCache.set(

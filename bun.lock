@@ -216,15 +216,15 @@
     "packages/hono-party": {
       "name": "hono-party",
       "version": "0.0.1",
-      "dependencies": {
-        "hono": "^4",
-        "partyserver": "workspace:*",
-      },
       "devDependencies": {
         "@cloudflare/workers-types": "^4.20250121.0",
+        "hono": "^4.6.17",
+        "partyserver": "workspace:*",
       },
       "peerDependencies": {
         "@cloudflare/workers-types": "^4.20240729.0",
+        "hono": "^4.6.17",
+        "partyserver": "workspace:*",
       },
     },
     "packages/partyagent": {

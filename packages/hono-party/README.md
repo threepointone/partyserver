@@ -1,6 +1,6 @@
 # hono-party
 
-A middleware for [Hono](https://hono.dev) to handle [PartyKit](https://partykit.io) requests. Useful for exposing many PartyKit servers within a single Hono app.
+A middleware for [Hono](https://hono.dev) to handle [PartyServer](https://github.com/threepointone/partyserver) requests. Useful for exposing many PartyServer servers within a single Hono app.
 
 ```bash
 npm install hono-party
@@ -10,7 +10,7 @@ npm install hono-party
 
 ```typescript
 import { Hono } from "hono";
-import { partyKitMiddleware } from "hono-party";
+import { partyserverMiddleware } from "hono-party";
 import { Server } from "partyserver";
 
 // Multiple party servers
@@ -20,12 +20,12 @@ class Document extends Server {}
 
 // Basic setup
 const app = new Hono();
-app.use("*", partyKitMiddleware({}));
+app.use("*", partyserverMiddleware({}));
 
 // or with authentication
 app.use(
   "*",
-  partyKitMiddleware({
+  partyserverMiddleware({
     options: {
       onBeforeConnect: async (req) => {
         const token = req.headers.get("authorization");
@@ -39,7 +39,7 @@ app.use(
 // With error handling
 app.use(
   "*",
-  partyKitMiddleware({
+  partyserverMiddleware({
     onError: (error) => console.error(error)
   })
 );
@@ -47,7 +47,7 @@ app.use(
 // With custom routing
 app.use(
   "*",
-  partyKitMiddleware({
+  partyserverMiddleware({
     options: {
       prefix: "/party" // Handles /party/* routes only
     }
@@ -67,28 +67,24 @@ const honoUrl = "http://localhost:3000";
 
 // Basic connection
 const socket = usePartySocket({
-  host: honoUrl,
   party: "chat",
   room: "general"
 });
 
 // game connection
 const socket = usePartySocket({
-  host: honoUrl,
   party: "game",
   room: "uuid"
 });
 
 // document connection
 const socket = usePartySocket({
-  host: honoUrl,
   party: "document",
   room: "id"
 });
 
 // With auth
 const socket = usePartySocket({
-  host: honoUrl,
   party: "chat",
   room: "general",
   headers: {
