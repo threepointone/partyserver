@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.63
+
+### Patch Changes
+
+- [#157](https://github.com/threepointone/partyserver/pull/157) [`7710635`](https://github.com/threepointone/partyserver/commit/7710635d7fd0ca68047d966e0d1640a9fd3c09bc) Thanks [@aulneau](https://github.com/aulneau)! - Extract and export PartyServerOptions interface for use in other packages.
+
 ## 0.0.62
 
 ### Patch Changes
