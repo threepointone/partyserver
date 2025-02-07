@@ -1,3 +1,7 @@
-## partysmart
+# partysmart
 
-Nothing here yet.
+Alternative name for PartyAgent. See [partyagent](../partyagent/README.md) for details.
+
+## License
+
+ISC
