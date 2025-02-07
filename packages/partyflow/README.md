@@ -1,3 +1,7 @@
-## partyflow
+# partyflow
 
-Nothing here yet.
+Lightweight workflow engine for PartyServer built on Durable Objects.
+
+## License
+
+ISC

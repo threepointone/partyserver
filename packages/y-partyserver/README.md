@@ -1,7 +1,13 @@
-## y-partyserver
+# y-partyserver
+
+Yjs backend for PartyServer.
 
 > [!WARNING]
 > This project is experimental and is not yet recommended for production use.
+
+## License
+
+ISC
 
 [//]: # "keep in sync with packages/y-partyserver/README.md"
 [//]: # "keep in sync with docs/reference/y-partyserver.md"
