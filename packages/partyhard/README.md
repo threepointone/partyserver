@@ -1,3 +1,7 @@
-## partyhard
+# partyhard
 
-Nothing here yet.
+A component of the PartyServer ecosystem.
+
+## License
+
+ISC

@@ -1,6 +1,10 @@
-## partysync
+# partysync
 
-An experimental library to synchronise state from a Durable Object to a client.
+Experimental library to synchronize state between a Durable Object and client. See [design discussion](https://github.com/threepointone/partyserver/issues/147).
+
+## License
+
+ISC
 
 > [!WARNING]
 > WIP, API and design is subject to change.
