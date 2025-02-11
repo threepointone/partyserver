@@ -68,6 +68,7 @@ export class PartyTracks {
   sessionError$: Observable<string>;
   peerConnectionState$: Observable<RTCPeerConnectionState>;
   config: PartyTracksConfig;
+  #params: URLSearchParams;
 
   constructor(config: PartyTracksConfig = {}) {
     this.config = {
@@ -75,6 +76,7 @@ export class PartyTracks {
       maxApiHistory: 100,
       ...config
     };
+    this.#params = new URLSearchParams(config.apiExtraParams);
     this.history = new History<ApiHistoryEntry>(config.maxApiHistory);
     this.peerConnection$ = new Observable<RTCPeerConnection>((subscribe) => {
       let peerConnection: RTCPeerConnection;
@@ -191,7 +193,7 @@ export class PartyTracks {
   async createSession(peerConnection: RTCPeerConnection) {
     logger.debug("🆕 creating new session");
     const response = await this.fetchWithRecordedHistory(
-      `${this.config.prefix}/sessions/new?CreatingSession&${this.config.apiExtraParams}`,
+      `${this.config.prefix}/sessions/new${this.#params}`,
       { method: "POST" }
     );
     if (response.status > 400) {
@@ -284,7 +286,7 @@ export class PartyTracks {
                 }))
               };
               const response = await this.fetchWithRecordedHistory(
-                `${this.config.prefix}/sessions/${sessionId}/tracks/new?PushingTrack&${this.config.apiExtraParams}`,
+                `${this.config.prefix}/sessions/${sessionId}/tracks/new${this.#params}`,
                 {
                   method: "POST",
                   body: JSON.stringify(requestBody)
@@ -424,7 +426,7 @@ export class PartyTracks {
             this.taskScheduler.schedule(async () => {
               const newTrackResponse: TracksResponse =
                 await this.fetchWithRecordedHistory(
-                  `${this.config.prefix}/sessions/${sessionId}/tracks/new?PullingTrack&${this.config.apiExtraParams}`,
+                  `${this.config.prefix}/sessions/${sessionId}/tracks/new${this.#params}`,
                   {
                     method: "POST",
                     body: JSON.stringify({
@@ -468,7 +470,7 @@ export class PartyTracks {
 
                 const renegotiationResponse =
                   await this.fetchWithRecordedHistory(
-                    `${this.config.prefix}/sessions/${sessionId}/renegotiate?${this.config.apiExtraParams}`,
+                    `${this.config.prefix}/sessions/${sessionId}/renegotiate${this.#params}`,
                     {
                       method: "PUT",
                       body: JSON.stringify({
@@ -569,7 +571,7 @@ export class PartyTracks {
       force: false
     };
     const response = await this.fetchWithRecordedHistory(
-      `${this.config.prefix}/sessions/${sessionId}/tracks/close?${this.config.apiExtraParams}`,
+      `${this.config.prefix}/sessions/${sessionId}/tracks/close${this.#params}`,
       {
         method: "PUT",
         body: JSON.stringify(requestBody)
