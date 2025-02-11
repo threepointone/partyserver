@@ -1,8 +1,10 @@
-_(wip, do not use)_
-
-## partywhen
+# partywhen
 
 Sophisticated scheduler for durable tasks, built on Durable Object Alarms.
+
+## License
+
+ISC
 
 - schedule tasks by time, delay, or cron expression
 - schedule multiple tasks on the same object

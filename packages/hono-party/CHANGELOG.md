@@ -1,5 +1,14 @@
 # hono-party
 
+## 0.0.5
+
+### Patch Changes
+
+- [`a240942`](https://github.com/threepointone/partyserver/commit/a240942d20540d70fc0076edb779302e6d621c65) Thanks [@threepointone](https://github.com/threepointone)! - update deps, use vite for one fixture
+
+- Updated dependencies [[`a240942`](https://github.com/threepointone/partyserver/commit/a240942d20540d70fc0076edb779302e6d621c65)]:
+  - partyserver@0.0.64
+
 ## 0.0.4
 
 ### Patch Changes

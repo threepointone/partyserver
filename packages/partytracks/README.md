@@ -1,3 +1,21 @@
+# partytracks
+
+Audio/video handling for realtime apps using Observables for WebRTC.
+
+## Features
+
+- **Observable-based API** - Better handling of WebRTC complexities
+- **Automatic Recovery** - Handles disconnects, hardware changes, and network switches
+- **Abstracted Complexity** - Application code doesn't need to handle WebRTC details
+
+## Why Observables?
+
+A promise-based API (push a track, get a promise of metadata) seems simpler but proved to be a leaky abstraction when things go wrong. Sometimes a webcam is unplugged, or your peer connection drops when switching networks. Observables allow all of the logic of replacing/repairing tracks and connections to be contained within the library, allowing your application code to not be concerned with the details of WebRTC.
+
+## License
+
+ISC
+
 ## partytracks 🎶
 
 A utility library for [Cloudflare Calls](https://developers.cloudflare.com/calls/) built with RxJS Observables.
@@ -113,12 +131,3 @@ function SomeComponent({ value }) {
   useOnEmit(value$, (v) => console.log(v));
 }
 ```
-
-### Why Observables?
-
-A promise based API (push a track, get a promise of metadata) seems simpler,
-but proved to be a leaky abstraction when things go wrong. Sometimes a webcam
-is unplugged, or your peer connection drops when switching networks. Observables
-allow all of the logic of replacing/repairing tracks and connections to be
-contained within the library, allowing your application code to not be concerned
-with the details of WebRTC.

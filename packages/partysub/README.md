@@ -1,3 +1,11 @@
+# partysub
+
+Pub-sub functionality for Durable Objects in PartyServer.
+
+## License
+
+ISC
+
 ## 🥖 partysub
 
 > [!WARNING]
