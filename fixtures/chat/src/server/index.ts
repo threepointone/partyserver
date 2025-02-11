@@ -13,11 +13,8 @@ export class Chat extends Server {
   }
 }
 
-console.log("Hello from the server!");
-
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    console.log("Fetching the server!");
     return (
       (await routePartykitRequest(request, env)) ||
       new Response("Not Found", { status: 404 })
