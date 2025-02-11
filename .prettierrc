@@ -1,14 +1,1 @@
-{
-  "singleQuote": false,
-  "trailingComma": "none",
-  "importOrder": [
-    "<BUILTIN_MODULES>",
-    "",
-    "^react",
-    "<THIRD_PARTY_MODULES>",
-    "",
-    "^[.]",
-    "",
-    "<TYPES>"
-  ]
-}
+{ "singleQuote": false, "trailingComma": "none" }
