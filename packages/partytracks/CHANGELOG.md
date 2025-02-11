@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.21
+
+### Patch Changes
+
+- [#164](https://github.com/threepointone/partyserver/pull/164) [`7066384`](https://github.com/threepointone/partyserver/commit/7066384e0aba0a5f1f00808d5165ec0d9478586d) Thanks [@third774](https://github.com/third774)! - Clean up request params
+
 ## 0.0.20
 
 ### Patch Changes
