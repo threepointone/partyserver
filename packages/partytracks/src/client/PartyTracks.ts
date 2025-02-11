@@ -62,10 +62,9 @@ export class PartyTracks {
     peerConnection: RTCPeerConnection;
     sessionId: string;
   }>;
-  #sender$: Subject<RTCRtpSender> = new ReplaySubject();
-  sender$: Observable<RTCRtpSender> = this.#sender$.asObservable();
-  #receiver$: Subject<RTCRtpReceiver> = new ReplaySubject();
-  receiver$: Observable<RTCRtpReceiver> = this.#receiver$.asObservable();
+  #transceiver$: Subject<RTCRtpTransceiver> = new ReplaySubject();
+  transceiver$: Observable<RTCRtpTransceiver> =
+    this.#transceiver$.asObservable();
   sessionError$: Observable<string>;
   peerConnectionState$: Observable<RTCPeerConnectionState>;
   config: PartyTracksConfig;
@@ -349,8 +348,7 @@ export class PartyTracks {
           direction: "sendonly"
         });
         logger.debug("🌱 creating transceiver!");
-        this.#sender$.next(transceiver.sender);
-
+        this.#transceiver$.next(transceiver);
         return {
           transceiver,
           stableId,
@@ -452,7 +450,7 @@ export class PartyTracks {
                       peerConnection,
                       (t) => t.mid === pulledTrackData.mid
                     ).then((transceiver) => {
-                      this.#receiver$.next(transceiver.receiver);
+                      this.#transceiver$.next(transceiver);
                       return transceiver.receiver.track;
                     })
                   });
