@@ -6,16 +6,16 @@
     "start": "wrangler dev"
   },
   "dependencies": {
-    "@types/react": "^19.0.7",
+    "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "nanoid": "^5.0.9",
     "partyserver": "workspace:*",
     "partysocket": "^1.0.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "valibot": "^1.0.0-beta.14"
+    "valibot": "^1.0.0-rc.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250121.0"
+    "@cloudflare/workers-types": "^4.20250204.0"
   }
 }

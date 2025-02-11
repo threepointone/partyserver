@@ -1105,6 +1105,7 @@ button.action-button:disabled {
   vertical-align: middle;
   -webkit-appearance: none;
   -moz-appearance: none;
+  appearance: none;
   width: 70px;
   font-size: 14px;
   color: #777;
@@ -1309,6 +1310,7 @@ button.action-button:disabled {
   vertical-align: middle;
   -webkit-appearance: none;
   -moz-appearance: none;
+  appearance: none;
   width: 70px;
   font-size: 14px;
   color: #777;
@@ -3807,7 +3809,7 @@ body {
   width: 2px;
   height: 15px;
   top: 6px;
-  start: 13px;
+  /* start: 13px; */
 }
 .PollNode__optionDelete:before {
   transform: rotate(-45deg);

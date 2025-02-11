@@ -43,7 +43,7 @@
     "@cloudflare/workers-types": "^4.20240729.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250121.0",
+    "@cloudflare/workers-types": "^4.20250204.0",
     "ws": "^8.18.0"
   }
 }

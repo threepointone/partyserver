@@ -6,10 +6,10 @@
     "start": "wrangler dev"
   },
   "dependencies": {
-    "hono": "^4.6.17",
+    "hono": "^4.7.0",
     "partytracks": "workspace:*"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250121.0"
+    "@cloudflare/workers-types": "^4.20250204.0"
   }
 }

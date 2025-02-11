@@ -10,7 +10,7 @@ npm install hono-party hono partyserver
 
 ## Usage
 
-```typescript
+```tsx
 import { Hono } from "hono";
 import { partyserverMiddleware } from "hono-party";
 import { Server } from "partyserver";
@@ -41,9 +41,7 @@ app.use(
 // With error handling
 app.use(
   "*",
-  partyserverMiddleware({
-    onError: (error) => console.error(error)
-  })
+  partyserverMiddleware({ onError: (error) => console.error(error) })
 );
 
 // With custom routing
@@ -61,34 +59,23 @@ export default app;
 
 ## React Usage
 
-```typescript
+```tsx
 import { usePartySocket } from "partysocket/react";
 
 // Basic connection
-const socket = usePartySocket({
-  party: "chat",
-  room: "general"
-});
+const socket = usePartySocket({ party: "chat", room: "general" });
 
 // game connection
-const socket = usePartySocket({
-  party: "game",
-  room: "uuid"
-});
+const socket = usePartySocket({ party: "game", room: "uuid" });
 
 // document connection
-const socket = usePartySocket({
-  party: "document",
-  room: "id"
-});
+const socket = usePartySocket({ party: "document", room: "id" });
 
 // With auth
 const socket = usePartySocket({
   party: "chat",
   room: "general",
-  headers: {
-    authorization: `Bearer ${token}`
-  }
+  headers: { authorization: `Bearer ${token}` }
 });
 ```
 
@@ -104,12 +91,7 @@ const socket = usePartySocket({
       { "name": "Document", "class_name": "Document" }
     ]
   },
-  "migrations": [
-    {
-      "tag": "v1",
-      "new_classes": ["Chat", "Game", "Document"]
-    }
-  ]
+  "migrations": [{ "tag": "v1", "new_classes": ["Chat", "Game", "Document"] }]
 }
 ```
 

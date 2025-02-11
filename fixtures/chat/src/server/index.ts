@@ -2,22 +2,22 @@ import { routePartykitRequest, Server } from "partyserver";
 
 import type { Connection, WSMessage } from "partyserver";
 
-type Env = {
-  Chat: DurableObjectNamespace<Chat>;
-};
+type Env = { Chat: DurableObjectNamespace<Chat> };
 
 export class Chat extends Server {
-  static options = {
-    hibernate: true
-  };
+  static options = { hibernate: true };
 
   onMessage(connection: Connection, message: WSMessage) {
+    console.log("Received a message:", message);
     this.broadcast(message);
   }
 }
 
+console.log("Hello from the server!");
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
+    console.log("Fetching the server!");
     return (
       (await routePartykitRequest(request, env)) ||
       new Response("Not Found", { status: 404 })

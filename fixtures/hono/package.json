@@ -6,7 +6,7 @@
     "start": "wrangler dev"
   },
   "dependencies": {
-    "hono": "^4.6.17",
+    "hono": "^4.7.0",
     "hono-party": "workspace:*",
     "partyserver": "workspace:*",
     "partysocket": "^1.0.3",
@@ -14,7 +14,7 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@types/react": "^19.0.7",
+    "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3"
   }
 }
