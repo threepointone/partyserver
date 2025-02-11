@@ -1,6 +1,6 @@
 # partytracks
 
-Audio/video handling for PartyServer apps using Observables for WebRTC.
+Audio/video handling for realtime apps using Observables for WebRTC.
 
 ## Features
 
