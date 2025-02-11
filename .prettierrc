@@ -1,7 +1,6 @@
 {
   "singleQuote": false,
   "trailingComma": "none",
-  "plugins": ["@ianvs/prettier-plugin-sort-imports"],
   "importOrder": [
     "<BUILTIN_MODULES>",
     "",
