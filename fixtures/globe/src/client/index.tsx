@@ -19,13 +19,7 @@ function App() {
   // is called on every animation frame, and we don't want to re-render
   // the component on every frame.
   const positions = useRef<
-    Map<
-      string,
-      {
-        location: [number, number];
-        size: number;
-      }
-    >
+    Map<string, { location: [number, number]; size: number }>
   >(new Map());
   // Connect to the PartyServer server
   const socket = usePartySocket({

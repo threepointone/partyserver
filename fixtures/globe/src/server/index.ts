@@ -3,20 +3,14 @@ import { routePartykitRequest, Server } from "partyserver";
 import type { OutgoingMessage, Position } from "../types";
 import type { Connection, ConnectionContext } from "partyserver";
 
-type Env = {
-  Globe: DurableObjectNamespace<Globe>;
-};
+type Env = { Globe: DurableObjectNamespace<Globe> };
 
 // This is the state that we'll store on each connection
-type ConnectionState = {
-  position: Position;
-};
+type ConnectionState = { position: Position };
 
 export class Globe extends Server {
   // Let's use hibernation mode so we can scale to thousands of connections
-  static options = {
-    hibernate: true
-  };
+  static options = { hibernate: true };
 
   onConnect(conn: Connection<ConnectionState>, ctx: ConnectionContext) {
     // Whenever a fresh connection is made, we'll
@@ -28,13 +22,7 @@ export class Globe extends Server {
     const lng = Number.parseFloat(request.cf!.longitude as string);
     const id = conn.id;
     // And save this on the connection's state
-    conn.setState({
-      position: {
-        lat,
-        lng,
-        id
-      }
-    });
+    conn.setState({ position: { lat, lng, id } });
 
     // Now, let's send the entire state to the new connection
     for (const connection of this.getConnections<ConnectionState>()) {

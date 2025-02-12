@@ -2,8 +2,9 @@
   "name": "@partyserver/fixture-globe",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "start": "wrangler dev"
+    "start": "vite dev"
   },
   "dependencies": {
     "@types/react": "^19.0.8",
