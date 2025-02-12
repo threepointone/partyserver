@@ -4,10 +4,6 @@ compatibility_date = "2024-04-19"
 
 assets = { directory = "public" }
 
-[build]
-command = "bun scripts/build.ts"
-watch_dir = "client"
-
 
 [[durable_objects.bindings]]
 name = "Document"
