@@ -3,7 +3,7 @@ import { PartySocket } from "partysocket";
 const id = crypto.randomUUID();
 
 const socket = new PartySocket({
-  host: "localhost:8787",
+  host: window.location.host,
   party: "chat",
   room: "test"
 });
