@@ -4,9 +4,6 @@ compatibility_date = "2024-07-25"
 
 assets = {directory = "./public"}
 
-[build]
-command = "npx esbuild src/client/index.tsx --bundle --outdir=public/dist --platform=browser --format=esm --sourcemap"
-
 [[durable_objects.bindings]]
 name = "LexicalDocument"
 class_name = "LexicalDocument"
