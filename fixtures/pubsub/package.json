@@ -2,8 +2,9 @@
   "name": "@partyserver/fixture-pubsub",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "start": "wrangler dev"
+    "start": "vite dev"
   },
   "dependencies": {
     "nanoid": "^5.0.9",
