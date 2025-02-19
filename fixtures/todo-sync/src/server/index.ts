@@ -87,7 +87,7 @@ export class ToDos extends SyncServer<
     }
     // });
   }
-  async alarm() {
+  async onAlarm() {
     // actually delete any todos that have been
     // marked as deleted more than 24 hours ago
     this.sql(
