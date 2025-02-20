@@ -82,7 +82,9 @@ export class PartyTracks {
     this.history = new History<ApiHistoryEntry>(config.maxApiHistory);
     this.peerConnection$ = new Observable<RTCPeerConnection>((subscriber) => {
       let peerConnection: RTCPeerConnection;
+      let iceTimeout = -1;
       const setup = () => {
+        clearTimeout(iceTimeout);
         peerConnection?.close();
         peerConnection = new RTCPeerConnection({
           iceServers: config.iceServers ?? [
@@ -103,7 +105,6 @@ export class PartyTracks {
           }
         });
 
-        let iceTimeout = -1;
         peerConnection.addEventListener("iceconnectionstatechange", () => {
           clearTimeout(iceTimeout);
           if (
