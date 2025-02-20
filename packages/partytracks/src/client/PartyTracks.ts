@@ -193,7 +193,7 @@ export class PartyTracks {
   async createSession(peerConnection: RTCPeerConnection) {
     logger.debug("🆕 creating new session");
     const response = await this.fetchWithRecordedHistory(
-      `${this.config.prefix}/sessions/new${this.#params}`,
+      `${this.config.prefix}/sessions/new?${this.#params}`,
       { method: "POST" }
     );
     if (response.status > 400) {
@@ -286,7 +286,7 @@ export class PartyTracks {
                 }))
               };
               const response = await this.fetchWithRecordedHistory(
-                `${this.config.prefix}/sessions/${sessionId}/tracks/new${this.#params}`,
+                `${this.config.prefix}/sessions/${sessionId}/tracks/new?${this.#params}`,
                 {
                   method: "POST",
                   body: JSON.stringify(requestBody)
@@ -426,7 +426,7 @@ export class PartyTracks {
             this.taskScheduler.schedule(async () => {
               const newTrackResponse: TracksResponse =
                 await this.fetchWithRecordedHistory(
-                  `${this.config.prefix}/sessions/${sessionId}/tracks/new${this.#params}`,
+                  `${this.config.prefix}/sessions/${sessionId}/tracks/new?${this.#params}`,
                   {
                     method: "POST",
                     body: JSON.stringify({
@@ -470,7 +470,7 @@ export class PartyTracks {
 
                 const renegotiationResponse =
                   await this.fetchWithRecordedHistory(
-                    `${this.config.prefix}/sessions/${sessionId}/renegotiate${this.#params}`,
+                    `${this.config.prefix}/sessions/${sessionId}/renegotiate?${this.#params}`,
                     {
                       method: "PUT",
                       body: JSON.stringify({
@@ -571,7 +571,7 @@ export class PartyTracks {
       force: false
     };
     const response = await this.fetchWithRecordedHistory(
-      `${this.config.prefix}/sessions/${sessionId}/tracks/close${this.#params}`,
+      `${this.config.prefix}/sessions/${sessionId}/tracks/close?${this.#params}`,
       {
         method: "PUT",
         body: JSON.stringify(requestBody)
