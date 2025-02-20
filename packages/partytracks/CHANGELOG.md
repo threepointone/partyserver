@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.23
+
+### Patch Changes
+
+- [#170](https://github.com/threepointone/partyserver/pull/170) [`de8562b`](https://github.com/threepointone/partyserver/commit/de8562bb5ccbb4b145c95b646b23076c7eedc151) Thanks [@third774](https://github.com/third774)! - Fix API extra params
+
 ## 0.0.22
 
 ### Patch Changes
