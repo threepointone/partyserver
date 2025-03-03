@@ -9,7 +9,6 @@ import {
   Observable,
   of,
   ReplaySubject,
-  retry,
   share,
   shareReplay,
   switchMap,
@@ -29,6 +28,7 @@ import type {
   TracksResponse
 } from "./callsTypes";
 import type { Subject } from "rxjs";
+import { retryWithBackoff } from "./rxjs-helpers";
 
 export interface PartyTracksConfig {
   apiExtraParams?: string;
@@ -145,6 +145,7 @@ export class PartyTracks {
       // TODO: Convert the promise based session creation here
       // into an observable that will close the session in cleanup
       switchMap((pc) => from(this.createSession(pc))),
+      retryWithBackoff(),
       // we want new subscribers to receive the session right away
       shareReplay({
         bufferSize: 1,
@@ -329,7 +330,7 @@ export class PartyTracks {
           });
         });
       };
-    }).pipe(retry(2));
+    }).pipe(retryWithBackoff());
   }
 
   push(
@@ -519,7 +520,7 @@ export class PartyTracks {
           }
         });
       };
-    }).pipe(retry(2));
+    }).pipe(retryWithBackoff());
   }
 
   pull(trackData$: Observable<TrackMetadata>): Observable<MediaStreamTrack> {
