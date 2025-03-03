@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.24
+
+### Patch Changes
+
+- [#175](https://github.com/threepointone/partyserver/pull/175) [`50f6732`](https://github.com/threepointone/partyserver/commit/50f6732c40506b7a10951e414ca70dfd995e676b) Thanks [@third774](https://github.com/third774)! - Retry forever with exponential backoff
+
 ## 0.0.23
 
 ### Patch Changes

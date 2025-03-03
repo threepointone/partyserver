@@ -1,6 +1,6 @@
 {
   "name": "partytracks",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "scripts": {
     "check:test": "(cd tests; vitest --no-watch)",
     "dev": "bun run build -- --watch",
