@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.26
+
+### Patch Changes
+
+- [#179](https://github.com/threepointone/partyserver/pull/179) [`a0bbb6c`](https://github.com/threepointone/partyserver/commit/a0bbb6c11e7a4a1eae8dc62e30ef477341899b77) Thanks [@third774](https://github.com/third774)! - Remove dtx codec
+
 ## 0.0.25
 
 ### Patch Changes
