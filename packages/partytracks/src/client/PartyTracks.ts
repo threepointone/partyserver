@@ -553,7 +553,6 @@ export class PartyTracks {
     mid: string,
     sessionId: string
   ) {
-    // TODO: Close tracks in bulk
     const transceiver = peerConnection
       .getTransceivers()
       .find((t) => t.mid === mid);
