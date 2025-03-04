@@ -1,7 +1,7 @@
 import { Observable, shareReplay } from "rxjs";
 import invariant from "tiny-invariant";
 
-export function getScreenshare$({ contentHint }: { contentHint: string }) {
+export function getScreenshare$() {
   return new Observable<MediaStream | undefined>((subscribe) => {
     let cleanup = () => {};
     // do this in a setTimeout that we can cancel
@@ -13,11 +13,6 @@ export function getScreenshare$({ contentHint }: { contentHint: string }) {
           cleanup = () => {
             ms.getTracks().forEach((t) => t.stop());
           };
-          ms.getVideoTracks().forEach((track) => {
-            if (contentHint && "contentHint" in track) {
-              track.contentHint = contentHint;
-            }
-          });
 
           subscribe.next(ms);
           ms.getVideoTracks()[0].addEventListener("ended", () => {
