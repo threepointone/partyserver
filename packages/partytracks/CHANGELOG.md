@@ -1,5 +1,12 @@
 # partytracks
 
+## 0.0.25
+
+### Patch Changes
+
+- [#177](https://github.com/threepointone/partyserver/pull/177) [`0cd24be`](https://github.com/threepointone/partyserver/commit/0cd24be1284929bd3fe7354273f47bdb0c4a7fd8) Thanks [@third774](https://github.com/third774)! - - Close tracks in bulk requests
+  - Remove contentHint from getScreenshare$ utility
+
 ## 0.0.24
 
 ### Patch Changes
