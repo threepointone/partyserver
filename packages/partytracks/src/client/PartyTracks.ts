@@ -189,7 +189,9 @@ export class PartyTracks {
       >;
     }
   >(32);
-  closeTrackDispatcher = new BulkRequestDispatcher(32);
+  closeTrackDispatcher = new BulkRequestDispatcher<{ mid: string }, unknown>(
+    32
+  );
 
   async createSession(peerConnection: RTCPeerConnection) {
     logger.debug("🆕 creating new session");
@@ -325,8 +327,14 @@ export class PartyTracks {
         clearTimeout(timeout);
         pushedTrackPromise?.then(() => {
           this.taskScheduler.schedule(async () => {
-            logger.debug("🔚 Closing pushed track ", trackName);
-            return this.closeTrack(peerConnection, transceiver.mid, sessionId);
+            if (transceiver.mid) {
+              logger.debug("🔚 Closing pushed track ", trackName);
+              this.#closeTrackInBulk(
+                peerConnection,
+                transceiver.mid,
+                sessionId
+              );
+            }
           });
         });
       };
@@ -514,9 +522,7 @@ export class PartyTracks {
         pulledTrackPromise?.then((trackName) => {
           if (mid) {
             logger.debug("🔚 Closing pulled track ", trackName);
-            this.taskScheduler.schedule(async () =>
-              this.closeTrack(peerConnection, mid, sessionId)
-            );
+            this.#closeTrackInBulk(peerConnection, mid, sessionId);
           }
         });
       };
@@ -542,9 +548,9 @@ export class PartyTracks {
     );
   }
 
-  async closeTrack(
+  async #closeTrackInBulk(
     peerConnection: RTCPeerConnection,
-    mid: string | null,
+    mid: string,
     sessionId: string
   ) {
     // TODO: Close tracks in bulk
@@ -557,29 +563,37 @@ export class PartyTracks {
     ) {
       return;
     }
-    // create an offer
-    const offer = await peerConnection.createOffer();
-    // Turn on Opus DTX to save bandwidth
-    offer.sdp = offer.sdp?.replace("useinbandfec=1", "usedtx=1;useinbandfec=1");
-    // And set the offer as the local description
-    await peerConnection.setLocalDescription(offer);
-    const requestBody = {
-      tracks: [{ mid: transceiver.mid }],
-      sessionDescription: {
-        sdp: peerConnection.localDescription?.sdp,
-        type: "offer"
-      },
-      force: false
-    };
-    const response = await this.fetchWithRecordedHistory(
-      `${this.config.prefix}/sessions/${sessionId}/tracks/close?${this.#params}`,
-      {
-        method: "PUT",
-        body: JSON.stringify(requestBody)
-      }
-    ).then((res) => res.json() as Promise<TracksResponse>);
-    await peerConnection.setRemoteDescription(
-      new RTCSessionDescription(response.sessionDescription)
+
+    this.closeTrackDispatcher.doBulkRequest({ mid }, (mids) =>
+      this.taskScheduler.schedule(async () => {
+        // create an offer
+        const offer = await peerConnection.createOffer();
+        // Turn on Opus DTX to save bandwidth
+        offer.sdp = offer.sdp?.replace(
+          "useinbandfec=1",
+          "usedtx=1;useinbandfec=1"
+        );
+        // And set the offer as the local description
+        await peerConnection.setLocalDescription(offer);
+        const requestBody = {
+          tracks: mids,
+          sessionDescription: {
+            sdp: peerConnection.localDescription?.sdp,
+            type: "offer"
+          },
+          force: false
+        };
+        const response = await this.fetchWithRecordedHistory(
+          `${this.config.prefix}/sessions/${sessionId}/tracks/close?${this.#params}`,
+          {
+            method: "PUT",
+            body: JSON.stringify(requestBody)
+          }
+        ).then((res) => res.json() as Promise<TracksResponse>);
+        await peerConnection.setRemoteDescription(
+          new RTCSessionDescription(response.sessionDescription)
+        );
+      })
     );
   }
 }
