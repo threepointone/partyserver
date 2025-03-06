@@ -1,6 +1,6 @@
 {
   "name": "hono-party",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "repository": {
     "type": "git",
     "url": "git://github.com/threepointone/partyserver.git"
@@ -31,11 +31,11 @@
   "peerDependencies": {
     "@cloudflare/workers-types": "^4.20240729.0",
     "hono": "^4.6.17",
-    "partyserver": "^0.0.64"
+    "partyserver": "^0.0.65"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250303.0",
     "hono": "^4.7.4",
-    "partyserver": "^0.0.64"
+    "partyserver": "^0.0.65"
   }
 }

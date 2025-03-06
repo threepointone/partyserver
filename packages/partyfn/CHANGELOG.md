@@ -1,5 +1,11 @@
 # partyfn
 
+## 0.0.5
+
+### Patch Changes
+
+- [#181](https://github.com/threepointone/partyserver/pull/181) [`3e56cce`](https://github.com/threepointone/partyserver/commit/3e56cceca2c253d7b4368299e018b73af6deb42b) Thanks [@threepointone](https://github.com/threepointone)! - update dependencies
+
 ## 0.0.4
 
 ### Patch Changes

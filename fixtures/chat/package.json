@@ -1,6 +1,6 @@
 {
   "name": "@partyserver/fixture-chat",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.11",
-    "partyserver": "^0.0.64",
+    "partyserver": "^0.0.65",
     "partysocket": "^1.0.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
