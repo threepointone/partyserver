@@ -3,7 +3,6 @@
   "version": "0.0.26",
   "scripts": {
     "check:test": "(cd tests; vitest --no-watch)",
-    "dev": "bun run build -- --watch",
     "prebuild": "rm -rf dist",
     "build": "tsup src/client/index.ts src/react/index.ts src/server/index.ts --format esm --dts --external react",
     "postbuild": "prettier --write ./dist/*/**.d.ts"
@@ -46,7 +45,7 @@
   "license": "ISC",
   "description": "Integrate Cloudflare Calls into your PartyServer app",
   "dependencies": {
-    "rxjs": "^7.8.1",
+    "rxjs": "^7.8.2",
     "tiny-invariant": "^1.3.3"
   }
 }

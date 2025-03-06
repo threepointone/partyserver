@@ -12,7 +12,7 @@
   "scripts": {
     "check:test": "vitest -r src/tests --watch false",
     "test": "vitest -r src/tests",
-    "build": "bun scripts/build.ts"
+    "build": "tsx scripts/build.ts"
   },
   "files": [
     "dist",
@@ -37,13 +37,13 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "nanoid": "^5.0.9"
+    "nanoid": "^5.1.2"
   },
   "peerDependencies": {
     "@cloudflare/workers-types": "^4.20240729.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250204.0",
-    "ws": "^8.18.0"
+    "@cloudflare/workers-types": "^4.20250303.0",
+    "ws": "^8.18.1"
   }
 }

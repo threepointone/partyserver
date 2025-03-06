@@ -24,7 +24,7 @@
     }
   },
   "scripts": {
-    "build": "bun scripts/build.ts"
+    "build": "tsx scripts/build.ts"
   },
   "files": [
     "dist",
@@ -41,19 +41,19 @@
   "dependencies": {
     "lib0": "^0.2.99",
     "lodash.debounce": "^4.0.8",
-    "nanoid": "^5.0.9",
+    "nanoid": "^5.1.2",
     "y-protocols": "^1.0.6"
   },
   "peerDependencies": {
     "@cloudflare/workers-types": "^4.20240729.0",
-    "partyserver": "workspace:*",
+    "partyserver": "^0.0.64",
     "yjs": "^13.6.14"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250204.0",
+    "@cloudflare/workers-types": "^4.20250303.0",
     "@types/lodash.debounce": "^4.0.9",
-    "partyserver": "workspace:*",
-    "ws": "^8.18.0",
-    "yjs": "^13.6.23"
+    "partyserver": "^0.0.64",
+    "ws": "^8.18.1",
+    "yjs": "^13.6.24"
   }
 }

@@ -7,10 +7,10 @@
     "start": "vite dev"
   },
   "dependencies": {
-    "hono": "^4.7.0",
-    "partytracks": "workspace:*"
+    "hono": "^4.7.4",
+    "partytracks": "^0.0.26"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250204.0"
+    "@cloudflare/workers-types": "^4.20250303.0"
   }
 }
