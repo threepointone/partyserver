@@ -24,7 +24,7 @@
     }
   },
   "scripts": {
-    "build": "bun scripts/build.ts",
+    "build": "tsx scripts/build.ts",
     "check:test": "vitest -r src/server/tests --watch false"
   },
   "files": [
@@ -41,12 +41,12 @@
   "dependencies": {},
   "peerDependencies": {
     "@cloudflare/workers-types": "^4.20240729.0",
-    "partyserver": "workspace:*",
+    "partyserver": "^0.0.64",
     "partysocket": "^1.0.2"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250204.0",
-    "partyserver": "workspace:*",
+    "@cloudflare/workers-types": "^4.20250303.0",
+    "partyserver": "^0.0.64",
     "partysocket": "^1.0.3"
   }
 }

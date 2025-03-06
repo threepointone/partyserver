@@ -16,18 +16,18 @@ jobs:
         with:
           fetch-depth: 1
 
-      - uses: oven-sh/setup-bun@v1
+      - uses: actions/setup-node@v3
 
-      - run: bun install
+      - run: npm install
 
       - name: Modify package.json version
-        run: bun .github/version-script.ts
+        run: npx tsx .github/version-script.ts
 
       - name: Resolve workspace dependencies
-        run: bun .github/resolve-workspace-versions.ts
+        run: npx tsx .github/resolve-workspace-versions.ts
 
-      - run: npm run build # bun run build goes into an infinte loop
-      - run: npm run check # bun run check goes into an infinte loop
+      - run: npm run build
+      - run: npm run check
 
       - run: npm publish --tag beta
         env:

@@ -1,4 +1,4 @@
-import { Observable, timer } from "rxjs";
+import { type Observable, timer } from "rxjs";
 import { retry } from "rxjs/operators";
 
 interface BackoffConfig {
@@ -10,7 +10,7 @@ interface BackoffConfig {
 }
 
 const configDefaults: Required<BackoffConfig> = {
-  maxRetries: Infinity,
+  maxRetries: Number.POSITIVE_INFINITY,
   initialDelay: 250,
   maxDelay: 10000,
   backoffFactor: 2,
@@ -23,7 +23,7 @@ export function retryWithBackoff<T>(config: BackoffConfig = {}) {
     ...config
   };
   const {
-    maxRetries = Infinity,
+    maxRetries = Number.POSITIVE_INFINITY,
     initialDelay = 250,
     maxDelay = 10000,
     backoffFactor = 2,
@@ -38,7 +38,7 @@ export function retryWithBackoff<T>(config: BackoffConfig = {}) {
         delay: (_err, count) => {
           // Calculate delay with exponential backoff
           const delay = Math.min(
-            initialDelay * Math.pow(backoffFactor, count - 1),
+            initialDelay * backoffFactor ** (count - 1),
             maxDelay
           );
 

@@ -1,8 +1,9 @@
-import { $, Glob } from "bun";
+import { execSync } from "node:child_process";
+import fg from "fast-glob";
 
 const tsconfigs: string[] = [];
 
-for await (const file of new Glob("**/tsconfig.json").scan(".")) {
+for await (const file of await fg.glob("**/tsconfig.json")) {
   if (file.includes("node_modules")) continue;
   tsconfigs.push(file);
 }
@@ -10,7 +11,9 @@ for await (const file of new Glob("**/tsconfig.json").scan(".")) {
 console.log(`Typechecking ${tsconfigs.length} projects...`);
 
 const failed = (
-  await Promise.allSettled(tsconfigs.map((tsconfig) => $`tsc -p ${tsconfig}`))
+  await Promise.allSettled(
+    tsconfigs.map((tsconfig) => execSync(`tsc -p ${tsconfig}`))
+  )
 ).filter((r) => r.status === "rejected");
 
 if (failed.length > 0) {
