@@ -1,6 +1,6 @@
 {
   "name": "partysub",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "repository": {
     "type": "git",
     "url": "git://github.com/threepointone/partyserver.git"
@@ -41,12 +41,12 @@
   "dependencies": {},
   "peerDependencies": {
     "@cloudflare/workers-types": "^4.20240729.0",
-    "partyserver": "^0.0.64",
+    "partyserver": "^0.0.65",
     "partysocket": "^1.0.2"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250303.0",
-    "partyserver": "^0.0.64",
+    "partyserver": "^0.0.65",
     "partysocket": "^1.0.3"
   }
 }
