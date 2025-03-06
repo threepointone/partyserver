@@ -14,7 +14,7 @@
     }
   },
   "scripts": {
-    "build": "bun scripts/build.ts"
+    "build": "tsx scripts/build.ts"
   },
   "files": [
     "dist",
@@ -31,11 +31,11 @@
   "peerDependencies": {
     "@cloudflare/workers-types": "^4.20240729.0",
     "hono": "^4.6.17",
-    "partyserver": "workspace:*"
+    "partyserver": "^0.0.64"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250204.0",
-    "hono": "^4.7.0",
-    "partyserver": "workspace:*"
+    "@cloudflare/workers-types": "^4.20250303.0",
+    "hono": "^4.7.4",
+    "partyserver": "^0.0.64"
   }
 }

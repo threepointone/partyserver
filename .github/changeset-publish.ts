@@ -1,4 +1,4 @@
-import { $ } from "bun";
+import { execSync } from "node:child_process";
 
-await $`bun ./.github/resolve-workspace-versions.ts`;
-await $`bunx changeset publish`;
+execSync("npx tsx ./.github/resolve-workspace-versions.ts");
+execSync("npx changeset publish");

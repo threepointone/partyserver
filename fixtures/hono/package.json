@@ -7,15 +7,15 @@
     "start": "vite dev"
   },
   "dependencies": {
-    "hono": "^4.7.0",
-    "hono-party": "workspace:*",
-    "partyserver": "workspace:*",
+    "hono": "^4.7.4",
+    "hono-party": "^0.0.5",
+    "partyserver": "^0.0.64",
     "partysocket": "^1.0.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@types/react": "^19.0.8",
-    "@types/react-dom": "^19.0.3"
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4"
   }
 }

@@ -8,20 +8,20 @@
     "start": "remix dev -c \"wrangler dev\""
   },
   "dependencies": {
-    "@remix-run/cloudflare": "^2.15.3",
-    "@remix-run/css-bundle": "^2.15.3",
-    "@remix-run/react": "^2.15.3",
-    "@remix-run/server-runtime": "^2.15.3",
-    "isbot": "^5.1.22",
+    "@remix-run/cloudflare": "^2.16.0",
+    "@remix-run/css-bundle": "^2.16.0",
+    "@remix-run/react": "^2.16.0",
+    "@remix-run/server-runtime": "^2.16.0",
+    "isbot": "^5.1.23",
     "partysocket": "^1.0.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250204.0",
-    "@remix-run/dev": "^2.15.3",
-    "@types/react": "^19.0.8",
-    "@types/react-dom": "^19.0.3"
+    "@cloudflare/workers-types": "^4.20250303.0",
+    "@remix-run/dev": "^2.16.0",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4"
   },
   "engines": {
     "node": ">=20.0.0"

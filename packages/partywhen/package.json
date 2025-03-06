@@ -10,7 +10,7 @@
   "types": "dist/index.d.ts",
   "module": "dist/index.js",
   "scripts": {
-    "build": "bun scripts/build.ts",
+    "build": "tsx scripts/build.ts",
     "check:test": "(cd tests; vitest --no-watch)"
   },
   "files": [
@@ -28,6 +28,6 @@
   "description": "A library for scheduling and running tasks in Cloudflare Workers",
   "dependencies": {
     "cron-parser": "^4.9.0",
-    "partyserver": "workspace:*"
+    "partyserver": "^0.0.64"
   }
 }
