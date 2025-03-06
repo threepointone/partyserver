@@ -10,7 +10,10 @@ import fg from "fast-glob";
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 const packageJsons: Record<string, any> = {};
 
-for await (const file of await fg.glob("./packages/*/package.json")) {
+for await (const file of await fg.glob(
+  "./(packages|fixtures)/*/package.json"
+)) {
+  console.log(file);
   const packageJson = JSON.parse(fs.readFileSync(file, "utf8"));
   packageJsons[packageJson.name] = {
     file,
