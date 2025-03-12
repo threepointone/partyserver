@@ -557,7 +557,7 @@ export class PartyTracks {
     ) {
       return;
     }
-
+    transceiver.stop()
     this.closeTrackDispatcher.doBulkRequest({ mid }, (mids) =>
       this.taskScheduler.schedule(async () => {
         // create an offer
