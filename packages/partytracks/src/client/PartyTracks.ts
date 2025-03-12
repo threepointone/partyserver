@@ -338,8 +338,11 @@ export class PartyTracks {
 
   push(
     track$: Observable<MediaStreamTrack>,
-    encodings$: Observable<RTCRtpEncodingParameters[]> = of([])
+    options: {
+      sendEncodings?: RTCRtpEncodingParameters[];
+    } = {}
   ): Observable<TrackMetadata> {
+    const { sendEncodings } = options;
     // we want a single id for this connection, but we need to wait for
     // the first track to show up before we can proceed, so we
     const stableId$ = track$.pipe(
@@ -351,7 +354,8 @@ export class PartyTracks {
       withLatestFrom(track$),
       map(([[stableId, session], track]) => {
         const transceiver = session.peerConnection.addTransceiver(track, {
-          direction: "sendonly"
+          direction: "sendonly",
+          sendEncodings
         });
         logger.debug("🌱 creating transceiver!");
         this.#transceiver$.next(transceiver);
@@ -379,19 +383,8 @@ export class PartyTracks {
       )
     );
 
-    return combineLatest([
-      pushedTrackData$,
-      transceiver$,
-      track$,
-      encodings$
-    ]).pipe(
-      tap(([_trackData, { transceiver }, track, encodings]) => {
-        const parameters = transceiver.sender.getParameters();
-        encodings.forEach((encoding, i) => {
-          const existing = parameters.encodings[i];
-          parameters.encodings[i] = { ...existing, ...encoding };
-        });
-        transceiver.sender.setParameters(parameters);
+    return combineLatest([pushedTrackData$, transceiver$, track$]).pipe(
+      tap(([_trackData, { transceiver }, track]) => {
         if (transceiver.sender.transport !== null) {
           logger.debug("♻︎ replacing track");
           transceiver.sender.replaceTrack(track);
@@ -557,7 +550,7 @@ export class PartyTracks {
     ) {
       return;
     }
-    transceiver.stop()
+    transceiver.stop();
     this.closeTrackDispatcher.doBulkRequest({ mid }, (mids) =>
       this.taskScheduler.schedule(async () => {
         // create an offer
