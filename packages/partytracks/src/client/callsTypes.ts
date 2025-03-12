@@ -22,6 +22,9 @@ export type TrackMetadata = {
   trackName?: string;
   sessionId?: string;
   mid?: string | null;
+  simulcast?: {
+    preferredRid: string;
+  };
 };
 
 export type TracksRequest = {
