@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.28
+
+### Patch Changes
+
+- [#184](https://github.com/threepointone/partyserver/pull/184) [`3bcd1d9`](https://github.com/threepointone/partyserver/commit/3bcd1d9d9f9f1819ec2a292d8fd605319aa15c9b) Thanks [@third774](https://github.com/third774)! - Stop transceiver when closing track
+
 ## 0.0.27
 
 ### Patch Changes
