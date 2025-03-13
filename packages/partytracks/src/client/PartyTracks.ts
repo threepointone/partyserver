@@ -408,18 +408,24 @@ export class PartyTracks {
   #pullTrackInBulk(
     peerConnection: RTCPeerConnection,
     sessionId: string,
-    trackData: TrackMetadata
-  ): Observable<MediaStreamTrack> {
+    trackMetadata: TrackMetadata
+  ): Observable<{
+    track: MediaStreamTrack;
+    trackMetadata: TrackMetadata;
+  }> {
     let mid = "";
-    return new Observable<MediaStreamTrack>((subscribe) => {
+    return new Observable<{
+      track: MediaStreamTrack;
+      trackMetadata: TrackMetadata;
+    }>((subscribe) => {
       let pulledTrackPromise: Promise<unknown>;
       // we're doing this in a timeout so that we can bail if the observable
       // is unsubscribed from immediately after subscribing. This will prevent
       // React's StrictMode from causing extra API calls to push/pull tracks.
       const timeout = setTimeout(() => {
-        logger.debug("📥 pulling track ", trackData.trackName);
+        logger.debug("📥 pulling track ", trackMetadata.trackName);
         pulledTrackPromise = this.pullTrackDispatcher
-          .doBulkRequest(trackData, (tracks) =>
+          .doBulkRequest(trackMetadata, (tracks) =>
             this.taskScheduler.schedule(async () => {
               const newTrackResponse: TracksResponse =
                 await this.fetchWithRecordedHistory(
@@ -489,19 +495,19 @@ export class PartyTracks {
             })
           )
           .then(({ trackMap }) => {
-            const trackInfo = trackMap.get(trackData);
+            const trackInfo = trackMap.get(trackMetadata);
 
             if (trackInfo) {
               trackInfo.resolvedTrack
                 .then((track) => {
                   mid = trackInfo.mid;
-                  subscribe.next(track);
+                  subscribe.next({ track, trackMetadata });
                 })
                 .catch((err) => subscribe.error(err));
             } else {
               subscribe.error(new Error("Missing Track Info"));
             }
-            return trackData.trackName;
+            return trackMetadata.trackName;
           });
       });
 
@@ -517,8 +523,17 @@ export class PartyTracks {
     }).pipe(retryWithBackoff());
   }
 
-  pull(trackData$: Observable<TrackMetadata>): Observable<MediaStreamTrack> {
-    return combineLatest([
+  pull(
+    trackData$: Observable<TrackMetadata>,
+    options: {
+      simulcast?: {
+        preferredRid$: Observable<string>;
+      };
+    } = {}
+  ): Observable<MediaStreamTrack> {
+    const preferredRid$ = options.simulcast?.preferredRid$ ?? of("");
+
+    const pulledTrack$ = combineLatest([
       this.session$,
       trackData$.pipe(
         // only necessary when pulling a track that was pushed locally to avoid
@@ -526,13 +541,55 @@ export class PartyTracks {
         distinctUntilChanged((x, y) => JSON.stringify(x) === JSON.stringify(y))
       )
     ]).pipe(
-      switchMap(([{ peerConnection, sessionId }, trackData]) => {
-        return this.#pullTrackInBulk(peerConnection, sessionId, trackData);
-      }),
+      withLatestFrom(preferredRid$),
+      switchMap(
+        ([[{ peerConnection, sessionId }, trackData], preferredRid]) => {
+          return this.#pullTrackInBulk(
+            peerConnection,
+            sessionId,
+            preferredRid
+              ? { ...trackData, simulcast: { preferredRid } }
+              : trackData
+          );
+        }
+      ),
       shareReplay({
         refCount: true,
         bufferSize: 1
       })
+    );
+
+    return combineLatest([pulledTrack$, this.session$, preferredRid$]).pipe(
+      tap(
+        ([
+          { track, trackMetadata },
+          { peerConnection, sessionId },
+          preferredRid
+        ]) => {
+          logger.log(
+            `🔧 Updating preferredRid (${preferredRid}) for trackName ${trackMetadata.trackName}`
+          );
+          if (!preferredRid) return;
+          const transceiver = peerConnection
+            .getTransceivers()
+            .find((t) => t.receiver.track === track);
+          if (!transceiver) return;
+          const request = {
+            tracks: [
+              {
+                ...trackMetadata,
+                mid: transceiver.mid,
+                simulcast: { preferredRid }
+              }
+            ]
+          };
+          this.fetchWithRecordedHistory(
+            `${this.config.prefix}/sessions/${sessionId}/tracks/update?${this.#params}`,
+            { method: "PUT", body: JSON.stringify(request) }
+          );
+        }
+      ),
+      map(([{ track }]) => track)
     );
   }
 
