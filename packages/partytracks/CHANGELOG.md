@@ -1,5 +1,15 @@
 # partytracks
 
+## 0.0.29
+
+### Patch Changes
+
+- [#186](https://github.com/threepointone/partyserver/pull/186) [`bdfcdce`](https://github.com/threepointone/partyserver/commit/bdfcdce562f84a94ceb4bc03be133a82d8969839) Thanks [@third774](https://github.com/third774)! - - Enable sending simulcast via sendEncodings
+
+  - Change encodings$ when pushing a track to not be an observable (changing requires renegotiation anyways)
+
+- [#186](https://github.com/threepointone/partyserver/pull/186) [`e5045fd`](https://github.com/threepointone/partyserver/commit/e5045fd052bdb8369b6cfaf54d4c619d3ac32a81) Thanks [@third774](https://github.com/third774)! - Enable pulling simulcast tracks with preferredRid
+
 ## 0.0.28
 
 ### Patch Changes
