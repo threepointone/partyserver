@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.30
+
+### Patch Changes
+
+- [#188](https://github.com/threepointone/partyserver/pull/188) [`08286bd`](https://github.com/threepointone/partyserver/commit/08286bd96acd93a4e30683cd6d91bd77a98c2453) Thanks [@third774](https://github.com/third774)! - Reset useObservableAsValue state when observable changes
+
 ## 0.0.29
 
 ### Patch Changes
