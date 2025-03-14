@@ -1,5 +1,12 @@
 # @partyserver/fixture-partytracks
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`08286bd`](https://github.com/threepointone/partyserver/commit/08286bd96acd93a4e30683cd6d91bd77a98c2453)]:
+  - partytracks@0.0.30
+
 ## 0.0.3
 
 ### Patch Changes
