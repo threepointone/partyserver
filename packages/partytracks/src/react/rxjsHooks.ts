@@ -24,6 +24,9 @@ export function useObservableAsValue<T>(
   defaultValue?: T
 ): T {
   const [state, setState] = useState(defaultValue);
+  useEffect(() => {
+    setState(defaultValue);
+  }, [observable]);
   useOnEmit(observable, setState);
   // @ts-expect-error: not sure how to satisfy the type checker here, but this is safe.
   return state;
