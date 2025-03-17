@@ -607,9 +607,9 @@ export class PartyTracks {
     ) {
       return;
     }
-    transceiver.stop();
     this.closeTrackDispatcher.doBulkRequest({ mid }, (mids) =>
       this.taskScheduler.schedule(async () => {
+        transceiver.stop();
         // create an offer
         const offer = await peerConnection.createOffer();
         // And set the offer as the local description
