@@ -24,6 +24,7 @@ export function useObservableAsValue<T>(
   defaultValue?: T
 ): T {
   const [state, setState] = useState(defaultValue);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: who cares, the world is ending
   useEffect(() => {
     setState(defaultValue);
   }, [observable]);
