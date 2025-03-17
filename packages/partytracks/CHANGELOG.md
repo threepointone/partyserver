@@ -1,5 +1,15 @@
 # partytracks
 
+## 0.0.31
+
+### Patch Changes
+
+- [#193](https://github.com/threepointone/partyserver/pull/193) [`947e166`](https://github.com/threepointone/partyserver/commit/947e1666c7d8486a990ff5b3a94981a36aafba73) Thanks [@threepointone](https://github.com/threepointone)! - fix effect dependency
+
+- [#192](https://github.com/threepointone/partyserver/pull/192) [`2b190cb`](https://github.com/threepointone/partyserver/commit/2b190cb5b5ccfe0be88bc7905b85552d70a6825d) Thanks [@third774](https://github.com/third774)! - Bug fix: Stop transceiver right before renegotiating. This avoids a potential undesirable outcome where
+  a transceiver could be released and _potentially_ re-used in a subsequent negotiation before the track
+  is actually closed.
+
 ## 0.0.30
 
 ### Patch Changes
