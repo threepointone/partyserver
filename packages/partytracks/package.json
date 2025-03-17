@@ -5,6 +5,7 @@
     "check:test": "(cd tests; vitest --no-watch)",
     "prebuild": "rm -rf dist",
     "build": "tsup src/client/index.ts src/react/index.ts src/server/index.ts --format esm --dts --external react",
+    "dev": "npm run build -- --watch",
     "postbuild": "prettier --write ./dist/*/**.d.ts"
   },
   "exports": {
