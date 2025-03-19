@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.32
+
+### Patch Changes
+
+- [#195](https://github.com/threepointone/partyserver/pull/195) [`e895f0b`](https://github.com/threepointone/partyserver/commit/e895f0bd13a3bef35bffd4e2f4ba0b7ac451c60c) Thanks [@third774](https://github.com/third774)! - Update track cleanup/close logic to be more stable
+
 ## 0.0.31
 
 ### Patch Changes
