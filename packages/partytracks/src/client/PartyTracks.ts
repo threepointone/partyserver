@@ -1,6 +1,7 @@
 import {
   catchError,
   combineLatest,
+  concat,
   distinctUntilChanged,
   filter,
   from,
@@ -11,6 +12,7 @@ import {
   ReplaySubject,
   share,
   shareReplay,
+  skip,
   switchMap,
   take,
   tap,
@@ -337,10 +339,10 @@ export class PartyTracks {
   push(
     track$: Observable<MediaStreamTrack>,
     options: {
-      sendEncodings?: RTCRtpEncodingParameters[];
+      sendEncodings$?: Observable<RTCRtpEncodingParameters[]>;
     } = {}
   ): Observable<TrackMetadata> {
-    const { sendEncodings } = options;
+    const { sendEncodings$ = of([]) } = options;
     // we want a single id for this connection, but we need to wait for
     // the first track to show up before we can proceed, so we
     const stableId$ = track$.pipe(
@@ -350,7 +352,8 @@ export class PartyTracks {
 
     const transceiver$ = combineLatest([stableId$, this.session$]).pipe(
       withLatestFrom(track$),
-      map(([[stableId, session], track]) => {
+      withLatestFrom(sendEncodings$),
+      map(([[[stableId, session], track], sendEncodings]) => {
         const transceiver = session.peerConnection.addTransceiver(track, {
           direction: "sendonly",
           sendEncodings
@@ -381,11 +384,29 @@ export class PartyTracks {
       )
     );
 
-    return combineLatest([pushedTrackData$, transceiver$, track$]).pipe(
-      tap(([_trackData, { transceiver }, track]) => {
+    const subsequentSendEncodings$ = concat(
+      of(undefined),
+      sendEncodings$.pipe(skip(1))
+    );
+
+    return combineLatest([
+      pushedTrackData$,
+      transceiver$,
+      track$,
+      subsequentSendEncodings$
+    ]).pipe(
+      tap(([_trackData, { transceiver }, track, sendEncodings]) => {
         if (transceiver.sender.transport !== null) {
           logger.debug("♻︎ replacing track");
           transceiver.sender.replaceTrack(track);
+        }
+
+        if (sendEncodings) {
+          const parameters = transceiver.sender.getParameters();
+          transceiver.sender.setParameters({
+            ...parameters,
+            encodings: sendEncodings
+          });
         }
       }),
       map(([trackData]) => {
@@ -560,13 +581,23 @@ export class PartyTracks {
       })
     );
 
-    return combineLatest([pulledTrack$, this.session$, preferredRid$]).pipe(
+    const subsequentPreferredRid$ = concat(
+      of(undefined),
+      preferredRid$.pipe(skip(1))
+    );
+
+    return combineLatest([
+      pulledTrack$,
+      this.session$,
+      subsequentPreferredRid$
+    ]).pipe(
       tap(
         ([
           { track, trackMetadata },
           { peerConnection, sessionId },
           preferredRid
         ]) => {
+          if (!preferredRid) return;
           logger.log(
             `🔧 Updating preferredRid (${preferredRid}) for trackName ${trackMetadata.trackName}`
           );
