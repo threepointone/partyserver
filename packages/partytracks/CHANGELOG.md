@@ -1,5 +1,12 @@
 # partytracks
 
+## 0.0.33
+
+### Patch Changes
+
+- [#197](https://github.com/threepointone/partyserver/pull/197) [`4c164b6`](https://github.com/threepointone/partyserver/commit/4c164b6c69aa5fa0dfe70d935d2002e8b766d132) Thanks [@third774](https://github.com/third774)! - - Update sendEncodings to be an observable.
+  - Only update preferridRid after it has changed.
+
 ## 0.0.32
 
 ### Patch Changes
