@@ -1,5 +1,13 @@
 # partyflare
 
+## 0.0.66
+
+### Patch Changes
+
+- [#199](https://github.com/threepointone/partyserver/pull/199) [`c41057b`](https://github.com/threepointone/partyserver/commit/c41057ba5c738496bc7e2a4968357f1f5b65707b) Thanks [@threepointone](https://github.com/threepointone)! - convert UPPERCASE bindings to lowercase as expected
+
+- [#199](https://github.com/threepointone/partyserver/pull/199) [`b3701a5`](https://github.com/threepointone/partyserver/commit/b3701a5f5eee278c96587d9e29e42992806733ac) Thanks [@threepointone](https://github.com/threepointone)! - allow for sub/path/like prefixes on the server
+
 ## 0.0.65
 
 ### Patch Changes
