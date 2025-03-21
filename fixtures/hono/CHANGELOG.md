@@ -1,5 +1,13 @@
 # @partyserver/fixture-hono
 
+## 0.0.2
+
+### Patch Changes
+
+- Updated dependencies [[`c41057b`](https://github.com/threepointone/partyserver/commit/c41057ba5c738496bc7e2a4968357f1f5b65707b), [`b3701a5`](https://github.com/threepointone/partyserver/commit/b3701a5f5eee278c96587d9e29e42992806733ac)]:
+  - partyserver@0.0.66
+  - hono-party@0.0.7
+
 ## 0.0.1
 
 ### Patch Changes
