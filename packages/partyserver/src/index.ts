@@ -130,16 +130,23 @@ export async function routePartykitRequest<
   >;
 
   const prefix = options?.prefix || "parties";
+  const prefixParts = prefix.split("/");
 
   const url = new URL(req.url);
+  const parts = url.pathname.split("/").filter(Boolean); // Remove empty strings
 
-  const parts = url.pathname.split("/");
-  if (parts[1] === prefix && parts.length < 4) {
+  // Check if the URL starts with the prefix
+  const prefixMatches = prefixParts.every(
+    (part, index) => parts[index] === part
+  );
+  if (!prefixMatches || parts.length < prefixParts.length + 2) {
     return null;
   }
-  const name = parts[3];
-  const namespace = parts[2];
-  if (parts[1] === prefix && name && namespace) {
+
+  const namespace = parts[prefixParts.length];
+  const name = parts[prefixParts.length + 1];
+
+  if (name && namespace) {
     if (!map[namespace]) {
       if (namespace === "main") {
         console.warn(
