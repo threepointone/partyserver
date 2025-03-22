@@ -1,5 +1,14 @@
 # partysub
 
+## 0.0.23
+
+### Patch Changes
+
+- [#201](https://github.com/threepointone/partyserver/pull/201) [`e3a7c23`](https://github.com/threepointone/partyserver/commit/e3a7c231ef33e471b0d476e46f09787ece3b05a0) Thanks [@threepointone](https://github.com/threepointone)! - move partysocket into the partyserver repo
+
+- Updated dependencies [[`e3a7c23`](https://github.com/threepointone/partyserver/commit/e3a7c231ef33e471b0d476e46f09787ece3b05a0)]:
+  - partysocket@1.1.1
+
 ## 0.0.22
 
 ### Patch Changes
