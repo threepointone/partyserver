@@ -6,6 +6,7 @@ try {
 
   for (const path of [
     "./packages/partyserver/package.json",
+    "./packages/partysocket/package.json",
     "./packages/y-partyserver/package.json",
     "./packages/partysub/package.json",
     "./packages/partyfn/package.json",

@@ -11,7 +11,7 @@
     "@types/react-dom": "^19.0.4",
     "nanoid": "^5.1.2",
     "partyserver": "^0.0.66",
-    "partysocket": "^1.0.3",
+    "partysocket": "^1.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "valibot": "^1.0.0-rc.3"
