@@ -13,7 +13,7 @@
     "@remix-run/react": "^2.16.0",
     "@remix-run/server-runtime": "^2.16.0",
     "isbot": "^5.1.23",
-    "partysocket": "^1.1.0",
+    "partysocket": "^1.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
