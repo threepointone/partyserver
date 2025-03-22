@@ -1,0 +1,1 @@
+import "event-target-polyfill";

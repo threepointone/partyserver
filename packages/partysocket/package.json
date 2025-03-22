@@ -1,0 +1,70 @@
+{
+  "name": "partysocket",
+  "version": "1.1.0",
+  "type": "module",
+  "description": "A better WebSocket that Just Works™",
+  "homepage": "https://docs.partykit.io/reference/partysocket-api",
+  "bugs": "https://github.com/threepointone/partyserver/issues",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./ws": {
+      "types": "./dist/ws.d.ts",
+      "import": "./dist/ws.mjs",
+      "require": "./dist/ws.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.mjs",
+      "require": "./dist/react.js"
+    },
+    "./use-ws": {
+      "types": "./dist/use-ws.d.ts",
+      "import": "./dist/use-ws.mjs",
+      "require": "./dist/use-ws.js"
+    },
+    "./event-target-polyfill": {
+      "types": "./dist/event-target-polyfill.d.ts",
+      "import": "./dist/event-target-polyfill.mjs",
+      "require": "./dist/event-target-polyfill.js"
+    }
+  },
+  "scripts": {
+    "build": "npx tsx scripts/build.ts",
+    "check:test": "vitest --no-watch"
+  },
+  "files": [
+    "dist",
+    "*.d.ts",
+    "event-target-polyfill.*"
+  ],
+  "keywords": [
+    "websocket",
+    "client",
+    "reconnecting",
+    "reconnection",
+    "reconnect",
+    "forever",
+    "persistent",
+    "forever",
+    "automatic"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/threepointone/partyserver.git",
+    "directory": "packages/partysocket"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "event-target-polyfill": "^0.0.4"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.18.0"
+  }
+}

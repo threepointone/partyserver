@@ -10,7 +10,7 @@
     "hono": "^4.7.4",
     "hono-party": "^0.0.7",
     "partyserver": "^0.0.66",
-    "partysocket": "^1.0.3",
+    "partysocket": "^1.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
