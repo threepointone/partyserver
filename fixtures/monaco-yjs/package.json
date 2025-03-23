@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "monaco-editor": "^0.52.2",
-    "partysocket": "^1.1.0",
+    "partysocket": "^1.1.2",
     "y-monaco": "^0.1.6"
   }
 }

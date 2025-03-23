@@ -1,0 +1,5 @@
+/*.d.ts
+/*.d.mts
+/*.d.ts.map
+
+/event-target-polyfill.*
