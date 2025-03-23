@@ -1,5 +1,11 @@
 # partysocket
 
+## 1.1.3
+
+### Patch Changes
+
+- [#203](https://github.com/threepointone/partyserver/pull/203) [`c7646a1`](https://github.com/threepointone/partyserver/commit/c7646a11d0fc83035f83f786d9125271a5b51686) Thanks [@threepointone](https://github.com/threepointone)! - fix partysocket exports
+
 ## 1.1.1
 
 ### Patch Changes

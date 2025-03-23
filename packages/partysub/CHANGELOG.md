@@ -1,5 +1,14 @@
 # partysub
 
+## 0.0.24
+
+### Patch Changes
+
+- [#203](https://github.com/threepointone/partyserver/pull/203) [`c7646a1`](https://github.com/threepointone/partyserver/commit/c7646a11d0fc83035f83f786d9125271a5b51686) Thanks [@threepointone](https://github.com/threepointone)! - fix partysocket exports
+
+- Updated dependencies [[`c7646a1`](https://github.com/threepointone/partyserver/commit/c7646a11d0fc83035f83f786d9125271a5b51686)]:
+  - partysocket@1.1.3
+
 ## 0.0.23
 
 ### Patch Changes
