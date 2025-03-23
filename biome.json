@@ -12,6 +12,8 @@
       "**/dist/**",
       "**/coverage/**",
       "**/*.d.ts",
+      "**/*.d.mts",
+      "./packages/partysocket/event-target-polyfill.*",
       "tsconfig.base.json",
       "**/.wrangler/**",
       "lexical.css"

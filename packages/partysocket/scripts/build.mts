@@ -17,7 +17,10 @@ await build({
   dts: true
 });
 
-// then run prettier on the generated .d.ts files
+// then run prettier on the generated files
 execSync("prettier --write ./dist/**/*.d.ts");
+execSync("prettier --write ./dist/**/*.d.mts");
+execSync("prettier --write ./dist/**/*.js");
+execSync("prettier --write ./dist/**/*.mjs");
 
 process.exit(0);

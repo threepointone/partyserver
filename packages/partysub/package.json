@@ -42,11 +42,11 @@
   "peerDependencies": {
     "@cloudflare/workers-types": "^4.20240729.0",
     "partyserver": "^0.0.66",
-    "partysocket": "^1.1.1"
+    "partysocket": "^1.1.2"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250303.0",
     "partyserver": "^0.0.66",
-    "partysocket": "^1.1.1"
+    "partysocket": "^1.1.2"
   }
 }

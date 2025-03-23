@@ -11,7 +11,7 @@
     "@types/react-dom": "^19.0.4",
     "cobe": "^0.6.3",
     "partyserver": "^0.0.66",
-    "partysocket": "^1.1.0",
+    "partysocket": "^1.1.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

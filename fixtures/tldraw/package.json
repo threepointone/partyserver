@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "partyserver": "^0.0.66",
-    "partysocket": "^1.1.0",
+    "partysocket": "^1.1.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tldraw": "^3.9.0"
