@@ -153,7 +153,6 @@ export class Agent<
 
       this.rpc[channel as string] ||= new RPCClient(
         channel as string,
-        // @ts-ignore
         this.ws as unknown as PSWebSocket
       );
 
