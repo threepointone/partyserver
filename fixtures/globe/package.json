@@ -7,7 +7,7 @@
     "start": "vite dev"
   },
   "dependencies": {
-    "@types/react": "^19.0.10",
+    "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",
     "cobe": "^0.6.3",
     "partyserver": "^0.0.66",
@@ -16,6 +16,6 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250303.0"
+    "@cloudflare/workers-types": "^4.20250327.0"
   }
 }

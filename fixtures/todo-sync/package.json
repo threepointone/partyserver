@@ -7,16 +7,16 @@
     "start": "vite dev"
   },
   "dependencies": {
-    "@types/react": "^19.0.10",
+    "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",
-    "nanoid": "^5.1.2",
+    "nanoid": "^5.1.5",
     "partyserver": "^0.0.66",
     "partysocket": "^1.1.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "valibot": "^1.0.0-rc.3"
+    "valibot": "^1.0.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250303.0"
+    "@cloudflare/workers-types": "^4.20250327.0"
   }
 }
