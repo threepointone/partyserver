@@ -297,7 +297,7 @@ export class PartyTracks {
                 await peerConnection.setRemoteDescription(
                   new RTCSessionDescription(response.sessionDescription)
                 );
-                await peerConnectionIsConnected(peerConnection);
+                await signalingStateIsStable(peerConnection);
               }
 
               return {
@@ -505,7 +505,7 @@ export class PartyTracks {
                 if (renegotiationResponse.errorCode) {
                   throw new Error(renegotiationResponse.errorDescription);
                 } else {
-                  await peerConnectionIsConnected(peerConnection);
+                  await signalingStateIsStable(peerConnection);
                 }
               }
 
@@ -688,30 +688,30 @@ async function resolveTransceiver(
   });
 }
 
-async function peerConnectionIsConnected(peerConnection: RTCPeerConnection) {
-  if (peerConnection.connectionState !== "connected") {
+async function signalingStateIsStable(peerConnection: RTCPeerConnection) {
+  if (peerConnection.signalingState !== "stable") {
     const connected = new Promise((res, rej) => {
       // timeout after 5s
       const timeout = setTimeout(() => {
         peerConnection.removeEventListener(
-          "connectionstatechange",
-          connectionStateChangeHandler
+          "signalingstatechange",
+          signalingStateChangeHandler
         );
-        rej();
+        rej(new Error("Signaling State did not stabilize within 5 seconds"));
       }, 5000);
-      const connectionStateChangeHandler = () => {
-        if (peerConnection.connectionState === "connected") {
+      const signalingStateChangeHandler = () => {
+        if (peerConnection.signalingState === "stable") {
           peerConnection.removeEventListener(
-            "connectionstatechange",
-            connectionStateChangeHandler
+            "signalingstatechange",
+            signalingStateChangeHandler
           );
           clearTimeout(timeout);
           res(undefined);
         }
       };
       peerConnection.addEventListener(
-        "connectionstatechange",
-        connectionStateChangeHandler
+        "signalingstatechange",
+        signalingStateChangeHandler
       );
     });
 
