@@ -1,5 +1,12 @@
 # @partyserver/fixture-todo-sync
 
+## 0.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`b1baf6c`](https://github.com/threepointone/partyserver/commit/b1baf6cdda4c7684a4663a1281070ab1762670fd)]:
+  - partyserver@0.0.67
+
 ## 0.0.2
 
 ### Patch Changes

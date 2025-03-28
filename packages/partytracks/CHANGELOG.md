@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.34
+
+### Patch Changes
+
+- [#207](https://github.com/threepointone/partyserver/pull/207) [`cc542ea`](https://github.com/threepointone/partyserver/commit/cc542ea2a1f23523b34beea48a70a9c1b17a9d12) Thanks [@third774](https://github.com/third774)! - Wait for signalingState instead of connectionState
+
 ## 0.0.33
 
 ### Patch Changes

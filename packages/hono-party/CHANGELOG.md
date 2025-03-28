@@ -1,5 +1,14 @@
 # hono-party
 
+## 0.0.8
+
+### Patch Changes
+
+- [#205](https://github.com/threepointone/partyserver/pull/205) [`b1baf6c`](https://github.com/threepointone/partyserver/commit/b1baf6cdda4c7684a4663a1281070ab1762670fd) Thanks [@threepointone](https://github.com/threepointone)! - update deps
+
+- Updated dependencies [[`b1baf6c`](https://github.com/threepointone/partyserver/commit/b1baf6cdda4c7684a4663a1281070ab1762670fd)]:
+  - partyserver@0.0.67
+
 ## 0.0.7
 
 ### Patch Changes
