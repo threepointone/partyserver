@@ -34,8 +34,8 @@
     "partyserver": "^0.0.66"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250303.0",
-    "hono": "^4.7.4",
+    "@cloudflare/workers-types": "^4.20250327.0",
+    "hono": "^4.7.5",
     "partyserver": "^0.0.66"
   }
 }

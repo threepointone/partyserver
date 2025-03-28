@@ -7,7 +7,7 @@
     "start": "vite dev"
   },
   "dependencies": {
-    "hono": "^4.7.4",
+    "hono": "^4.7.5",
     "hono-party": "^0.0.7",
     "partyserver": "^0.0.66",
     "partysocket": "^1.1.2",
@@ -15,7 +15,7 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@types/react": "^19.0.10",
+    "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4"
   }
 }
