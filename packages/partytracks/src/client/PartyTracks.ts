@@ -597,11 +597,9 @@ export class PartyTracks {
           { peerConnection, sessionId },
           preferredRid
         ]) => {
-          if (!preferredRid) return;
           logger.log(
             `🔧 Updating preferredRid (${preferredRid}) for trackName ${trackMetadata.trackName}`
           );
-          if (!preferredRid) return;
           const transceiver = peerConnection
             .getTransceivers()
             .find((t) => t.receiver.track === track);
