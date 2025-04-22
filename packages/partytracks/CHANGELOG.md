@@ -1,5 +1,13 @@
 # partytracks
 
+## 0.0.34
+
+### Patch Changes
+
+- [#207](https://github.com/threepointone/partyserver/pull/207) [`cc542ea`](https://github.com/threepointone/partyserver/commit/cc542ea2a1f23523b34beea48a70a9c1b17a9d12) Thanks [@third774](https://github.com/third774)! - Wait for signalingState instead of connectionState
+
+- [#211](https://github.com/threepointone/partyserver/pull/211) [`c82b772`](https://github.com/threepointone/partyserver/commit/c82b772f68507967402f8e5d8cfcd235262b5617) Thanks [@third774](https://github.com/third774)! - Allow preferredRid to be empty string
+
 ## 0.0.33
 
 ### Patch Changes
