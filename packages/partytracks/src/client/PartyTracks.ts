@@ -553,7 +553,7 @@ export class PartyTracks {
       };
     } = {}
   ): Observable<MediaStreamTrack> {
-    const preferredRid$ = options.simulcast?.preferredRid$ ?? of();
+    const preferredRid$ = options.simulcast?.preferredRid$ ?? of(undefined);
 
     const pulledTrack$ = combineLatest([
       this.session$,
