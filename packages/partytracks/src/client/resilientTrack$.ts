@@ -9,6 +9,7 @@ import {
   merge,
   Observable,
   shareReplay,
+  delay,
   switchMap
 } from "rxjs";
 
@@ -33,6 +34,11 @@ export const devices$ = defer(() =>
       debounceTime(1500),
       switchMap(() => navigator.mediaDevices.enumerateDevices())
     )
+  ).pipe(
+    shareReplay({
+      refCount: true,
+      bufferSize: 1
+    })
   )
 );
 
@@ -63,17 +69,7 @@ export const resilientTrack$ = ({
           ...deviceList.map(
             (device) =>
               new Observable<MediaStreamTrack>((subscriber) => {
-                const cleanupRef = { current: () => {} };
-                acquireTrack(
-                  subscriber,
-                  device,
-                  constraints,
-                  cleanupRef,
-                  onDeviceFailure
-                );
-                return () => {
-                  cleanupRef.current();
-                };
+                acquireTrack(subscriber, device, constraints, onDeviceFailure);
               })
           ),
           new Observable<MediaStreamTrack>((sub) =>
@@ -81,6 +77,8 @@ export const resilientTrack$ = ({
           )
         )
       ),
+      // delay(0) for React Strict Mode
+      delay(0),
       shareReplay({
         refCount: true,
         bufferSize: 1
@@ -91,7 +89,6 @@ function acquireTrack(
   subscriber: Subscriber<MediaStreamTrack>,
   device: MediaDeviceInfo,
   constraints: MediaTrackConstraints,
-  cleanupRef: { current: () => void },
   onDeviceFailure: (device: MediaDeviceInfo) => void
 ) {
   const { deviceId, groupId, label } = device;
@@ -119,16 +116,10 @@ function acquireTrack(
           if (await trackIsHealthy(track)) return;
           logger.log("Reacquiring track");
           cleanup();
-          acquireTrack(
-            subscriber,
-            device,
-            constraints,
-            cleanupRef,
-            onDeviceFailure
-          );
+          acquireTrack(subscriber, device, constraints, onDeviceFailure);
         };
         document.addEventListener("visibilitychange", onVisibleHandler);
-        cleanupRef.current = cleanup;
+        subscriber.add(cleanup);
         subscriber.next(track);
       } else {
         logger.log("☠️ track is not healthy, stopping");

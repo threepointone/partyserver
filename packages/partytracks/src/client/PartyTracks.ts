@@ -1,6 +1,7 @@
 import {
   catchError,
   combineLatest,
+  delay,
   concat,
   distinctUntilChanged,
   filter,
@@ -137,6 +138,8 @@ export class PartyTracks {
         peerConnection.close();
       };
     }).pipe(
+      // delay(0) for React StrictMode
+      delay(0),
       shareReplay({
         bufferSize: 1,
         refCount: true
@@ -260,79 +263,69 @@ export class PartyTracks {
     trackName: string
   ): Observable<TrackMetadata> {
     return new Observable<TrackMetadata>((subscriber) => {
-      let pushedTrackPromise: Promise<unknown>;
-      // we're doing this in a timeout so that we can bail if the observable
-      // is unsubscribed from immediately after subscribing. This will prevent
-      // React's StrictMode from causing extra API calls to push/pull tracks.
-      const timeout = setTimeout(() => {
-        logger.debug("📤 pushing track ", trackName);
-        pushedTrackPromise = this.pushTrackDispatcher
-          .doBulkRequest({ trackName, transceiver }, (tracks) =>
-            this.taskScheduler.schedule(async () => {
-              // create an offer
-              const offer = await peerConnection.createOffer();
-              // And set the offer as the local description
-              await peerConnection.setLocalDescription(offer);
+      logger.debug("📤 pushing track ", trackName);
+      this.pushTrackDispatcher
+        .doBulkRequest({ trackName, transceiver }, (tracks) =>
+          this.taskScheduler.schedule(async () => {
+            // create an offer
+            const offer = await peerConnection.createOffer();
+            // And set the offer as the local description
+            await peerConnection.setLocalDescription(offer);
 
-              const requestBody = {
-                sessionDescription: {
-                  sdp: offer.sdp,
-                  type: "offer"
-                },
-                tracks: tracks.map(({ trackName, transceiver }) => ({
-                  trackName,
-                  mid: transceiver.mid,
-                  location: "local"
-                }))
-              };
-              const response = await this.fetchWithRecordedHistory(
-                `${this.config.prefix}/sessions/${sessionId}/tracks/new?${this.#params}`,
-                {
-                  method: "POST",
-                  body: JSON.stringify(requestBody)
-                }
-              ).then((res) => res.json() as Promise<TracksResponse>);
-              invariant(response.tracks !== undefined);
-              if (!response.errorCode) {
-                await peerConnection.setRemoteDescription(
-                  new RTCSessionDescription(response.sessionDescription)
-                );
-                await signalingStateIsStable(peerConnection);
+            const requestBody = {
+              sessionDescription: {
+                sdp: offer.sdp,
+                type: "offer"
+              },
+              tracks: tracks.map(({ trackName, transceiver }) => ({
+                trackName,
+                mid: transceiver.mid,
+                location: "local"
+              }))
+            };
+            const response = await this.fetchWithRecordedHistory(
+              `${this.config.prefix}/sessions/${sessionId}/tracks/new?${this.#params}`,
+              {
+                method: "POST",
+                body: JSON.stringify(requestBody)
               }
-
-              return {
-                tracks: response.tracks
-              };
-            })
-          )
-          .then(({ tracks }) => {
-            const trackData = tracks.find((t) => t.mid === transceiver.mid);
-            if (trackData) {
-              subscriber.next({
-                ...trackData,
-                sessionId,
-                location: "remote"
-              });
-              subscriber.add(() => {
-                if (transceiver.mid) {
-                  logger.debug("🔚 Closing pushed track ", trackName);
-                  this.#closeTrackInBulk(
-                    peerConnection,
-                    transceiver.mid,
-                    sessionId
-                  );
-                }
-              });
-            } else {
-              subscriber.error(new Error("Missing TrackData"));
+            ).then((res) => res.json() as Promise<TracksResponse>);
+            invariant(response.tracks !== undefined);
+            if (!response.errorCode) {
+              await peerConnection.setRemoteDescription(
+                new RTCSessionDescription(response.sessionDescription)
+              );
+              await signalingStateIsStable(peerConnection);
             }
-          })
-          .catch((err) => subscriber.error(err));
-      });
 
-      return () => {
-        clearTimeout(timeout);
-      };
+            return {
+              tracks: response.tracks
+            };
+          })
+        )
+        .then(({ tracks }) => {
+          const trackData = tracks.find((t) => t.mid === transceiver.mid);
+          if (trackData) {
+            subscriber.next({
+              ...trackData,
+              sessionId,
+              location: "remote"
+            });
+            subscriber.add(() => {
+              if (transceiver.mid) {
+                logger.debug("🔚 Closing pushed track ", trackName);
+                this.#closeTrackInBulk(
+                  peerConnection,
+                  transceiver.mid,
+                  sessionId
+                );
+              }
+            });
+          } else {
+            subscriber.error(new Error("Missing TrackData"));
+          }
+        })
+        .catch((err) => subscriber.error(err));
     }).pipe(retryWithBackoff());
   }
 
@@ -436,112 +429,101 @@ export class PartyTracks {
       track: MediaStreamTrack;
       trackMetadata: TrackMetadata;
     }>((subscriber) => {
-      let pulledTrackPromise: Promise<unknown>;
-      // we're doing this in a timeout so that we can bail if the observable
-      // is unsubscribed from immediately after subscribing. This will prevent
-      // React's StrictMode from causing extra API calls to push/pull tracks.
-      const timeout = setTimeout(() => {
-        logger.debug("📥 pulling track ", trackMetadata.trackName);
-        pulledTrackPromise = this.pullTrackDispatcher
-          .doBulkRequest(trackMetadata, (tracks) =>
-            this.taskScheduler.schedule(async () => {
-              const newTrackResponse: TracksResponse =
-                await this.fetchWithRecordedHistory(
-                  `${this.config.prefix}/sessions/${sessionId}/tracks/new?${this.#params}`,
-                  {
-                    method: "POST",
-                    body: JSON.stringify({
-                      tracks
-                    })
-                  }
-                ).then((res) => res.json() as Promise<TracksResponse>);
-              if (newTrackResponse.errorCode) {
-                throw new Error(newTrackResponse.errorDescription);
-              }
-              invariant(newTrackResponse.tracks);
-              const trackMap = tracks.reduce((acc, track) => {
-                const pulledTrackData = newTrackResponse.tracks?.find(
-                  (t) =>
-                    t.trackName === track.trackName &&
-                    t.sessionId === track.sessionId
-                );
-
-                if (pulledTrackData?.mid) {
-                  acc.set(track, {
-                    mid: pulledTrackData.mid,
-                    resolvedTrack: resolveTransceiver(
-                      peerConnection,
-                      (t) => t.mid === pulledTrackData.mid
-                    ).then((transceiver) => {
-                      this.#transceiver$.next(transceiver);
-                      return transceiver.receiver.track;
-                    })
-                  });
+      logger.debug("📥 pulling track ", trackMetadata.trackName);
+      this.pullTrackDispatcher
+        .doBulkRequest(trackMetadata, (tracks) =>
+          this.taskScheduler.schedule(async () => {
+            const newTrackResponse: TracksResponse =
+              await this.fetchWithRecordedHistory(
+                `${this.config.prefix}/sessions/${sessionId}/tracks/new?${this.#params}`,
+                {
+                  method: "POST",
+                  body: JSON.stringify({
+                    tracks
+                  })
                 }
-
-                return acc;
-              }, new Map<TrackMetadata, { resolvedTrack: Promise<MediaStreamTrack>; mid: string }>());
-
-              if (newTrackResponse.requiresImmediateRenegotiation) {
-                await peerConnection.setRemoteDescription(
-                  new RTCSessionDescription(newTrackResponse.sessionDescription)
-                );
-                const answer = await peerConnection.createAnswer();
-                await peerConnection.setLocalDescription(answer);
-
-                const renegotiationResponse =
-                  await this.fetchWithRecordedHistory(
-                    `${this.config.prefix}/sessions/${sessionId}/renegotiate?${this.#params}`,
-                    {
-                      method: "PUT",
-                      body: JSON.stringify({
-                        sessionDescription: {
-                          type: "answer",
-                          sdp: peerConnection.currentLocalDescription?.sdp
-                        }
-                      })
-                    }
-                  ).then((res) => res.json() as Promise<RenegotiationResponse>);
-                if (renegotiationResponse.errorCode) {
-                  throw new Error(renegotiationResponse.errorDescription);
-                } else {
-                  await signalingStateIsStable(peerConnection);
-                }
-              }
-
-              return { trackMap };
-            })
-          )
-          .then(({ trackMap }) => {
-            const trackInfo = trackMap.get(trackMetadata);
-
-            if (trackInfo) {
-              trackInfo.resolvedTrack
-                .then((track) => {
-                  subscriber.next({ track, trackMetadata });
-                  subscriber.add(() => {
-                    logger.debug(
-                      "🔚 Closing pulled track ",
-                      trackMetadata.trackName
-                    );
-                    this.#closeTrackInBulk(
-                      peerConnection,
-                      trackInfo.mid,
-                      sessionId
-                    );
-                  });
-                })
-                .catch((err) => subscriber.error(err));
-            } else {
-              subscriber.error(new Error("Missing Track Info"));
+              ).then((res) => res.json() as Promise<TracksResponse>);
+            if (newTrackResponse.errorCode) {
+              throw new Error(newTrackResponse.errorDescription);
             }
-            return trackMetadata.trackName;
-          });
-      });
+            invariant(newTrackResponse.tracks);
+            const trackMap = tracks.reduce((acc, track) => {
+              const pulledTrackData = newTrackResponse.tracks?.find(
+                (t) =>
+                  t.trackName === track.trackName &&
+                  t.sessionId === track.sessionId
+              );
 
-      return () => {
-        clearTimeout(timeout);
-      };
+              if (pulledTrackData?.mid) {
+                acc.set(track, {
+                  mid: pulledTrackData.mid,
+                  resolvedTrack: resolveTransceiver(
+                    peerConnection,
+                    (t) => t.mid === pulledTrackData.mid
+                  ).then((transceiver) => {
+                    this.#transceiver$.next(transceiver);
+                    return transceiver.receiver.track;
+                  })
+                });
+              }
+
+              return acc;
+            }, new Map<TrackMetadata, { resolvedTrack: Promise<MediaStreamTrack>; mid: string }>());
+
+            if (newTrackResponse.requiresImmediateRenegotiation) {
+              await peerConnection.setRemoteDescription(
+                new RTCSessionDescription(newTrackResponse.sessionDescription)
+              );
+              const answer = await peerConnection.createAnswer();
+              await peerConnection.setLocalDescription(answer);
+
+              const renegotiationResponse = await this.fetchWithRecordedHistory(
+                `${this.config.prefix}/sessions/${sessionId}/renegotiate?${this.#params}`,
+                {
+                  method: "PUT",
+                  body: JSON.stringify({
+                    sessionDescription: {
+                      type: "answer",
+                      sdp: peerConnection.currentLocalDescription?.sdp
+                    }
+                  })
+                }
+              ).then((res) => res.json() as Promise<RenegotiationResponse>);
+              if (renegotiationResponse.errorCode) {
+                throw new Error(renegotiationResponse.errorDescription);
+              } else {
+                await signalingStateIsStable(peerConnection);
+              }
+            }
+
+            return { trackMap };
+          })
+        )
+        .then(({ trackMap }) => {
+          const trackInfo = trackMap.get(trackMetadata);
+
+          if (trackInfo) {
+            trackInfo.resolvedTrack
+              .then((track) => {
+                subscriber.next({ track, trackMetadata });
+                subscriber.add(() => {
+                  logger.debug(
+                    "🔚 Closing pulled track ",
+                    trackMetadata.trackName
+                  );
+                  this.#closeTrackInBulk(
+                    peerConnection,
+                    trackInfo.mid,
+                    sessionId
+                  );
+                });
+              })
+              .catch((err) => subscriber.error(err));
+          } else {
+            subscriber.error(new Error("Missing Track Info"));
+          }
+          return trackMetadata.trackName;
+        });
     }).pipe(retryWithBackoff());
   }
 
