@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.36
+
+### Patch Changes
+
+- [#214](https://github.com/threepointone/partyserver/pull/214) [`2e6f3ca`](https://github.com/threepointone/partyserver/commit/2e6f3ca2b94ba01a73a96132f01af0bfdf04d91d) Thanks [@third774](https://github.com/third774)! - Explicitly emit undefined
+
 ## 0.0.35
 
 ### Patch Changes
