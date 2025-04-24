@@ -4,11 +4,13 @@
   "version": "0.0.12",
   "type": "module",
   "scripts": {
-    "start": "vite dev"
+    "start": "vite dev",
+    "dev": "vite dev"
   },
   "dependencies": {
     "hono": "^4.7.5",
-    "partytracks": "^0.0.38"
+    "partytracks": "^0.0.38",
+    "rxjs": "^7.8.2"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250327.0"
