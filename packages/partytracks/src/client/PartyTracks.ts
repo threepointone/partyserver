@@ -549,11 +549,11 @@ export class PartyTracks {
     trackData$: Observable<TrackMetadata>,
     options: {
       simulcast?: {
-        preferredRid$: Observable<string>;
+        preferredRid$: Observable<string | undefined>;
       };
     } = {}
   ): Observable<MediaStreamTrack> {
-    const preferredRid$ = options.simulcast?.preferredRid$ ?? of("");
+    const preferredRid$ = options.simulcast?.preferredRid$ ?? of();
 
     const pulledTrack$ = combineLatest([
       this.session$,
@@ -597,6 +597,7 @@ export class PartyTracks {
           { peerConnection, sessionId },
           preferredRid
         ]) => {
+          if (preferredRid === undefined) return;
           logger.log(
             `🔧 Updating preferredRid (${preferredRid}) for trackName ${trackMetadata.trackName}`
           );
