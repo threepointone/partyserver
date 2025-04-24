@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.35
+
+### Patch Changes
+
+- [#212](https://github.com/threepointone/partyserver/pull/212) [`416abdc`](https://github.com/threepointone/partyserver/commit/416abdc9e643561246e75275407f431c154e4fb4) Thanks [@third774](https://github.com/third774)! - Fix issue with pulling tracks that weren't pushed with simulcast
+
 ## 0.0.34
 
 ### Patch Changes
