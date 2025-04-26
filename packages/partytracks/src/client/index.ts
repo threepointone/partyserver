@@ -8,4 +8,5 @@ export { getScreenshare$ } from "./getScreenshare$";
 export { setLogLevel } from "./logging";
 export type { PartyTracksConfig, ApiHistoryEntry } from "./PartyTracks";
 export type { TrackMetadata } from "./callsTypes";
-export * from "./broadcasting";
+import * as experimentalDevices from "./getDevices";
+export { experimentalDevices };

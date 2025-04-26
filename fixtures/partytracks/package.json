@@ -4,7 +4,8 @@
   "version": "0.0.10",
   "type": "module",
   "scripts": {
-    "start": "vite dev"
+    "start": "vite dev",
+    "dev": "vite dev"
   },
   "dependencies": {
     "hono": "^4.7.5",

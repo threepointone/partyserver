@@ -18,14 +18,26 @@ export const inaudibleAudioTrack$ = new Observable<MediaStreamTrack>(
     const destination = audioContext.createMediaStreamDestination();
     gainNode.connect(destination);
 
-    oscillator.start();
-
     const track = destination.stream.getAudioTracks()[0];
 
-    subscriber.next(track);
+    const start = () => {
+      oscillator.start();
+      subscriber.next(track);
+      document.removeEventListener("click", start, { capture: true });
+      document.removeEventListener("keydown", start, { capture: true });
+    };
+    document.addEventListener("click", start, { capture: true, once: true });
+    document.addEventListener("keydown", start, { capture: true, once: true });
+
+    if (audioContext.state === "running") {
+      start();
+    }
+
     return () => {
       track.stop();
       audioContext.close();
+      document.removeEventListener("click", start, { capture: true });
+      document.removeEventListener("keydown", start, { capture: true });
     };
   }
 );

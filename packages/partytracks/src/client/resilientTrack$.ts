@@ -33,6 +33,11 @@ export const devices$ = defer(() =>
       debounceTime(1500),
       switchMap(() => navigator.mediaDevices.enumerateDevices())
     )
+  ).pipe(
+    shareReplay({
+      refCount: true,
+      bufferSize: 1
+    })
   )
 );
 
