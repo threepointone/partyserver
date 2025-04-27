@@ -5,7 +5,7 @@ import {
 } from "./resilientTrack$";
 import { inaudibleAudioTrack$ } from "./inaudibleTrack$";
 import { broadcastSwitch } from "./broadcastSwitch";
-import { BehaviorSubject, combineLatest, map, Observable } from "rxjs";
+import { BehaviorSubject, combineLatest, map, Observable, tap } from "rxjs";
 import { blackCanvasTrack$ } from "./blackCanvasTrack$";
 
 export const getDevice =
@@ -46,7 +46,11 @@ export const getDevice =
       kind,
       devicePriority$,
       ...resilientTrackOptions
-    });
+    }).pipe(
+      tap((track) => {
+        activeDeviceId$.next(track.getSettings().deviceId ?? "default");
+      })
+    );
 
     const broadcastApi = broadcastSwitch({
       fallbackTrack$,
@@ -55,18 +59,9 @@ export const getDevice =
       trackTransform
     });
 
-    const activeDevice$ = combineLatest([
-      devices$,
-      preferredDevice$,
-      broadcastApi.broadcastTrack$
-    ]).pipe(
-      map(([devices, preferredDevice, broadcastTrack]) => {
-        return (
-          devices.find(
-            (d) => d.deviceId === broadcastTrack.getSettings().deviceId
-          ) ?? preferredDevice
-        );
-      })
+    const activeDeviceId$ = new BehaviorSubject<string>("default");
+    const activeDevice$ = combineLatest([activeDeviceId$, devices$]).pipe(
+      map(([deviceId, devices]) => devices.find((d) => d.deviceId === deviceId))
     );
 
     return {
