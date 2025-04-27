@@ -1,6 +1,6 @@
 {
   "name": "partysync",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "repository": {
     "type": "git",
     "url": "git://github.com/threepointone/partyserver.git"
@@ -59,10 +59,10 @@
   },
   "peerDependencies": {
     "@cloudflare/workers-types": "^4.20240729.0",
-    "partyserver": "^0.0.67"
+    "partyserver": "^0.0.68"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250327.0",
-    "partyserver": "^0.0.67"
+    "partyserver": "^0.0.68"
   }
 }

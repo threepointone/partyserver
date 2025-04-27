@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.68
+
+### Patch Changes
+
+- [#217](https://github.com/threepointone/partyserver/pull/217) [`a5d2dde`](https://github.com/threepointone/partyserver/commit/a5d2dde164bd9d38e1bac87b2d32d24c06742d2f) Thanks [@threepointone](https://github.com/threepointone)! - await the call that sets a party's name inside getServerByName
+
 ## 0.0.67
 
 ### Patch Changes
