@@ -1,7 +1,9 @@
 import "./styles.css";
 
-import { PartyTracks, experimentalDevices } from "partytracks/client";
+import { PartyTracks, partyTracksExperiments } from "partytracks/client";
 import invariant from "tiny-invariant";
+
+const { getMic, getCamera, createAudioSink } = partyTracksExperiments;
 
 const localVideo = document.getElementById("local-video");
 const remoteVideo = document.getElementById("remote-video");
@@ -21,18 +23,14 @@ invariant(cameraSelect instanceof HTMLSelectElement);
 // MIC SETUP
 // =====================================================================
 
-const mic = experimentalDevices.getMic();
-
-mic.isBroadcasting$.subscribe((isBroadcasting) => {
-  micButton.innerText = isBroadcasting ? "mic is on" : "mic is off";
-});
+const mic = getMic();
 
 micButton.addEventListener("click", () => {
   mic.toggleBroadcasting();
 });
 
-mic.activeDevice$.subscribe((d) => {
-  micSelect.value = d?.deviceId ?? "default";
+mic.isBroadcasting$.subscribe((isBroadcasting) => {
+  micButton.innerText = isBroadcasting ? "mic is on" : "mic is off";
 });
 
 mic.devices$.subscribe((mics) => {
@@ -46,6 +44,11 @@ mic.devices$.subscribe((mics) => {
   });
 });
 
+mic.activeDevice$.subscribe((d) => {
+  console.log(d);
+  micSelect.value = d?.deviceId ?? "default";
+});
+
 micSelect.onchange = (e) => {
   invariant(e.target instanceof HTMLSelectElement);
   const option = e.target.querySelector(`option[value="${e.target.value}"]`);
@@ -54,28 +57,24 @@ micSelect.onchange = (e) => {
   mic.setPreferredDevice(JSON.parse(option.dataset.mediaDeviceInfo));
 };
 
-// optionally:
-mic.localMonitorTrack$.subscribe((track) => {
-  // set up "speaking while muted" listening/notifications
-});
+// Use localMonitorTrack$ to set up "talking while muted" notifications:
+// mic.localMonitorTrack$.subscribe((track) => {
+//   /* ... */
+// });
 
 // CAMERA SETUP
 // =====================================================================
 
-const camera = experimentalDevices.getCamera({
+const camera = getCamera({
   broadcasting: true
-});
-
-camera.isBroadcasting$.subscribe((isBroadcasting) => {
-  cameraButton.innerText = isBroadcasting ? "camera is on" : "camera is off";
 });
 
 cameraButton.addEventListener("click", () => {
   camera.toggleBroadcasting();
 });
 
-camera.activeDevice$.subscribe((d) => {
-  cameraSelect.value = d?.deviceId ?? "default";
+camera.isBroadcasting$.subscribe((isBroadcasting) => {
+  cameraButton.innerText = isBroadcasting ? "camera is on" : "camera is off";
 });
 
 camera.devices$.subscribe((cameras) => {
@@ -87,6 +86,10 @@ camera.devices$.subscribe((cameras) => {
     option.dataset.mediaDeviceInfo = JSON.stringify(c);
     cameraSelect.appendChild(option);
   });
+});
+
+camera.activeDevice$.subscribe((d) => {
+  cameraSelect.value = d?.deviceId ?? "default";
 });
 
 cameraSelect.onchange = (e) => {
@@ -118,9 +121,5 @@ pulledVideoTrack$.subscribe((track) => {
   remoteVideo.srcObject = remoteMediaStream;
 });
 
-pulledAudioTrack$.subscribe((track) => {
-  const ms = new MediaStream();
-  ms.addTrack(track);
-  audio.srcObject = ms;
-  audio.play();
-});
+const audioSink = createAudioSink({ audioElement: audio });
+audioSink.attach(pulledAudioTrack$);
