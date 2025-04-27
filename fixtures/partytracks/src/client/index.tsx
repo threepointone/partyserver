@@ -122,4 +122,7 @@ pulledVideoTrack$.subscribe((track) => {
 });
 
 const audioSink = createAudioSink({ audioElement: audio });
-audioSink.attach(pulledAudioTrack$);
+const pulledTrackSinkSubscription = audioSink.attach(pulledAudioTrack$);
+
+// Remove track and unsubscribe by calling:
+// pulledTrackSinkSubscription.unsubscribe()
