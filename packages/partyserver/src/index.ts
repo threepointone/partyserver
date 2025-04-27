@@ -56,8 +56,8 @@ export async function getServerByName<Env, T extends Server<Env>>(
 
   req.headers.set("x-partykit-room", name);
 
-  // Note the lack of await
-  stub.fetch(req).catch((e) => {
+  // unfortunately we have to await this
+  await stub.fetch(req).catch((e) => {
     console.error("Could not set server name:", e);
   });
 
