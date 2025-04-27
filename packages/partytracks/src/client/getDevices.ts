@@ -5,7 +5,8 @@ import {
 } from "./resilientTrack$";
 import { inaudibleAudioTrack$ } from "./inaudibleTrack$";
 import { broadcastSwitch } from "./broadcastSwitch";
-import { BehaviorSubject, combineLatest, map, Observable, tap } from "rxjs";
+import { BehaviorSubject, combineLatest, map, tap } from "rxjs";
+import type { Observable } from "rxjs";
 import { blackCanvasTrack$ } from "./blackCanvasTrack$";
 
 export const getDevice =

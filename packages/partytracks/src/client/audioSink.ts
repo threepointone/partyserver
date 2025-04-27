@@ -1,4 +1,5 @@
-import { BehaviorSubject, map, Subscription, type Observable } from "rxjs";
+import { BehaviorSubject, map } from "rxjs";
+import type { Observable, Subscription } from "rxjs";
 import { devices$ } from "./resilientTrack$";
 
 export interface CreateSinkOptions {
@@ -18,7 +19,7 @@ export const createAudioSink = ({
   sinkId = "default"
 }: CreateSinkOptions): SinkApi => {
   audioElement.setSinkId(sinkId);
-  let sinkId$ = new BehaviorSubject(sinkId);
+  const sinkId$ = new BehaviorSubject(sinkId);
   const mediaStream = new MediaStream();
   audioElement.srcObject = mediaStream;
   const resetSrcObject = () => {

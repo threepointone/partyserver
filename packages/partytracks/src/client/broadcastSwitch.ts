@@ -1,4 +1,5 @@
-import { Observable, BehaviorSubject, switchMap, shareReplay } from "rxjs";
+import { BehaviorSubject, switchMap, shareReplay } from "rxjs";
+import type { Observable } from "rxjs";
 
 export const broadcastSwitch = (options: {
   contentTrack$: Observable<MediaStreamTrack>;
