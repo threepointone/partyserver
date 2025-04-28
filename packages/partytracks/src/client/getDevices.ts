@@ -8,6 +8,7 @@ import { broadcastSwitch } from "./broadcastSwitch";
 import { BehaviorSubject, combineLatest, map, tap } from "rxjs";
 import type { Observable } from "rxjs";
 import { blackCanvasTrack$ } from "./blackCanvasTrack$";
+import { createDeviceManager } from "./devicePrioritization";
 
 export const getDevice =
   ({
@@ -44,24 +45,18 @@ export const getDevice =
     const inputDevices$ = devices$.pipe(
       map((devices) => devices.filter((d) => d.kind === kind))
     );
+    const deviceManager = createDeviceManager({
+      localStorageNamespace: `partytracks-${kind}`,
+      devices$: inputDevices$
+    });
     const preferredDevice$ = new BehaviorSubject<MediaDeviceInfo | undefined>(
       undefined
     );
 
-    const devicePriority$ = combineLatest([
-      inputDevices$,
-      preferredDevice$
-    ]).pipe(
-      map(([devices, preferredDevice]) =>
-        preferredDevice ? [preferredDevice, ...devices] : devices
-      )
-    );
-    const setPreferredDevice = (device: MediaDeviceInfo) =>
-      preferredDevice$.next(device);
-
     const contentTrack$ = resilientTrack$({
       kind,
-      devicePriority$,
+      devicePriority$: deviceManager.devicePriority$,
+      onDeviceFailure: deviceManager.deprioritizeDevice,
       ...resilientTrackOptions
     }).pipe(
       tap((track) => {
@@ -89,7 +84,7 @@ export const getDevice =
       devices$: inputDevices$,
       activeDevice$,
       preferredDevice$,
-      setPreferredDevice,
+      setPreferredDevice: deviceManager.setPreferredDevice,
       ...broadcastApi,
       localMonitorTrack$,
       broadcastTrack$:
