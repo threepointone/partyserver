@@ -78,8 +78,11 @@ export const getDevice =
       });
 
     const activeDeviceId$ = new BehaviorSubject<string>("default");
-    const activeDevice$ = combineLatest([activeDeviceId$, devices$]).pipe(
-      map(([deviceId, devices]) => devices.find((d) => d.deviceId === deviceId))
+    const activeDevice$ = combineLatest([activeDeviceId$, inputDevices$]).pipe(
+      map(
+        ([deviceId, devices]) =>
+          devices.find((d) => d.deviceId === deviceId) ?? devices[0]
+      )
     );
 
     return {
