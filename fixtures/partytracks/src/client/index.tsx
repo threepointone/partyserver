@@ -45,7 +45,6 @@ mic.devices$.subscribe((mics) => {
 });
 
 mic.activeDevice$.subscribe((d) => {
-  console.log(d);
   micSelect.value = d?.deviceId ?? "default";
 });
 
@@ -65,9 +64,7 @@ micSelect.onchange = (e) => {
 // CAMERA SETUP
 // =====================================================================
 
-const camera = getCamera({
-  broadcasting: true
-});
+const camera = getCamera({ broadcasting: true });
 
 cameraButton.addEventListener("click", () => {
   camera.toggleBroadcasting();
