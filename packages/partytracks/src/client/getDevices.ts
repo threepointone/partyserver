@@ -10,7 +10,7 @@ import type { Observable } from "rxjs";
 import { blackCanvasTrack$ } from "./blackCanvasTrack$";
 import { createDeviceManager } from "./devicePrioritization";
 
-export const getDevice =
+const getDevice =
   ({
     kind,
     fallbackTrack$,
