@@ -68,17 +68,7 @@ export const resilientTrack$ = ({
           ...deviceList.map(
             (device) =>
               new Observable<MediaStreamTrack>((subscriber) => {
-                const cleanupRef = { current: () => {} };
-                acquireTrack(
-                  subscriber,
-                  device,
-                  constraints,
-                  cleanupRef,
-                  onDeviceFailure
-                );
-                return () => {
-                  cleanupRef.current();
-                };
+                acquireTrack(subscriber, device, constraints, onDeviceFailure);
               })
           ),
           new Observable<MediaStreamTrack>((sub) =>
@@ -96,7 +86,6 @@ function acquireTrack(
   subscriber: Subscriber<MediaStreamTrack>,
   device: MediaDeviceInfo,
   constraints: MediaTrackConstraints,
-  cleanupRef: { current: () => void },
   onDeviceFailure: (device: MediaDeviceInfo) => void
 ) {
   const { deviceId, groupId, label } = device;
@@ -124,16 +113,10 @@ function acquireTrack(
           if (await trackIsHealthy(track)) return;
           logger.log("Reacquiring track");
           cleanup();
-          acquireTrack(
-            subscriber,
-            device,
-            constraints,
-            cleanupRef,
-            onDeviceFailure
-          );
+          acquireTrack(subscriber, device, constraints, onDeviceFailure);
         };
         document.addEventListener("visibilitychange", onVisibleHandler);
-        cleanupRef.current = cleanup;
+        subscriber.add(cleanup);
         subscriber.next(track);
       } else {
         logger.log("☠️ track is not healthy, stopping");
