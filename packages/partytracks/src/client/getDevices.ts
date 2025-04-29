@@ -13,17 +13,18 @@ import { createDeviceManager } from "./devicePrioritization";
 const getDevice =
   ({
     kind,
-    fallbackTrack$,
+    defaultFallbackTrack$,
     retainIdleTrackDefaultValue
   }: {
     kind: "audioinput" | "videoinput";
-    fallbackTrack$: Observable<MediaStreamTrack>;
+    defaultFallbackTrack$: Observable<MediaStreamTrack>;
     retainIdleTrackDefaultValue: boolean;
   }) =>
   ({
     retainIdleTrack,
     broadcasting = false,
     trackTransform = async (track) => track,
+    fallbackTrack$ = defaultFallbackTrack$,
     ...resilientTrackOptions
   }: {
     broadcasting?: boolean;
@@ -41,6 +42,7 @@ const getDevice =
       is called, set this to false, and do not subscribe to the localMonitorTrack.
     */
     retainIdleTrack?: boolean;
+    fallbackTrack$?: Observable<MediaStreamTrack>;
   } & Omit<ResilientTrackOptions, "kind"> = {}) => {
     const inputDevices$ = devices$.pipe(
       map((devices) => devices.filter((d) => d.kind === kind))
@@ -102,11 +104,11 @@ const getDevice =
 export type Device = ReturnType<ReturnType<typeof getDevice>>;
 export const getMic = getDevice({
   kind: "audioinput",
-  fallbackTrack$: inaudibleAudioTrack$,
+  defaultFallbackTrack$: inaudibleAudioTrack$,
   retainIdleTrackDefaultValue: true
 });
 export const getCamera = getDevice({
   kind: "videoinput",
-  fallbackTrack$: blackCanvasTrack$,
+  defaultFallbackTrack$: blackCanvasTrack$,
   retainIdleTrackDefaultValue: false
 });
