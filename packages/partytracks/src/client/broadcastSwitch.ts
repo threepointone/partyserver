@@ -5,7 +5,6 @@ export const broadcastSwitch = (options: {
   contentTrack$: Observable<MediaStreamTrack>;
   fallbackTrack$: Observable<MediaStreamTrack>;
   broadcasting?: boolean;
-  trackTransform: (track: MediaStreamTrack) => Promise<MediaStreamTrack>;
 }) => {
   const isBroadcasting$ = new BehaviorSubject(options.broadcasting);
   const startBroadcasting = () => isBroadcasting$.next(true);
@@ -13,9 +12,7 @@ export const broadcastSwitch = (options: {
   const toggleBroadcasting = () => isBroadcasting$.next(!isBroadcasting$.value);
   const broadcastTrack$ = isBroadcasting$.pipe(
     switchMap((enabled) =>
-      enabled
-        ? options.contentTrack$.pipe(switchMap(options.trackTransform))
-        : options.fallbackTrack$
+      enabled ? options.contentTrack$ : options.fallbackTrack$
     ),
     shareReplay({
       refCount: true,

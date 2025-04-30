@@ -5,8 +5,16 @@ import {
 } from "./resilientTrack$";
 import { inaudibleAudioTrack$ } from "./inaudibleTrack$";
 import { broadcastSwitch } from "./broadcastSwitch";
-import { BehaviorSubject, combineLatest, map, tap } from "rxjs";
-import type { Observable } from "rxjs";
+import {
+  BehaviorSubject,
+  combineLatest,
+  map,
+  tap,
+  switchMap,
+  delay,
+  of
+} from "rxjs";
+import { Observable } from "rxjs";
 import { blackCanvasTrack$ } from "./blackCanvasTrack$";
 import { createDeviceManager } from "./devicePrioritization";
 
@@ -23,12 +31,11 @@ const getDevice =
   ({
     retainIdleTrack,
     broadcasting = false,
-    trackTransform = async (track) => track,
     fallbackTrack$ = defaultFallbackTrack$,
+    transformations = [(track: MediaStreamTrack) => of(track)],
     ...resilientTrackOptions
   }: {
     broadcasting?: boolean;
-    trackTransform?: (track: MediaStreamTrack) => Promise<MediaStreamTrack>;
     /**
       This option keeps the device active even when not broadcasting. This
       should almost certainly ALWAYS be off for video since users expect the
@@ -43,6 +50,9 @@ const getDevice =
     */
     retainIdleTrack?: boolean;
     fallbackTrack$?: Observable<MediaStreamTrack>;
+    transformations?: ((
+      track: MediaStreamTrack
+    ) => Observable<MediaStreamTrack>)[];
   } & Omit<ResilientTrackOptions, "kind"> = {}) => {
     const inputDevices$ = devices$.pipe(
       map((devices) => devices.filter((d) => d.kind === kind))
@@ -55,7 +65,11 @@ const getDevice =
       undefined
     );
 
-    const contentTrack$ = resilientTrack$({
+    const transformationMiddleware$ = new BehaviorSubject<
+      ((track: MediaStreamTrack) => Observable<MediaStreamTrack>)[]
+    >(transformations);
+
+    const sourceTrack$ = resilientTrack$({
       kind,
       devicePriority$: deviceManager.devicePriority$,
       onDeviceFailure: deviceManager.deprioritizeDevice,
@@ -66,12 +80,39 @@ const getDevice =
       })
     );
 
+    const contentTrack$ = transformationMiddleware$.pipe(
+      switchMap((transformations) =>
+        transformations.reduce(
+          (acc$, transformFn) => acc$.pipe(switchMap(transformFn)),
+          sourceTrack$
+        )
+      ),
+      delay(0)
+    );
+
+    const addTransform = (
+      transform: (track: MediaStreamTrack) => Observable<MediaStreamTrack>
+    ) => {
+      console.log("adding a transform");
+      transformationMiddleware$.next(
+        transformationMiddleware$.value.concat(transform)
+      );
+    };
+
+    const removeTransform = (
+      transform: (track: MediaStreamTrack) => Observable<MediaStreamTrack>
+    ) => {
+      console.log("removing a transform");
+      transformationMiddleware$.next(
+        transformationMiddleware$.value.filter((t) => t !== transform)
+      );
+    };
+
     const { broadcastTrack$, localMonitorTrack$, ...broadcastApi } =
       broadcastSwitch({
         fallbackTrack$,
         contentTrack$,
-        broadcasting,
-        trackTransform
+        broadcasting
       });
 
     const activeDeviceId$ = new BehaviorSubject<string>("default");
@@ -83,6 +124,8 @@ const getDevice =
     );
 
     return {
+      addTransform,
+      removeTransform,
       devices$: inputDevices$,
       activeDevice$,
       preferredDevice$,

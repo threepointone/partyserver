@@ -1,4 +1,5 @@
 import "./styles.css";
+import { Observable } from "rxjs";
 
 import { PartyTracks, partyTracksExperiments } from "partytracks/client";
 import invariant from "tiny-invariant";
@@ -23,7 +24,52 @@ invariant(cameraSelect instanceof HTMLSelectElement);
 // MIC SETUP
 // =====================================================================
 
-const mic = getMic();
+const createTransformation = (label: string) => (track: MediaStreamTrack) => {
+  console.log(`${label} transformation Observable Created`);
+  return new Observable<MediaStreamTrack>((sub) => {
+    console.log(`Emiting ${label} transformed track`);
+    sub.next(track);
+
+    return () => {
+      console.log(`Tearing down ${label} transformation`);
+    };
+  });
+};
+
+const transformations = {
+  first: createTransformation("first"),
+  second: createTransformation("second"),
+  third: createTransformation("third")
+};
+
+const mic = getMic({
+  transformations: [transformations.first]
+});
+
+setTimeout(() => {
+  console.log("➕ ADDING SECOND TRANSFORM");
+  mic.addTransform(transformations.second);
+}, 1000);
+
+setTimeout(() => {
+  console.log("➕ ADDING THIRD TRANSFORM");
+  mic.addTransform(transformations.third);
+}, 2000);
+
+setTimeout(() => {
+  console.log("➖ removing first transform?");
+  mic.removeTransform(transformations.first);
+}, 3000);
+
+setTimeout(() => {
+  console.log("➖ removing second transform?");
+  mic.removeTransform(transformations.second);
+}, 4000);
+
+setTimeout(() => {
+  console.log("➖ removing third transform?");
+  mic.removeTransform(transformations.third);
+}, 5000);
 
 micButton.addEventListener("click", () => {
   mic.toggleBroadcasting();
@@ -64,7 +110,7 @@ micSelect.onchange = (e) => {
 // CAMERA SETUP
 // =====================================================================
 
-const camera = getCamera({ broadcasting: true });
+const camera = getCamera();
 
 cameraButton.addEventListener("click", () => {
   camera.toggleBroadcasting();
