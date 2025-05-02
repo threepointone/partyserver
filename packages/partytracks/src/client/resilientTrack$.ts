@@ -1,6 +1,5 @@
 import {
   concat,
-  debounceTime,
   defer,
   distinctUntilChanged,
   from,
@@ -10,7 +9,8 @@ import {
   Observable,
   shareReplay,
   delay,
-  switchMap
+  switchMap,
+  throwError
 } from "rxjs";
 
 import { logger } from "./logging";
@@ -31,10 +31,20 @@ export const devices$ = defer(() =>
   merge(
     from(navigator.mediaDevices.enumerateDevices()),
     fromEvent(navigator.mediaDevices, "devicechange").pipe(
-      debounceTime(1500),
+      switchMap(() => navigator.mediaDevices.enumerateDevices())
+    ),
+    from(navigator.permissions.query({ name: "camera" })).pipe(
+      switchMap((permissionStatus) => fromEvent(permissionStatus, "change")),
+      switchMap(() => navigator.mediaDevices.enumerateDevices())
+    ),
+    from(navigator.permissions.query({ name: "microphone" })).pipe(
+      switchMap((permissionStatus) => fromEvent(permissionStatus, "change")),
       switchMap(() => navigator.mediaDevices.enumerateDevices())
     )
   ).pipe(
+    distinctUntilChanged(
+      (prev, current) => JSON.stringify(prev) === JSON.stringify(current)
+    ),
     shareReplay({
       refCount: true,
       bufferSize: 1
@@ -72,9 +82,7 @@ export const resilientTrack$ = ({
                 acquireTrack(subscriber, device, constraints, onDeviceFailure);
               })
           ),
-          new Observable<MediaStreamTrack>((sub) =>
-            sub.error(new DevicesExhaustedError())
-          )
+          throwError(() => new DevicesExhaustedError())
         )
       ),
       // delay(0) for React Strict Mode
