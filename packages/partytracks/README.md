@@ -114,7 +114,7 @@ By convention, Observables have a $ suffix to indicate that they're an Observabl
 ```ts
 import {
   useObservableAsValue,
-  useOnEmit,
+  useObservable,
   useValueAsObservable
 } from "partytracks/react";
 
@@ -126,8 +126,11 @@ function SomeComponent({ value }) {
   // second arg is the default value if nothing
   // has been emitted yet
   const latestValue = useObservableAsValue(value$, "default value");
-  // calls the callback whenever a value
-  // is emitted
-  useOnEmit(value$, (v) => console.log(v));
+  // Allows for hooking into new values, errors, and completion.
+  useObservable(value$, {
+    next: (v) => console.log(v),
+    error: (e) => console.error(e),
+    complete: () => console.log("complete!")
+  });
 }
 ```
