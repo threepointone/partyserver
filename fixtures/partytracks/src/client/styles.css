@@ -9,9 +9,8 @@
 body {
   font-family: sans-serif;
   font-size: 16px;
+  color-scheme: light dark;
   line-height: 1.5;
-  color: #999;
-  background-color: black;
   text-align: center;
   padding-top: 40px;
 }
@@ -31,22 +30,6 @@ h6 {
 
 #app {
   padding: 1rem;
-}
-
-h1 {
-  color: white;
-}
-
-b {
-  color: white;
-  font-weight: bold;
-}
-
-a {
-  color: #ccc;
-  text-decoration-line: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: #555;
 }
 
 video {

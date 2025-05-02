@@ -1,4 +1,5 @@
-import { type Observable, timer } from "rxjs";
+import type { Observable } from "rxjs";
+import { timer } from "rxjs";
 import { retry } from "rxjs/operators";
 
 interface BackoffConfig {

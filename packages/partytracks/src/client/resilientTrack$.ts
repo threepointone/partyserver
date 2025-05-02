@@ -1,6 +1,5 @@
 import {
   concat,
-  debounceTime,
   defer,
   distinctUntilChanged,
   from,
@@ -9,7 +8,9 @@ import {
   merge,
   Observable,
   shareReplay,
-  switchMap
+  delay,
+  switchMap,
+  throwError
 } from "rxjs";
 
 import { logger } from "./logging";
@@ -30,9 +31,24 @@ export const devices$ = defer(() =>
   merge(
     from(navigator.mediaDevices.enumerateDevices()),
     fromEvent(navigator.mediaDevices, "devicechange").pipe(
-      debounceTime(1500),
+      switchMap(() => navigator.mediaDevices.enumerateDevices())
+    ),
+    from(navigator.permissions.query({ name: "camera" })).pipe(
+      switchMap((permissionStatus) => fromEvent(permissionStatus, "change")),
+      switchMap(() => navigator.mediaDevices.enumerateDevices())
+    ),
+    from(navigator.permissions.query({ name: "microphone" })).pipe(
+      switchMap((permissionStatus) => fromEvent(permissionStatus, "change")),
       switchMap(() => navigator.mediaDevices.enumerateDevices())
     )
+  ).pipe(
+    distinctUntilChanged(
+      (prev, current) => JSON.stringify(prev) === JSON.stringify(current)
+    ),
+    shareReplay({
+      refCount: true,
+      bufferSize: 1
+    })
   )
 );
 
@@ -63,24 +79,14 @@ export const resilientTrack$ = ({
           ...deviceList.map(
             (device) =>
               new Observable<MediaStreamTrack>((subscriber) => {
-                const cleanupRef = { current: () => {} };
-                acquireTrack(
-                  subscriber,
-                  device,
-                  constraints,
-                  cleanupRef,
-                  onDeviceFailure
-                );
-                return () => {
-                  cleanupRef.current();
-                };
+                acquireTrack(subscriber, device, constraints, onDeviceFailure);
               })
           ),
-          new Observable<MediaStreamTrack>((sub) =>
-            sub.error(new DevicesExhaustedError())
-          )
+          throwError(() => new DevicesExhaustedError())
         )
       ),
+      // delay(0) for React Strict Mode
+      delay(0),
       shareReplay({
         refCount: true,
         bufferSize: 1
@@ -91,7 +97,6 @@ function acquireTrack(
   subscriber: Subscriber<MediaStreamTrack>,
   device: MediaDeviceInfo,
   constraints: MediaTrackConstraints,
-  cleanupRef: { current: () => void },
   onDeviceFailure: (device: MediaDeviceInfo) => void
 ) {
   const { deviceId, groupId, label } = device;
@@ -119,16 +124,10 @@ function acquireTrack(
           if (await trackIsHealthy(track)) return;
           logger.log("Reacquiring track");
           cleanup();
-          acquireTrack(
-            subscriber,
-            device,
-            constraints,
-            cleanupRef,
-            onDeviceFailure
-          );
+          acquireTrack(subscriber, device, constraints, onDeviceFailure);
         };
         document.addEventListener("visibilitychange", onVisibleHandler);
-        cleanupRef.current = cleanup;
+        subscriber.add(cleanup);
         subscriber.next(track);
       } else {
         logger.log("☠️ track is not healthy, stopping");
