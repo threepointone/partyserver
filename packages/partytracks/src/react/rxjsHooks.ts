@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { BehaviorSubject } from "rxjs";
 
-import type { Observable } from "rxjs";
+import type { Observable, Observer } from "rxjs";
 
 /**
  * Subscribes to an Observable and returns the latest emitted value,
@@ -10,7 +10,7 @@ import type { Observable } from "rxjs";
  * will be undefined until the Observable emits something else.
  *
  * NOTE: It's important that your Observable be stable, so be sure to
- * memoize it!
+ * memoize it before passing it in!
  */
 export function useObservableAsValue<T>(
   observable: Observable<T>
@@ -28,26 +28,30 @@ export function useObservableAsValue<T>(
   useEffect(() => {
     setState(defaultValue);
   }, [observable]);
-  useOnEmit(observable, setState);
+  useObservable(observable, { next: setState });
   // @ts-expect-error: not sure how to satisfy the type checker here, but this is safe.
   return state;
 }
 
 /**
- * Subscribes to an Observable and runs the provided function every
- * time a value is emitted, and unsubscribes when unmounting.
+ * Subscribes to an Observable with the provided Observer, and
+ * unsubscribes when unmounting.
  *
  * NOTE: It's important that your Observable be stable, so be sure to
- * memoize it!
+ * memoize it before passing in!
  */
-export function useOnEmit<T>(
+export function useObservable<T>(
   observable: Observable<T>,
-  fn: (value: T) => void
+  observer: Partial<Observer<T>>
 ) {
-  const fnRef = useRef(fn);
-  fnRef.current = fn;
+  const observerRef = useRef(observer);
+  observerRef.current = observer;
   useEffect(() => {
-    const subscription = observable.subscribe((v) => fnRef.current(v));
+    const subscription = observable.subscribe({
+      next: (value) => observerRef.current.next?.(value),
+      error: (value) => observerRef.current.error?.(value),
+      complete: () => observerRef.current.complete?.()
+    });
     return () => {
       subscription.unsubscribe();
     };
