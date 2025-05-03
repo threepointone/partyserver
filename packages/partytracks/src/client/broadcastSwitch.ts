@@ -1,4 +1,4 @@
-import { BehaviorSubject, switchMap, shareReplay } from "rxjs";
+import { BehaviorSubject, switchMap, shareReplay, tap } from "rxjs";
 import type { Observable } from "rxjs";
 
 export const broadcastSwitch = (options: {
@@ -12,7 +12,9 @@ export const broadcastSwitch = (options: {
   const toggleBroadcasting = () => isBroadcasting$.next(!isBroadcasting$.value);
   const broadcastTrack$ = isBroadcasting$.pipe(
     switchMap((enabled) =>
-      enabled ? options.contentTrack$ : options.fallbackTrack$
+      enabled
+        ? options.contentTrack$.pipe(tap({ error: () => stopBroadcasting() }))
+        : options.fallbackTrack$
     ),
     shareReplay({
       refCount: true,
