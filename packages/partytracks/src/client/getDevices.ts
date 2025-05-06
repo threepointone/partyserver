@@ -145,7 +145,10 @@ const getDevice =
       });
 
     const activeDeviceId$ = new BehaviorSubject<string>("default");
-    const activeDevice$ = combineLatest([activeDeviceId$, inputDevices$]).pipe(
+    const activeDevice$ = combineLatest([
+      activeDeviceId$,
+      deviceManager.devicePriority$
+    ]).pipe(
       map(
         ([deviceId, devices]) =>
           devices.find((d) => d.deviceId === deviceId) ?? devices[0]
