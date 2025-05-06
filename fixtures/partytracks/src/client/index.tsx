@@ -11,29 +11,45 @@ import invariant from "tiny-invariant";
 const localVideo = document.getElementById("local-video");
 const remoteVideo = document.getElementById("remote-video");
 const audio = document.getElementById("audio");
-const micButton = document.getElementById("mic-button");
-const cameraButton = document.getElementById("camera-button");
+const micBroadcastButton = document.getElementById("mic-broadcast-button");
+const micEnabledButton = document.getElementById("mic-enabled-button");
+const cameraBroadcastButton = document.getElementById(
+  "camera-broadcast-button"
+);
+const cameraEnabledButton = document.getElementById("camera-enabled-button");
 const micSelect = document.getElementById("mic-select");
 const cameraSelect = document.getElementById("camera-select");
 invariant(localVideo instanceof HTMLVideoElement);
 invariant(remoteVideo instanceof HTMLVideoElement);
 invariant(audio instanceof HTMLAudioElement);
-invariant(micButton instanceof HTMLButtonElement);
-invariant(cameraButton instanceof HTMLButtonElement);
+invariant(micBroadcastButton instanceof HTMLButtonElement);
+invariant(micEnabledButton instanceof HTMLButtonElement);
+invariant(cameraBroadcastButton instanceof HTMLButtonElement);
+invariant(cameraEnabledButton instanceof HTMLButtonElement);
 invariant(micSelect instanceof HTMLSelectElement);
 invariant(cameraSelect instanceof HTMLSelectElement);
 
 // MIC SETUP
 // =====================================================================
 
-const mic = getMic();
+const mic = getMic({ enabled: false });
 
-micButton.addEventListener("click", () => {
+micBroadcastButton.addEventListener("click", () => {
   mic.toggleBroadcasting();
 });
 
 mic.isBroadcasting$.subscribe((isBroadcasting) => {
-  micButton.innerText = isBroadcasting ? "mic is on" : "mic is off";
+  micBroadcastButton.innerText = isBroadcasting
+    ? "mic is broadcasting"
+    : "mic is not broadcasting";
+});
+
+micEnabledButton.addEventListener("click", () => {
+  mic.toggleEnabled();
+});
+
+mic.enabled$.subscribe((enabled) => {
+  micEnabledButton.innerText = enabled ? "mic is enabled" : "mic is disabled";
 });
 
 mic.devices$.subscribe((mics) => {
@@ -67,14 +83,26 @@ micSelect.onchange = (e) => {
 // CAMERA SETUP
 // =====================================================================
 
-const camera = getCamera({ broadcasting: true });
+const camera = getCamera({ enabled: false });
 
-cameraButton.addEventListener("click", () => {
+cameraBroadcastButton.addEventListener("click", () => {
   camera.toggleBroadcasting();
 });
 
 camera.isBroadcasting$.subscribe((isBroadcasting) => {
-  cameraButton.innerText = isBroadcasting ? "camera is on" : "camera is off";
+  cameraBroadcastButton.innerText = isBroadcasting
+    ? "camera is broadcasting"
+    : "camera is not broadcasting";
+});
+
+cameraEnabledButton.addEventListener("click", () => {
+  camera.toggleEnabled();
+});
+
+camera.enabled$.subscribe((enabled) => {
+  cameraEnabledButton.innerText = enabled
+    ? "camera is enabled"
+    : "camera is disabled";
 });
 
 camera.devices$.subscribe((cameras) => {
