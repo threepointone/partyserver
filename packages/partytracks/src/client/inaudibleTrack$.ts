@@ -1,4 +1,4 @@
-import { Observable } from "rxjs";
+import { Observable, shareReplay } from "rxjs";
 
 export const inaudibleAudioTrack$ = new Observable<MediaStreamTrack>(
   (subscriber) => {
@@ -40,4 +40,4 @@ export const inaudibleAudioTrack$ = new Observable<MediaStreamTrack>(
       document.removeEventListener("keydown", start, { capture: true });
     };
   }
-);
+).pipe(shareReplay({ refCount: true, bufferSize: 1 }));

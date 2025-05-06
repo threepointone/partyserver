@@ -1,4 +1,4 @@
-import { Observable } from "rxjs";
+import { Observable, shareReplay } from "rxjs";
 import invariant from "tiny-invariant";
 
 export const blackCanvasTrack$ = new Observable<MediaStreamTrack>(
@@ -25,4 +25,4 @@ export const blackCanvasTrack$ = new Observable<MediaStreamTrack>(
     });
     subscriber.next(track);
   }
-);
+).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
