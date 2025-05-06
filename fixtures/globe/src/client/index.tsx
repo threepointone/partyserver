@@ -107,8 +107,8 @@ function App() {
       </p>
       <p>
         Code:{" "}
-        <a href="https://github.com/threepointone/partyserver/tree/main/fixtures/globe">
-          https://github.com/threepointone/partyserver/tree/main/fixtures/globe
+        <a href="https://github.com/cloudflare/partykit/tree/main/fixtures/globe">
+          https://github.com/cloudflare/partykit/tree/main/fixtures/globe
         </a>
       </p>
     </div>

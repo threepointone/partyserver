@@ -1,6 +1,6 @@
 # hono-party
 
-🔥 [Hono](https://hono.dev) ⨉ 🎈 [PartyServer](https://github.com/threepointone/partyserver)
+🔥 [Hono](https://hono.dev) ⨉ 🎈 [PartyServer](https://github.com/cloudflare/partykit)
 
 Websockets from the future, now in Hono. Add collaborative editing, multiplayer games, local-first apps, ai agents, (or whatever!) into your Hono app today.
 
