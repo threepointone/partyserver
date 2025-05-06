@@ -1,6 +1,6 @@
 {
   "name": "@partyserver/fixture-hono",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,8 +8,8 @@
   },
   "dependencies": {
     "hono": "^4.7.5",
-    "hono-party": "^0.0.9",
-    "partyserver": "^0.0.68",
+    "hono-party": "^0.0.10",
+    "partyserver": "^0.0.69",
     "partysocket": "^1.1.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

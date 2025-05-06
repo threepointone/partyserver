@@ -1,5 +1,11 @@
 # partyhard
 
+## 0.0.4
+
+### Patch Changes
+
+- [`7ec1568`](https://github.com/cloudflare/partykit/commit/7ec15680fd1dcb257263d52d2c9cd5088e2f7c0a) Thanks [@threepointone](https://github.com/threepointone)! - replace url in package.json to point to cloudflare/partykit
+
 ## 0.0.3
 
 ### Patch Changes
