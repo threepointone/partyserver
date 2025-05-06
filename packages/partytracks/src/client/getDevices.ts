@@ -34,6 +34,7 @@ const getDevice =
     broadcasting = false,
     fallbackTrack$ = defaultFallbackTrack$,
     transformations = [(track: MediaStreamTrack) => of(track)],
+    enabled = true,
     ...resilientTrackOptions
   }: {
     /**
@@ -43,13 +44,13 @@ const getDevice =
      */
     broadcasting?: boolean;
     /**
-      This option keeps the device active even when not broadcasting. This
-      should almost certainly ALWAYS be off for video since users expect the
-      camera light to be off for re-assurance. For audio, if the
-      localMonitorTrack is subscribed to the idle track is already retained.
-      But consumers should not HAVE to implement the "talking while muted"
-      notifications in order to benefit from the instant unmute that comes
-      with keeping the track active even while muted.
+      This option keeps the device active even when not broadcasting, so long
+      as the device is enabled. This should almost certainly ALWAYS be off for
+      video since users expect the camera light to be off for re-assurance.
+      For audio, if the localMonitorTrack is subscribed to the idle track is
+      already retained. But consumers should not HAVE to implement the "talking
+      while muted" notifications in order to benefit from the instant unmute
+      that comes with keeping the track active even while muted.
 
       All that to say: if you want the mic to be released when stopBroadcasting
       is called, set this to false, and do not subscribe to the localMonitorTrack.
@@ -68,6 +69,10 @@ const getDevice =
     transformations?: ((
       track: MediaStreamTrack
     ) => Observable<MediaStreamTrack>)[];
+    /**
+     Whether or not enabled should be true initially. Defaults to true.
+     */
+    enabled?: boolean;
   } & Omit<ResilientTrackOptions, "kind"> = {}): MediaDevice => {
     const inputDevices$ = devices$.pipe(
       map((devices) => devices.filter((d) => d.kind === kind))
@@ -135,7 +140,8 @@ const getDevice =
       broadcastSwitch({
         fallbackTrack$,
         contentTrack$,
-        broadcasting
+        broadcasting,
+        enabled
       });
 
     const activeDeviceId$ = new BehaviorSubject<string>("default");
@@ -243,6 +249,29 @@ export interface MediaDevice {
    broadcasting is stopped.
    */
   broadcastTrack$: Observable<MediaStreamTrack>;
+  /**
+   Whether or not the device is enabled. If disabled, the content source
+   will not be requested, regardless of whether isBroadcasting is true
+   or not. This can flip to false if an error is encountering acquiring
+   content source. Default value is `true`.
+   */
+  enabled$: Observable<boolean>;
+  /**
+   Sets enabled to true.
+   */
+  enable: () => void;
+  /**
+   Sets enabled to false.
+   */
+  disable: () => void;
+  /**
+   Toggles enabled.
+   */
+  toggleEnabled: () => void;
+  /**
+   Emits errors encountered when acquiring content tracks.
+   */
+  error$: Observable<Error>;
 }
 
 export const getMic = getDevice({
