@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.70
+
+### Patch Changes
+
+- [`3f900b5`](https://github.com/cloudflare/partykit/commit/3f900b5f631ea3f8b8a70197890d1d551be3951d) Thanks [@threepointone](https://github.com/threepointone)! - trigger another release
+
 ## 0.0.69
 
 ### Patch Changes
