@@ -4,7 +4,8 @@ export {
   DevicesExhaustedError,
   devices$
 } from "./resilientTrack$";
-export { getScreenshare$ } from "./getScreenshare$";
+export { screenshare$ } from "./screenshare$";
+export { getScreenshare } from "./getScreenshare.ts";
 export { setLogLevel } from "./logging";
 export type { PartyTracksConfig, ApiHistoryEntry } from "./PartyTracks";
 export type { TrackMetadata } from "./callsTypes";

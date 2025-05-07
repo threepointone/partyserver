@@ -15,6 +15,8 @@ function deviceMatch(deviceA: MediaDeviceInfo, deviceB: MediaDeviceInfo) {
 }
 
 interface DeviceManager {
+  devices$: Observable<MediaDeviceInfo[]>;
+  activeDevice$: Observable<MediaDeviceInfo>;
   setPreferredDevice: (device: MediaDeviceInfo) => void;
   deprioritizeDevice: (device: MediaDeviceInfo) => void;
   devicePriority$: Observable<MediaDeviceInfo[]>;
@@ -23,6 +25,7 @@ interface DeviceManager {
 export const createDeviceManager = (options: {
   devices$: Observable<MediaDeviceInfo[]>;
   localStorageNamespace: string;
+  activeDeviceId$: Observable<string>;
 }): DeviceManager => {
   const preferredDevice$ = localStorageValue$<MediaDeviceInfo>(
     `${options.localStorageNamespace}-preferred-device`
@@ -33,60 +36,74 @@ export const createDeviceManager = (options: {
     []
   );
 
+  const devicePriority$ = combineLatest([
+    preferredDevice$.value$,
+    deprioritizedDevices.value$,
+    options.devices$
+  ]).pipe(
+    // sort first by deprioritizedDevices,
+    // then bring preferredDevice to the front
+    map(([preferredDevice, deprioritizedDevices, devices]) =>
+      devices
+        .toSorted((a, b) => {
+          const deprioritizeA = deprioritizedDevices?.some((item) =>
+            deviceMatch(a, item)
+          );
+          const deprioritizeB = deprioritizedDevices?.some((item) =>
+            deviceMatch(b, item)
+          );
+
+          if (b.label.toLowerCase().includes("virtual")) {
+            return -1;
+          }
+
+          if (b.label.toLowerCase().includes("iphone microphone")) {
+            return -1;
+          }
+
+          if (deprioritizeA && !deprioritizeB) {
+            // move A down the list
+            return 1;
+          } else if (!deprioritizeA && deprioritizeB) {
+            // move B down the list
+            return -1;
+          }
+
+          // leave as is
+          return 0;
+        })
+        .toSorted((a, b) => {
+          if (preferredDevice && deviceMatch(preferredDevice, a)) {
+            return -1;
+          } else if (preferredDevice && deviceMatch(preferredDevice, b)) {
+            return 1;
+          } else {
+            return 0;
+          }
+        })
+    )
+  );
+
+  const activeDevice$ = combineLatest([
+    options.activeDeviceId$,
+    devicePriority$
+  ]).pipe(
+    map(
+      ([deviceId, devices]) =>
+        devices.find((d) => d.deviceId === deviceId) ?? devices[0]
+    )
+  );
+
   return {
+    devices$: options.devices$,
     deprioritizeDevice: (device) =>
       deprioritizedDevices.setValue((deprioritizedDevices) =>
         (deprioritizedDevices ?? [])
           .filter((d) => deviceMatch(d, device))
           .concat(device)
       ),
-    devicePriority$: combineLatest([
-      preferredDevice$.value$,
-      deprioritizedDevices.value$,
-      options.devices$
-    ]).pipe(
-      // sort first by deprioritizedDevices,
-      // then bring preferredDevice to the front
-      map(([preferredDevice, deprioritizedDevices, devices]) =>
-        devices
-          .toSorted((a, b) => {
-            const deprioritizeA = deprioritizedDevices?.some((item) =>
-              deviceMatch(a, item)
-            );
-            const deprioritizeB = deprioritizedDevices?.some((item) =>
-              deviceMatch(b, item)
-            );
-
-            if (b.label.toLowerCase().includes("virtual")) {
-              return -1;
-            }
-
-            if (b.label.toLowerCase().includes("iphone microphone")) {
-              return -1;
-            }
-
-            if (deprioritizeA && !deprioritizeB) {
-              // move A down the list
-              return 1;
-            } else if (!deprioritizeA && deprioritizeB) {
-              // move B down the list
-              return -1;
-            }
-
-            // leave as is
-            return 0;
-          })
-          .toSorted((a, b) => {
-            if (preferredDevice && deviceMatch(preferredDevice, a)) {
-              return -1;
-            } else if (preferredDevice && deviceMatch(preferredDevice, b)) {
-              return 1;
-            } else {
-              return 0;
-            }
-          })
-      )
-    ),
+    devicePriority$,
+    activeDevice$,
     setPreferredDevice: (device) => {
       deprioritizedDevices.setValue(
         (devices) => devices?.filter((d) => deviceMatch(d, device)) ?? []
