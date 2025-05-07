@@ -4,7 +4,8 @@ import {
   shareReplay,
   tap,
   combineLatest,
-  Subject
+  Subject,
+  filter
 } from "rxjs";
 import type { Observable } from "rxjs";
 
@@ -50,7 +51,11 @@ export const broadcastSwitch = (options: {
     }
   };
 
-  const tappedContentTrack$ = options.contentTrack$.pipe(
+  const enabledContent$ = enabled$.pipe(
+    switchMap((enabled) =>
+      enabled ? options.contentTrack$ : options.fallbackTrack$
+    ),
+    filter((x) => x !== undefined),
     tap({
       complete: () => {
         disable();
@@ -67,7 +72,7 @@ export const broadcastSwitch = (options: {
 
   const broadcastTrack$ = combineLatest([enabled$, isBroadcasting$]).pipe(
     switchMap(([enabled, isBroadcasting]) =>
-      enabled && isBroadcasting ? tappedContentTrack$ : options.fallbackTrack$
+      enabled && isBroadcasting ? enabledContent$ : options.fallbackTrack$
     ),
     shareReplay({
       refCount: true,
@@ -77,7 +82,7 @@ export const broadcastSwitch = (options: {
 
   const localMonitorTrack$ = enabled$.pipe(
     switchMap((enabled) =>
-      enabled ? tappedContentTrack$ : options.fallbackTrack$
+      enabled ? enabledContent$ : options.fallbackTrack$
     ),
     shareReplay({
       refCount: true,
@@ -96,13 +101,13 @@ export const broadcastSwitch = (options: {
     toggleBroadcasting,
     error$,
     /**
-      This is the track to push. It will send content
-      while broadcasting, and send the fallback track
-      when not broadcasting.
+      This is the content to push. It will send from the content
+      source while broadcasting, and send from the fallback when
+      not broadcasting.
     */
     broadcastTrack$,
     /**
-      Track for local use only. Useful for showing
+      For local use only. Mainly useful for showing
       "talking while muted" notifications.
     */
     localMonitorTrack$
