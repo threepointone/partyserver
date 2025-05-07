@@ -4,6 +4,7 @@ import {
   PartyTracks,
   getMic,
   getCamera,
+  getScreenshare,
   createAudioSink
 } from "partytracks/client";
 import invariant from "tiny-invariant";
@@ -83,7 +84,7 @@ micSelect.onchange = (e) => {
 // CAMERA SETUP
 // =====================================================================
 
-const camera = getCamera({ enabled: false });
+const camera = getCamera();
 
 cameraBroadcastButton.addEventListener("click", () => {
   camera.toggleBroadcasting();
@@ -128,14 +129,80 @@ cameraSelect.onchange = (e) => {
   camera.setPreferredDevice(JSON.parse(option.dataset.mediaDeviceInfo));
 };
 
+// Screenshare Setup
+// =====================================================================
+
+const localScreenshareVideo = document.getElementById(
+  "local-screenshare-video"
+);
+const remoteScreenshareVideo = document.getElementById(
+  "remote-screenshare-video"
+);
+const screenshareAudioBroadcastButton = document.getElementById(
+  "screenshare-audio-broadcast-button"
+);
+const screenshareAudioEnabledButton = document.getElementById(
+  "screenshare-audio-enabled-button"
+);
+const screenshareVideoBroadcastButton = document.getElementById(
+  "screenshare-video-broadcast-button"
+);
+const screenshareVideoEnabledButton = document.getElementById(
+  "screenshare-video-enabled-button"
+);
+
+invariant(localScreenshareVideo instanceof HTMLVideoElement);
+invariant(remoteScreenshareVideo instanceof HTMLVideoElement);
+invariant(screenshareAudioBroadcastButton instanceof HTMLButtonElement);
+invariant(screenshareAudioEnabledButton instanceof HTMLButtonElement);
+invariant(screenshareVideoBroadcastButton instanceof HTMLButtonElement);
+invariant(screenshareVideoEnabledButton instanceof HTMLButtonElement);
+
+const screenshare = getScreenshare();
+
+// screenshare.video.localMonitorTrack$.subscribe((track) => {
+//   const ms = new MediaStream();
+//   ms.addTrack(track);
+//   localScreenshareVideo.srcObject = ms;
+// });
+//
+// screenshare.video.broadcastTrack$.subscribe((track) => {
+//   const ms = new MediaStream();
+//   ms.addTrack(track);
+//   localScreenshareVideo.srcObject = ms;
+// });
+
+screenshare.video.isBroadcasting$.subscribe((isBroadcasting) => {
+  screenshareVideoBroadcastButton.innerText = `screenshare video is${isBroadcasting ? " " : " not "}broadcasting`;
+});
+
+screenshareVideoBroadcastButton.onclick = () => {
+  screenshare.video.toggleBroadcasting();
+};
+
+// TODO: RENAME enabled$ to isEnabled$
+screenshare.video.enabled$.subscribe((isEnabled) => {
+  screenshareVideoEnabledButton.innerText = `screenshare video is${isEnabled ? " " : " not "}enabled`;
+});
+
+screenshareVideoEnabledButton.onclick = () => {
+  screenshare.video.toggleEnabled();
+};
+
 // Push and pull tracks
 // =====================================================================
 
 const partyTracks = new PartyTracks();
 const audioTrackMetadata$ = partyTracks.push(mic.broadcastTrack$);
 const videoTrackMetadata$ = partyTracks.push(camera.broadcastTrack$);
+const screenshareVideoTrackMetadata$ = partyTracks.push(
+  screenshare.video.broadcastTrack$
+);
 const pulledAudioTrack$ = partyTracks.pull(audioTrackMetadata$);
 const pulledVideoTrack$ = partyTracks.pull(videoTrackMetadata$);
+const screensharePulledVideoTrack$ = partyTracks.pull(
+  screenshareVideoTrackMetadata$
+);
 
 camera.broadcastTrack$.subscribe((track) => {
   const localMediaStream = new MediaStream();
@@ -147,6 +214,18 @@ pulledVideoTrack$.subscribe((track) => {
   const remoteMediaStream = new MediaStream();
   remoteMediaStream.addTrack(track);
   remoteVideo.srcObject = remoteMediaStream;
+});
+
+screenshare.video.localMonitorTrack$.subscribe((track) => {
+  const localScreenshareVideoStream = new MediaStream();
+  localScreenshareVideoStream.addTrack(track);
+  localScreenshareVideo.srcObject = localScreenshareVideoStream;
+});
+
+screensharePulledVideoTrack$.subscribe((track) => {
+  const remoteScreenshareVideoStream = new MediaStream();
+  remoteScreenshareVideoStream.addTrack(track);
+  remoteScreenshareVideo.srcObject = remoteScreenshareVideoStream;
 });
 
 const audioSink = createAudioSink({ audioElement: audio });
