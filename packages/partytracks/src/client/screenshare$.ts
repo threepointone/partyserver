@@ -1,38 +1,28 @@
-import { Observable, shareReplay, delay } from "rxjs";
+import { Observable } from "rxjs";
 import invariant from "tiny-invariant";
 
-export function screenshare$(
-  options: DisplayMediaStreamOptions = { audio: true }
-) {
-  return new Observable<MediaStream>((subscribe) => {
+export function screenshare$(options: DisplayMediaStreamOptions) {
+  return new Observable<MediaStream>((subscriber) => {
     navigator.mediaDevices
       .getDisplayMedia(options)
       .then((ms) => {
-        subscribe.add(() => {
-          ms.getTracks().forEach((t) => t.stop());
+        ms.getTracks().forEach((t) => {
+          subscriber.add(() => t.stop());
+          t.addEventListener("ended", () => {
+            console.log("ENDED?!");
+            return subscriber.complete();
+          });
         });
-
-        subscribe.next(ms);
-        ms.getVideoTracks()[0].addEventListener("ended", () => {
-          console.log("ENDED FIRED, COMPLETING");
-          subscribe.complete();
-        });
+        subscriber.next(ms);
       })
       .catch((err) => {
         invariant(err instanceof Error);
         // user cancelled the screenshare request
         if (err.name === "NotAllowedError") {
-          subscribe.complete();
+          subscriber.complete();
           return;
         }
-        subscribe.error(err);
+        subscriber.error(err);
       });
-  }).pipe(
-    // delay(0) for React strict mode
-    delay(0),
-    shareReplay({
-      refCount: true,
-      bufferSize: 1
-    })
-  );
+  });
 }
