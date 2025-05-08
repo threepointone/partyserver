@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.38
+
+### Patch Changes
+
+- [#221](https://github.com/cloudflare/partykit/pull/221) [`20a68a8`](https://github.com/cloudflare/partykit/commit/20a68a841ef67464a41b55d500114cec6a8c6a6e) Thanks [@threepointone](https://github.com/threepointone)! - add homepage in package.jsons
+
 ## 0.0.37
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @partyserver/fixture-partytracks
 
+## 0.0.12
+
+### Patch Changes
+
+- Updated dependencies [[`20a68a8`](https://github.com/cloudflare/partykit/commit/20a68a841ef67464a41b55d500114cec6a8c6a6e)]:
+  - partytracks@0.0.38
+
 ## 0.0.11
 
 ### Patch Changes
