@@ -1,10 +1,11 @@
 {
   "name": "partywhen",
-  "version": "0.0.16",
+  "version": "0.0.14",
   "repository": {
     "type": "git",
-    "url": "git://github.com/threepointone/partyserver.git"
+    "url": "git://github.com/cloudflare/partykit.git"
   },
+  "homepage": "https://github.com/cloudflare/partykit/tree/main/packages/partywhen",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

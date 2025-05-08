@@ -2,9 +2,6 @@
 
 Yjs backend for PartyServer.
 
-> [!WARNING]
-> This project is experimental and is not yet recommended for production use.
-
 ## License
 
 ISC

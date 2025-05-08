@@ -33,6 +33,7 @@
     "type": "git",
     "url": "git://github.com/cloudflare/partykit.git"
   },
+  "homepage": "https://github.com/cloudflare/partykit/tree/main/packages/partytracks",
   "files": [
     "dist",
     "README.md"
