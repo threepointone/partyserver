@@ -523,7 +523,10 @@ const partysocket = new PartySocket({
     }
     this._removeListeners();
     try {
-      if (this._ws.readyState === this.OPEN || this._ws.readyState === this.CONNECTING) {
+      if (
+        this._ws.readyState === this.OPEN ||
+        this._ws.readyState === this.CONNECTING
+      ) {
         this._ws.close(code, reason);
       }
       this._handleClose(new Events.CloseEvent(code, reason, this));
