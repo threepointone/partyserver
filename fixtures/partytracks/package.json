@@ -1,14 +1,14 @@
 {
   "name": "@partyserver/fixture-partytracks",
   "private": true,
-  "version": "0.0.11",
+  "version": "0.0.12",
   "type": "module",
   "scripts": {
     "start": "vite dev"
   },
   "dependencies": {
     "hono": "^4.7.5",
-    "partytracks": "^0.0.37"
+    "partytracks": "^0.0.38"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250327.0"
