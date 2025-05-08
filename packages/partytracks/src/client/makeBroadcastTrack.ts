@@ -1,16 +1,14 @@
 import {
   BehaviorSubject,
   combineLatest,
-  delay,
   map,
   of,
   shareReplay,
+  Subject,
   switchMap,
   tap
 } from "rxjs";
 import { Observable } from "rxjs";
-import { broadcastSwitch } from "./broadcastSwitch";
-import { subscribe } from "diagnostics_channel";
 
 export interface MakeBroadcastTrackOptions {
   /**
@@ -67,28 +65,43 @@ export const makeBroadcastTrack = ({
     ((track: MediaStreamTrack) => Observable<MediaStreamTrack>)[]
   >(transformations);
 
-  // NOTE: It might seems strange that we're using combineLatest here with
-  // sourceTrack$ only to then wrap it with of() again below, but there is
-  // a reason for this! By unwrapping it here, we can hold the same track
-  // without releasing the device when transformationMiddleware$ emits a
-  // new value.
-  const transformedContentTrack$ = combineLatest([
-    transformationMiddleware$,
-    contentTrack$
-  ]).pipe(
-    switchMap(([transformations, sourceTrack]) =>
-      transformations.reduce(
-        (acc$, transformFn) => acc$.pipe(switchMap(transformFn)),
-        of(sourceTrack)
-      )
-    ),
-    // delay(0) here for React's StrictMode
-    delay(0),
-    shareReplay({
-      refCount: true,
-      bufferSize: 1
-    })
-  );
+  const enabled$ = new BehaviorSubject(enabled);
+  const enable = () => {
+    if (!enabled$.value) enabled$.next(true);
+  };
+  const disable = () => {
+    if (enabled$.value) {
+      enabled$.next(false);
+      stopBroadcasting();
+    }
+  };
+  const toggleEnabled = () => {
+    if (enabled$.value) {
+      disable();
+    } else {
+      enable();
+    }
+  };
+
+  const isBroadcasting$ = new BehaviorSubject(broadcasting);
+  const startBroadcasting = () => {
+    enable();
+    if (!isBroadcasting$.value) {
+      isBroadcasting$.next(true);
+    }
+  };
+  const stopBroadcasting = () => {
+    if (isBroadcasting$.value) isBroadcasting$.next(false);
+  };
+  const toggleBroadcasting = () => {
+    if (isBroadcasting$.value) {
+      stopBroadcasting();
+    } else {
+      startBroadcasting();
+    }
+  };
+
+  const error$ = new Subject<Error>();
 
   const addTransform = (
     transform: (track: MediaStreamTrack) => Observable<MediaStreamTrack>
@@ -106,18 +119,72 @@ export const makeBroadcastTrack = ({
     );
   };
 
-  const { broadcastTrack$, localMonitorTrack$, ...broadcastApi } =
-    broadcastSwitch({
-      fallbackTrack$,
-      contentTrack$: transformedContentTrack$,
-      broadcasting,
+  const enabledContent$ = enabled$.pipe(
+    switchMap((enabled) =>
       enabled
-    });
+        ? contentTrack$.pipe(
+            tap({
+              complete: () => {
+                disable();
+              },
+              error: (error) => {
+                disable();
+                if (!(error instanceof Error)) throw error;
+                error$.next(error);
+              }
+            }),
+            // Important to apply the middleware AFTER tapping the content for
+            // completion and errors, since the inner observable of switchMap
+            // will not propagate to the outer observable.
+            (source$: Observable<MediaStreamTrack>) =>
+              // NOTE: It might seems strange that we're using combineLatest here with
+              // source$ only to then wrap it with of() again below, but there is a
+              // reason for this! By unwrapping it here, we can hold the same track
+              // without releasing the device when transformationMiddleware$ emits a
+              // new value.
+              combineLatest([transformationMiddleware$, source$]).pipe(
+                switchMap(([transformations, source]) =>
+                  transformations.reduce(
+                    (acc$, transformFn) => acc$.pipe(switchMap(transformFn)),
+                    of(source)
+                  )
+                )
+              )
+          )
+        : fallbackTrack$
+    )
+  );
+
+  const broadcastTrack$ = combineLatest([enabled$, isBroadcasting$]).pipe(
+    switchMap(([enabled, isBroadcasting]) =>
+      enabled && isBroadcasting ? enabledContent$ : fallbackTrack$
+    ),
+    shareReplay({
+      refCount: true,
+      bufferSize: 1
+    })
+  );
+
+  const localMonitorTrack$ = enabled$.pipe(
+    switchMap((enabled) => (enabled ? enabledContent$ : fallbackTrack$)),
+    shareReplay({
+      refCount: true,
+      bufferSize: 1
+    })
+  );
 
   return {
+    enable,
+    disable,
+    toggleEnabled,
+    error$,
+    enabled$: enabled$.asObservable(),
     addTransform,
     removeTransform,
-    ...broadcastApi,
+    isBroadcasting$,
+    startBroadcasting,
+    stopBroadcasting,
+    toggleBroadcasting,
     localMonitorTrack$,
     broadcastTrack$:
       // by using combineLatest for the localMonitorTrack, we ensure

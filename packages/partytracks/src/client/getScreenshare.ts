@@ -1,18 +1,36 @@
 import { inaudibleAudioTrack$ } from "./inaudibleTrack$";
-import { map, switchMap, of } from "rxjs";
+import { map, switchMap, of, shareReplay, Observable, finalize } from "rxjs";
 import { blackCanvasTrack$ } from "./blackCanvasTrack$";
 import { screenshare$ } from "./screenshare$";
 import { makeBroadcastTrack } from "./makeBroadcastTrack";
 
+function autoResetReplay<T>(factory: () => Observable<T>) {
+  let shared$: Observable<T> | null = null;
+
+  return new Observable<T>((subscriber) => {
+    if (!shared$) {
+      shared$ = factory().pipe(
+        finalize(() => {
+          // Reset on complete/error
+          shared$ = null;
+        }),
+        shareReplay({ bufferSize: 1, refCount: true })
+      );
+    }
+
+    return shared$.subscribe(subscriber);
+  });
+}
+
 interface GetScreenshareOptions {
+  enabled?: boolean;
+  retainIdleTrack?: boolean;
   audio?:
     | boolean
     | {
         constraints?: MediaTrackConstraints;
         options?: {
           broadcasting?: boolean;
-          enabled?: boolean;
-          retainIdleTrack?: boolean;
         };
       };
   video?:
@@ -21,20 +39,18 @@ interface GetScreenshareOptions {
         constraints?: MediaTrackConstraints;
         options?: {
           broadcasting?: boolean;
-          enabled?: boolean;
-          retainIdleTrack?: boolean;
         };
       };
 }
 
 const defaultAudioConfig = {
   constraints: {} as MediaTrackConstraints,
-  options: { broadcasting: false, enabled: false, retainIdleTrack: false }
+  options: { broadcasting: false }
 };
 
 const defaultVideoConfig = {
   constraints: {} as MediaTrackConstraints,
-  options: { broadcasting: false, enabled: false, retainIdleTrack: false }
+  options: { broadcasting: false }
 };
 
 export const getScreenshare = (options: GetScreenshareOptions = {}) => {
@@ -68,11 +84,13 @@ export const getScreenshare = (options: GetScreenshareOptions = {}) => {
             ...defaultVideoConfig.options,
             ...options.video.options
           };
-  // TODO: pass in options
-  const screenshareSource$ = screenshare$({
-    audio: audioConstraints,
-    video: videoConstraints
-  });
+
+  const screenshareSource$ = autoResetReplay(() =>
+    screenshare$({
+      audio: audioConstraints,
+      video: videoConstraints
+    })
+  );
 
   const audioSourceTrack$ = screenshareSource$.pipe(
     switchMap((ms) => {
