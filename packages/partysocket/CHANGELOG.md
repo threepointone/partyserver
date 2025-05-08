@@ -1,5 +1,11 @@
 # partysocket
 
+## 1.1.4
+
+### Patch Changes
+
+- [#210](https://github.com/cloudflare/partykit/pull/210) [`c94cdb0`](https://github.com/cloudflare/partykit/commit/c94cdb0f092b606cf0142c56d607088ab6cfa132) Thanks [@emmachase](https://github.com/emmachase)! - Close websocket if disconnect is called during CONNECTING state
+
 ## 1.1.3
 
 ### Patch Changes
