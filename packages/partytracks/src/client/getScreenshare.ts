@@ -1,29 +1,15 @@
 import { inaudibleAudioTrack$ } from "./inaudibleTrack$";
-import { map, switchMap, of, shareReplay, Observable, finalize } from "rxjs";
+import { map, switchMap, of, BehaviorSubject } from "rxjs";
 import { blackCanvasTrack$ } from "./blackCanvasTrack$";
 import { screenshare$ } from "./screenshare$";
-import { makeBroadcastTrack } from "./makeBroadcastTrack";
-
-function autoResetReplay<T>(factory: () => Observable<T>) {
-  let shared$: Observable<T> | null = null;
-
-  return new Observable<T>((subscriber) => {
-    if (!shared$) {
-      shared$ = factory().pipe(
-        finalize(() => {
-          // Reset on complete/error
-          shared$ = null;
-        }),
-        shareReplay({ bufferSize: 1, refCount: true })
-      );
-    }
-
-    return shared$.subscribe(subscriber);
-  });
-}
+import { makeBroadcastTrack, type BroadcastTrack } from "./makeBroadcastTrack";
 
 interface GetScreenshareOptions {
-  enabled?: boolean;
+  /**
+  Whether isSourceEnabled should be initially true.
+  Defaults to false.
+  */
+  activateSource?: boolean;
   retainIdleTrack?: boolean;
   audio?:
     | boolean
@@ -53,7 +39,14 @@ const defaultVideoConfig = {
   options: { broadcasting: false }
 };
 
-export const getScreenshare = (options: GetScreenshareOptions = {}) => {
+const defaultOptions = {
+  activateSource: false,
+  retainIdleTrack: false
+} satisfies GetScreenshareOptions;
+
+export const getScreenshare = (
+  options: GetScreenshareOptions = defaultOptions
+) => {
   const audioConstraints =
     options.audio === true || options.audio === undefined
       ? defaultAudioConfig.constraints
@@ -85,12 +78,10 @@ export const getScreenshare = (options: GetScreenshareOptions = {}) => {
             ...options.video.options
           };
 
-  const screenshareSource$ = autoResetReplay(() =>
-    screenshare$({
-      audio: audioConstraints,
-      video: videoConstraints
-    })
-  );
+  const screenshareSource$ = screenshare$({
+    audio: audioConstraints,
+    video: videoConstraints
+  });
 
   const audioSourceTrack$ = screenshareSource$.pipe(
     switchMap((ms) => {
@@ -99,21 +90,73 @@ export const getScreenshare = (options: GetScreenshareOptions = {}) => {
     })
   );
 
-  const audio = makeBroadcastTrack({
+  const isSourceEnabled$ = new BehaviorSubject(
+    options.activateSource ?? defaultOptions.activateSource
+  );
+
+  const audioApi = makeBroadcastTrack({
     contentTrack$: audioSourceTrack$,
     fallbackTrack$: inaudibleAudioTrack$,
+    ...defaultOptions,
+    retainIdleTrack: options.retainIdleTrack,
+    isSourceEnabled$,
     ...audioBroadcastOptions
   });
+
+  const audio: Partial<typeof audioApi> = {
+    ...audioApi
+  };
+
+  delete audio.toggleIsSourceEnabled;
+  delete audio.disableSource;
+  delete audio.enableSource;
 
   const videoSourceTrack$ = screenshareSource$.pipe(
     map((ms) => ms.getVideoTracks()[0])
   );
 
-  const video = makeBroadcastTrack({
+  const videoApi = makeBroadcastTrack({
     contentTrack$: videoSourceTrack$,
     fallbackTrack$: blackCanvasTrack$,
+    retainIdleTrack: options.retainIdleTrack,
+    isSourceEnabled$,
     ...videoBroadcastOptions
   });
 
-  return { audio, video };
+  const video: Partial<typeof videoApi> = {
+    ...videoApi
+  };
+
+  delete video.toggleIsSourceEnabled;
+  delete video.disableSource;
+  delete video.enableSource;
+
+  const disableSource = () => {
+    audioApi.disableSource();
+    videoApi.disableSource();
+  };
+
+  const enableSource = () => {
+    audioApi.enableSource();
+    videoApi.enableSource();
+  };
+
+  const toggleIsSourceEnabled = () => {
+    audioApi.toggleIsSourceEnabled();
+    videoApi.toggleIsSourceEnabled();
+  };
+
+  return {
+    audio: audio as Omit<
+      BroadcastTrack,
+      "enableSource" | "disableSource" | "toggleIsSourceEnabled"
+    >,
+    video: video as Omit<
+      BroadcastTrack,
+      "enableSource" | "disableSource" | "toggleIsSourceEnabled"
+    >,
+    disableSource,
+    enableSource,
+    toggleIsSourceEnabled
+  };
 };

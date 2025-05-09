@@ -13,3 +13,4 @@ export { createAudioSink } from "./audioSink";
 export { getMic, getCamera } from "./getDevices";
 export type { MediaDevice } from "./getDevices";
 export type { CreateSinkOptions, SinkApi } from "./audioSink";
+export type { SafePermissionState } from "./permission$.ts";

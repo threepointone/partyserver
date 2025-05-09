@@ -1,4 +1,4 @@
-import { Observable } from "rxjs";
+import { Observable, ReplaySubject, share } from "rxjs";
 import invariant from "tiny-invariant";
 
 export function screenshare$(options: DisplayMediaStreamOptions) {
@@ -9,7 +9,6 @@ export function screenshare$(options: DisplayMediaStreamOptions) {
         ms.getTracks().forEach((t) => {
           subscriber.add(() => t.stop());
           t.addEventListener("ended", () => {
-            console.log("ENDED?!");
             return subscriber.complete();
           });
         });
@@ -24,5 +23,14 @@ export function screenshare$(options: DisplayMediaStreamOptions) {
         }
         subscriber.error(err);
       });
-  });
+  }).pipe(
+    // We basically want shareReplay({refCount: true, bufferSize:1})
+    // but that doesn't allow for resetting on complete/error, so we
+    // do this instead
+    share({
+      resetOnComplete: true,
+      resetOnError: true,
+      connector: () => new ReplaySubject(1)
+    })
+  );
 }
