@@ -157,6 +157,7 @@ export const getScreenshare = (
     >,
     disableSource,
     enableSource,
-    toggleIsSourceEnabled
+    toggleIsSourceEnabled,
+    isSourceEnabled$
   };
 };
