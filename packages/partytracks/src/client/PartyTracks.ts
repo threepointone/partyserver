@@ -330,12 +330,13 @@ export class PartyTracks {
   }
 
   push(
-    track$: Observable<MediaStreamTrack>,
+    sourceTrack$: Observable<MediaStreamTrack>,
     options: {
       sendEncodings$?: Observable<RTCRtpEncodingParameters[]>;
     } = {}
   ): Observable<TrackMetadata> {
-    const { sendEncodings$ = of([]) } = options;
+    const track$ = sourceTrack$.pipe(share());
+    const sendEncodings$ = (options.sendEncodings$ ?? of([])).pipe(share());
     // we want a single id for this connection, but we need to wait for
     // the first track to show up before we can proceed, so we
     const stableId$ = track$.pipe(
@@ -425,6 +426,8 @@ export class PartyTracks {
     track: MediaStreamTrack;
     trackMetadata: TrackMetadata;
   }> {
+    // make it a new object since we will us it later as key in a Map
+    trackMetadata = { ...trackMetadata };
     return new Observable<{
       track: MediaStreamTrack;
       trackMetadata: TrackMetadata;
