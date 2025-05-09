@@ -10,7 +10,7 @@ interface GetScreenshareOptions {
   Defaults to false.
   */
   activateSource?: boolean;
-  retainIdleTrack?: boolean;
+  retainIdleTracks?: boolean;
   audio?:
     | boolean
     | {
@@ -41,7 +41,7 @@ const defaultVideoConfig = {
 
 const defaultOptions = {
   activateSource: false,
-  retainIdleTrack: false
+  retainIdleTracks: false
 } satisfies GetScreenshareOptions;
 
 export const getScreenshare = (
@@ -98,7 +98,7 @@ export const getScreenshare = (
     contentTrack$: audioSourceTrack$,
     fallbackTrack$: inaudibleAudioTrack$,
     ...defaultOptions,
-    retainIdleTrack: options.retainIdleTrack,
+    retainIdleTrack: options.retainIdleTracks,
     isSourceEnabled$,
     ...audioBroadcastOptions
   });
@@ -118,7 +118,7 @@ export const getScreenshare = (
   const videoApi = makeBroadcastTrack({
     contentTrack$: videoSourceTrack$,
     fallbackTrack$: blackCanvasTrack$,
-    retainIdleTrack: options.retainIdleTrack,
+    retainIdleTrack: options.retainIdleTracks,
     isSourceEnabled$,
     ...videoBroadcastOptions
   });
