@@ -42,15 +42,22 @@ export function useObservableAsValue<T>(
  */
 export function useObservable<T>(
   observable: Observable<T>,
-  observer: Partial<Observer<T>>
+  observerOrNext: Partial<Observer<T>> | ((value: T) => void)
 ) {
-  const observerRef = useRef(observer);
-  observerRef.current = observer;
+  const observerOrNextRef = useRef(observerOrNext);
+  observerOrNextRef.current = observerOrNext;
   useEffect(() => {
     const subscription = observable.subscribe({
-      next: (value) => observerRef.current.next?.(value),
-      error: (value) => observerRef.current.error?.(value),
-      complete: () => observerRef.current.complete?.()
+      next: (value) =>
+        typeof observerOrNextRef.current === "function"
+          ? observerOrNextRef.current(value)
+          : observerOrNextRef.current.next?.(value),
+      error: (value) =>
+        typeof observerOrNextRef.current !== "function" &&
+        observerOrNextRef.current.error?.(value),
+      complete: () =>
+        typeof observerOrNextRef.current !== "function" &&
+        observerOrNextRef.current.complete?.()
     });
     return () => {
       subscription.unsubscribe();
