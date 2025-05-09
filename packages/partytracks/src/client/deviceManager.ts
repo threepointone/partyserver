@@ -9,12 +9,14 @@ import {
   shareReplay
 } from "rxjs";
 import type { Observable } from "rxjs";
+import { permission$ } from "./permission$";
 
 function deviceMatch(deviceA: MediaDeviceInfo, deviceB: MediaDeviceInfo) {
   return deviceA.kind === deviceB.kind && deviceA.label === deviceB.label;
 }
 
 interface DeviceManager {
+  permissionState$: Observable<PermissionState>;
   devices$: Observable<MediaDeviceInfo[]>;
   activeDevice$: Observable<MediaDeviceInfo>;
   setPreferredDevice: (device: MediaDeviceInfo) => void;
@@ -26,6 +28,7 @@ export const createDeviceManager = (options: {
   devices$: Observable<MediaDeviceInfo[]>;
   localStorageNamespace: string;
   activeDeviceId$: Observable<string>;
+  permissionName: "camera" | "microphone";
 }): DeviceManager => {
   const preferredDevice$ = localStorageValue$<MediaDeviceInfo>(
     `${options.localStorageNamespace}-preferred-device`
@@ -95,6 +98,7 @@ export const createDeviceManager = (options: {
   );
 
   return {
+    permissionState$: permission$(options.permissionName),
     devices$: options.devices$,
     deprioritizeDevice: (device) =>
       deprioritizedDevices.setValue((deprioritizedDevices) =>

@@ -8,9 +8,10 @@ import {
   merge,
   Observable,
   shareReplay,
-  delay,
   switchMap,
-  throwError
+  throwError,
+  share,
+  ReplaySubject
 } from "rxjs";
 
 import { logger } from "./logging";
@@ -85,11 +86,13 @@ export const resilientTrack$ = ({
           throwError(() => new DevicesExhaustedError())
         )
       ),
-      // delay(0) for React Strict Mode
-      delay(0),
-      shareReplay({
-        refCount: true,
-        bufferSize: 1
+      // We basically want shareReplay({refCount: true, bufferSize:1})
+      // but that doesn't allow for resetting on complete/error, so we
+      // do this instead
+      share({
+        resetOnComplete: true,
+        resetOnError: true,
+        connector: () => new ReplaySubject(1)
       })
     );
 

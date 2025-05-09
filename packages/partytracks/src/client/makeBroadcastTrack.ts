@@ -8,7 +8,7 @@ import {
   switchMap,
   tap
 } from "rxjs";
-import { Observable } from "rxjs";
+import type { Observable } from "rxjs";
 
 export interface MakeBroadcastTrackOptions {
   /**
@@ -18,8 +18,8 @@ export interface MakeBroadcastTrackOptions {
   */
   broadcasting?: boolean;
   /**
-  This option keeps the device active even when not broadcasting, so long
-  as the device is enabled. This should almost certainly ALWAYS be off for
+  This option keeps the source active even when not broadcasting, so long
+  as the source is enabled. This should almost certainly ALWAYS be off for
   video since users expect the camera light to be off for re-assurance.
   For audio, if the localMonitorTrack is subscribed to the idle track is
   already retained. But consumers should not HAVE to implement the "talking
@@ -31,7 +31,8 @@ export interface MakeBroadcastTrackOptions {
   */
   retainIdleTrack?: boolean;
   /**
-  TODO: Document
+  The main content track that will be the source for both broadcastTrack$ and
+  localMonitorTrack$.
   */
   contentTrack$: Observable<MediaStreamTrack>;
   /**
@@ -49,8 +50,12 @@ export interface MakeBroadcastTrackOptions {
   ) => Observable<MediaStreamTrack>)[];
   /**
   Whether or not enabled should be true initially. Defaults to true.
+  This needs to be a BehaviorSubject so that multiple tracks can share
+  the same enabled state (needed for screenshare API for example, which
+  may produce two tracks, audio and video, and when one is disabled, they
+  both are)
   */
-  enabled?: boolean;
+  isSourceEnabled$?: BehaviorSubject<boolean>;
 }
 
 export const makeBroadcastTrack = ({
@@ -59,33 +64,32 @@ export const makeBroadcastTrack = ({
   fallbackTrack$,
   contentTrack$,
   transformations = [(track: MediaStreamTrack) => of(track)],
-  enabled = true
+  isSourceEnabled$ = new BehaviorSubject(true)
 }: MakeBroadcastTrackOptions): BroadcastTrack => {
   const transformationMiddleware$ = new BehaviorSubject<
     ((track: MediaStreamTrack) => Observable<MediaStreamTrack>)[]
   >(transformations);
 
-  const enabled$ = new BehaviorSubject(enabled);
-  const enable = () => {
-    if (!enabled$.value) enabled$.next(true);
+  const enableSource = () => {
+    if (!isSourceEnabled$.value) isSourceEnabled$.next(true);
   };
-  const disable = () => {
-    if (enabled$.value) {
-      enabled$.next(false);
+  const disableSource = () => {
+    if (isSourceEnabled$.value) {
+      isSourceEnabled$.next(false);
       stopBroadcasting();
     }
   };
-  const toggleEnabled = () => {
-    if (enabled$.value) {
-      disable();
+  const toggleIsSourceEnabled = () => {
+    if (isSourceEnabled$.value) {
+      disableSource();
     } else {
-      enable();
+      enableSource();
     }
   };
 
   const isBroadcasting$ = new BehaviorSubject(broadcasting);
   const startBroadcasting = () => {
-    enable();
+    enableSource();
     if (!isBroadcasting$.value) {
       isBroadcasting$.next(true);
     }
@@ -119,16 +123,16 @@ export const makeBroadcastTrack = ({
     );
   };
 
-  const enabledContent$ = enabled$.pipe(
+  const enabledContent$ = isSourceEnabled$.pipe(
     switchMap((enabled) =>
       enabled
         ? contentTrack$.pipe(
             tap({
               complete: () => {
-                disable();
+                disableSource();
               },
               error: (error) => {
-                disable();
+                disableSource();
                 if (!(error instanceof Error)) throw error;
                 error$.next(error);
               }
@@ -140,7 +144,7 @@ export const makeBroadcastTrack = ({
               // NOTE: It might seems strange that we're using combineLatest here with
               // source$ only to then wrap it with of() again below, but there is a
               // reason for this! By unwrapping it here, we can hold the same track
-              // without releasing the device when transformationMiddleware$ emits a
+              // without releasing the source when transformationMiddleware$ emits a
               // new value.
               combineLatest([transformationMiddleware$, source$]).pipe(
                 switchMap(([transformations, source]) =>
@@ -155,7 +159,10 @@ export const makeBroadcastTrack = ({
     )
   );
 
-  const broadcastTrack$ = combineLatest([enabled$, isBroadcasting$]).pipe(
+  const broadcastTrack$ = combineLatest([
+    isSourceEnabled$,
+    isBroadcasting$
+  ]).pipe(
     switchMap(([enabled, isBroadcasting]) =>
       enabled && isBroadcasting ? enabledContent$ : fallbackTrack$
     ),
@@ -165,7 +172,7 @@ export const makeBroadcastTrack = ({
     })
   );
 
-  const localMonitorTrack$ = enabled$.pipe(
+  const localMonitorTrack$ = isSourceEnabled$.pipe(
     switchMap((enabled) => (enabled ? enabledContent$ : fallbackTrack$)),
     shareReplay({
       refCount: true,
@@ -174,11 +181,11 @@ export const makeBroadcastTrack = ({
   );
 
   return {
-    enable,
-    disable,
-    toggleEnabled,
     error$,
-    enabled$: enabled$.asObservable(),
+    enableSource,
+    disableSource,
+    toggleIsSourceEnabled,
+    isSourceEnabled$: isSourceEnabled$.asObservable(),
     addTransform,
     removeTransform,
     isBroadcasting$,
@@ -225,23 +232,23 @@ export interface BroadcastTrack {
     transform: (track: MediaStreamTrack) => Observable<MediaStreamTrack>
   ) => void;
   /**
-   Whether or not the device is currently broadcasting content.
+   Whether or not the source is currently broadcasting content.
    */
   isBroadcasting$: Observable<boolean>;
   /**
-   Starts sending content from the device.
+   Starts sending content from the source.
    */
   startBroadcasting: () => void;
   /**
-   Stops sending content from the device.
+   Stops sending content from the source.
    */
   stopBroadcasting: () => void;
   /**
-   Toggles sending content from the device.
+   Toggles sending content from the source.
    */
   toggleBroadcasting: () => void;
   /**
-   A monitor track that is "always on" for this device. You usually
+   A monitor track that is "always on" for this source. You usually
    only want this for your mic so that you can show "talking while muted"
    notifications. Users have a STRONG sensitivity to the webcam light
    being on even when the content might not be broadcasting, so it
@@ -256,26 +263,27 @@ export interface BroadcastTrack {
    */
   broadcastTrack$: Observable<MediaStreamTrack>;
   /**
-   Whether or not the device is enabled. If disabled, the content source
+   Whether or not the source is enabled. If disabled, the content source
    will not be requested, regardless of whether isBroadcasting is true
    or not. This can flip to false if an error is encountering acquiring
-   content source. Default value is `true`.
+   content source, or if the source completes (e.g. screenshare ended).
+   Default value is `true`.
    */
-  enabled$: Observable<boolean>;
+  isSourceEnabled$: Observable<boolean>;
   /**
-   Sets enabled to true.
+   Sets isSourceEnabled to true.
    */
-  enable: () => void;
+  enableSource: () => void;
   /**
-   Sets enabled to false.
+   Sets isSourceEnabled to false.
    */
-  disable: () => void;
+  disableSource: () => void;
   /**
-   Toggles enabled.
+   Toggles isSourceEnabled.
    */
-  toggleEnabled: () => void;
+  toggleIsSourceEnabled: () => void;
   /**
-   Emits errors encountered when acquiring content tracks.
+   Emits errors encountered when acquiring source.
    */
   error$: Observable<Error>;
 }

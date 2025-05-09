@@ -33,7 +33,12 @@ invariant(cameraSelect instanceof HTMLSelectElement);
 // MIC SETUP
 // =====================================================================
 
-const mic = getMic({ enabled: false });
+const mic = getMic();
+mic.error$.subscribe(console.error);
+
+mic.permissionState$.subscribe((ps) => {
+  console.log("Mic permissionState: ", ps);
+});
 
 micBroadcastButton.addEventListener("click", () => {
   mic.toggleBroadcasting();
@@ -46,11 +51,13 @@ mic.isBroadcasting$.subscribe((isBroadcasting) => {
 });
 
 micEnabledButton.addEventListener("click", () => {
-  mic.toggleEnabled();
+  mic.toggleIsSourceEnabled();
 });
 
-mic.enabled$.subscribe((enabled) => {
-  micEnabledButton.innerText = enabled ? "mic is enabled" : "mic is disabled";
+mic.isSourceEnabled$.subscribe((isSourceEnabled) => {
+  micEnabledButton.innerText = isSourceEnabled
+    ? "mic is enabled"
+    : "mic is disabled";
 });
 
 mic.devices$.subscribe((mics) => {
@@ -97,10 +104,10 @@ camera.isBroadcasting$.subscribe((isBroadcasting) => {
 });
 
 cameraEnabledButton.addEventListener("click", () => {
-  camera.toggleEnabled();
+  camera.toggleIsSourceEnabled();
 });
 
-camera.enabled$.subscribe((enabled) => {
+camera.isSourceEnabled$.subscribe((enabled) => {
   cameraEnabledButton.innerText = enabled
     ? "camera is enabled"
     : "camera is disabled";
@@ -160,18 +167,6 @@ invariant(screenshareVideoEnabledButton instanceof HTMLButtonElement);
 
 const screenshare = getScreenshare();
 
-// screenshare.video.localMonitorTrack$.subscribe((track) => {
-//   const ms = new MediaStream();
-//   ms.addTrack(track);
-//   localScreenshareVideo.srcObject = ms;
-// });
-//
-// screenshare.video.broadcastTrack$.subscribe((track) => {
-//   const ms = new MediaStream();
-//   ms.addTrack(track);
-//   localScreenshareVideo.srcObject = ms;
-// });
-
 screenshare.video.isBroadcasting$.subscribe((isBroadcasting) => {
   screenshareVideoBroadcastButton.innerText = `screenshare video is${isBroadcasting ? " " : " not "}broadcasting`;
 });
@@ -180,13 +175,28 @@ screenshareVideoBroadcastButton.onclick = () => {
   screenshare.video.toggleBroadcasting();
 };
 
-// TODO: RENAME enabled$ to isEnabled$
-screenshare.video.enabled$.subscribe((isEnabled) => {
-  screenshareVideoEnabledButton.innerText = `screenshare video is${isEnabled ? " " : " not "}enabled`;
+screenshare.video.isSourceEnabled$.subscribe((isSourceEnabled) => {
+  screenshareVideoEnabledButton.innerText = `screenshare video is${isSourceEnabled ? " " : " not "}enabled`;
 });
 
 screenshareVideoEnabledButton.onclick = () => {
-  screenshare.video.toggleEnabled();
+  screenshare.toggleIsSourceEnabled();
+};
+
+screenshare.audio.isBroadcasting$.subscribe((isBroadcasting) => {
+  screenshareAudioBroadcastButton.innerText = `screenshare audio is${isBroadcasting ? " " : " not "}broadcasting`;
+});
+
+screenshareAudioBroadcastButton.onclick = () => {
+  screenshare.audio.toggleBroadcasting();
+};
+
+screenshare.audio.isSourceEnabled$.subscribe((isSourceEnabled) => {
+  screenshareAudioEnabledButton.innerText = `screenshare audio is${isSourceEnabled ? " " : " not "}enabled`;
+});
+
+screenshareAudioEnabledButton.onclick = () => {
+  screenshare.toggleIsSourceEnabled();
 };
 
 // Push and pull tracks
@@ -198,10 +208,16 @@ const videoTrackMetadata$ = partyTracks.push(camera.broadcastTrack$);
 const screenshareVideoTrackMetadata$ = partyTracks.push(
   screenshare.video.broadcastTrack$
 );
+const screenshareAudioTrackMetadata$ = partyTracks.push(
+  screenshare.audio.broadcastTrack$
+);
 const pulledAudioTrack$ = partyTracks.pull(audioTrackMetadata$);
 const pulledVideoTrack$ = partyTracks.pull(videoTrackMetadata$);
-const screensharePulledVideoTrack$ = partyTracks.pull(
+const pulledScreenshareVideoTrack$ = partyTracks.pull(
   screenshareVideoTrackMetadata$
+);
+const pulledScreenshareAudioTrack$ = partyTracks.pull(
+  screenshareAudioTrackMetadata$
 );
 
 camera.broadcastTrack$.subscribe((track) => {
@@ -216,13 +232,13 @@ pulledVideoTrack$.subscribe((track) => {
   remoteVideo.srcObject = remoteMediaStream;
 });
 
-screenshare.video.localMonitorTrack$.subscribe((track) => {
-  const localScreenshareVideoStream = new MediaStream();
-  localScreenshareVideoStream.addTrack(track);
-  localScreenshareVideo.srcObject = localScreenshareVideoStream;
-});
+// screenshare.video.localMonitorTrack$.subscribe((track) => {
+//   const localScreenshareVideoStream = new MediaStream();
+//   localScreenshareVideoStream.addTrack(track);
+//   localScreenshareVideo.srcObject = localScreenshareVideoStream;
+// });
 
-screensharePulledVideoTrack$.subscribe((track) => {
+pulledScreenshareVideoTrack$.subscribe((track) => {
   const remoteScreenshareVideoStream = new MediaStream();
   remoteScreenshareVideoStream.addTrack(track);
   remoteScreenshareVideo.srcObject = remoteScreenshareVideoStream;
@@ -230,6 +246,9 @@ screensharePulledVideoTrack$.subscribe((track) => {
 
 const audioSink = createAudioSink({ audioElement: audio });
 const pulledTrackSinkSubscription = audioSink.attach(pulledAudioTrack$);
+const pulledScreenshareAudioTrackSinkSubscription = audioSink.attach(
+  pulledScreenshareAudioTrack$
+);
 
 // Remove track and unsubscribe by calling:
 // pulledTrackSinkSubscription.unsubscribe();

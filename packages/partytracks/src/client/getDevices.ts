@@ -14,6 +14,7 @@ interface GetDeviceOptions {
   kind: "audioinput" | "videoinput";
   fallbackTrack$: Observable<MediaStreamTrack>;
   retainIdleTrackDefaultValue: boolean;
+  permissionName: "camera" | "microphone";
 }
 
 interface MediaOptions {
@@ -43,9 +44,9 @@ interface MediaOptions {
     track: MediaStreamTrack
   ) => Observable<MediaStreamTrack>)[];
   /**
-  Whether or not enabled should be true initially. Defaults to true.
+  Whether or not isSourceEnabled should be true initially. Defaults to true.
   */
-  enabled?: boolean;
+  activateSource?: boolean;
 }
 
 interface MediaDeviceOptions
@@ -55,10 +56,11 @@ interface MediaDeviceOptions
 const getDevice = ({
   kind,
   fallbackTrack$,
-  retainIdleTrackDefaultValue
+  retainIdleTrackDefaultValue,
+  permissionName
 }: GetDeviceOptions) => {
   return ({
-    enabled,
+    activateSource = true,
     transformations,
     retainIdleTrack,
     onDeviceFailure,
@@ -74,7 +76,8 @@ const getDevice = ({
       createDeviceManager({
         localStorageNamespace: `partytracks-${kind}`,
         devices$: inputDevices$,
-        activeDeviceId$
+        activeDeviceId$,
+        permissionName
       });
     const sourceTrack$ = resilientTrack$({
       kind,
@@ -89,9 +92,10 @@ const getDevice = ({
         activeDeviceId$.next(track.getSettings().deviceId ?? "default")
       )
     );
+    const isSourceEnabled$ = new BehaviorSubject(activateSource);
     const broadcastApi = makeBroadcastTrack({
       broadcasting,
-      enabled,
+      isSourceEnabled$,
       fallbackTrack$,
       contentTrack$: sourceTrack$,
       retainIdleTrack: retainIdleTrack ?? retainIdleTrackDefaultValue
@@ -105,6 +109,10 @@ const getDevice = ({
 };
 
 export interface MediaDevice extends BroadcastTrack {
+  /**
+   * The permission state of the device.
+   */
+  permissionState$: Observable<PermissionState>;
   /**
    A list of available devices. Use this to create your device
    selection options.
@@ -130,11 +138,13 @@ export interface MediaDevice extends BroadcastTrack {
 export const getMic = getDevice({
   kind: "audioinput",
   fallbackTrack$: inaudibleAudioTrack$,
-  retainIdleTrackDefaultValue: true
+  retainIdleTrackDefaultValue: true,
+  permissionName: "microphone"
 });
 
 export const getCamera = getDevice({
   kind: "videoinput",
   fallbackTrack$: blackCanvasTrack$,
-  retainIdleTrackDefaultValue: false
+  retainIdleTrackDefaultValue: false,
+  permissionName: "camera"
 });
