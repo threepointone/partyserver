@@ -91,6 +91,7 @@ export class PartyTracks {
           ],
           bundlePolicy: "max-bundle"
         });
+        subscriber.add(() => peerConnection.close());
         peerConnection.addEventListener("connectionstatechange", () => {
           if (
             peerConnection.connectionState === "failed" ||
