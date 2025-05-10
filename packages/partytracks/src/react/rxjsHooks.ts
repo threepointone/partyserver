@@ -72,9 +72,9 @@ export function useObservable<T>(
 export function useValueAsObservable<T>(value: T): Observable<T> {
   const ref = useRef(new BehaviorSubject(value));
   const observableRef = useRef(ref.current.asObservable());
-  const previousValue = useRef<T>(undefined);
-  if (previousValue.current !== value) {
-    previousValue.current = value;
+  const previousValueRef = useRef<T>(value);
+  if (previousValueRef.current !== value) {
+    previousValueRef.current = value;
     // since subscribers might call a setState, we don't want to
     // do this in the render path.
     queueMicrotask(() => ref.current.next(value));
