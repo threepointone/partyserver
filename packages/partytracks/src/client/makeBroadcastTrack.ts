@@ -9,6 +9,7 @@ import {
   tap
 } from "rxjs";
 import type { Observable } from "rxjs";
+import { handoffMap } from "./handoffMap";
 
 export interface MakeBroadcastTrackOptions {
   /**
@@ -163,7 +164,7 @@ export const makeBroadcastTrack = ({
     isSourceEnabled$,
     isBroadcasting$
   ]).pipe(
-    switchMap(([enabled, isBroadcasting]) =>
+    handoffMap(([enabled, isBroadcasting]) =>
       enabled && isBroadcasting ? enabledContent$ : fallbackTrack$
     ),
     shareReplay({
@@ -173,7 +174,7 @@ export const makeBroadcastTrack = ({
   );
 
   const localMonitorTrack$ = isSourceEnabled$.pipe(
-    switchMap((enabled) => (enabled ? enabledContent$ : fallbackTrack$)),
+    handoffMap((enabled) => (enabled ? enabledContent$ : fallbackTrack$)),
     shareReplay({
       refCount: true,
       bufferSize: 1
