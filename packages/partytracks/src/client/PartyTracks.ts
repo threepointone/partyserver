@@ -11,7 +11,6 @@ import {
   Observable,
   of,
   ReplaySubject,
-  share,
   shareReplay,
   skip,
   switchMap,
@@ -174,7 +173,7 @@ export class PartyTracks {
           () => peerConnection.connectionState
         )
       ),
-      share()
+      shareReplay({ refCount: true, bufferSize: 1 })
     );
   }
 
@@ -336,8 +335,12 @@ export class PartyTracks {
       sendEncodings$?: Observable<RTCRtpEncodingParameters[]>;
     } = {}
   ): Observable<TrackMetadata> {
-    const track$ = sourceTrack$.pipe(share());
-    const sendEncodings$ = (options.sendEncodings$ ?? of([])).pipe(share());
+    const track$ = sourceTrack$.pipe(
+      shareReplay({ refCount: true, bufferSize: 1 })
+    );
+    const sendEncodings$ = (options.sendEncodings$ ?? of([])).pipe(
+      shareReplay({ refCount: true, bufferSize: 1 })
+    );
     // we want a single id for this connection, but we need to wait for
     // the first track to show up before we can proceed, so we
     const stableId$ = track$.pipe(
