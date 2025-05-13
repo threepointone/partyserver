@@ -107,8 +107,11 @@ export const getScreenshare = (
     ...audioApi
   };
 
+  // biome-ignore lint/performance/noDelete: <explanation>
   delete audio.toggleIsSourceEnabled;
+  // biome-ignore lint/performance/noDelete: <explanation>
   delete audio.disableSource;
+  // biome-ignore lint/performance/noDelete: <explanation>
   delete audio.enableSource;
 
   const videoSourceTrack$ = screenshareSource$.pipe(
@@ -127,8 +130,11 @@ export const getScreenshare = (
     ...videoApi
   };
 
+  // biome-ignore lint/performance/noDelete: <explanation>
   delete video.toggleIsSourceEnabled;
+  // biome-ignore lint/performance/noDelete: <explanation>
   delete video.disableSource;
+  // biome-ignore lint/performance/noDelete: <explanation>
   delete video.enableSource;
 
   const disableSource = () => {
