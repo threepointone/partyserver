@@ -148,22 +148,18 @@ const remoteScreenshareVideo = document.getElementById(
 const screenshareAudioBroadcastButton = document.getElementById(
   "screenshare-audio-broadcast-button"
 );
-const screenshareAudioEnabledButton = document.getElementById(
-  "screenshare-audio-enabled-button"
-);
 const screenshareVideoBroadcastButton = document.getElementById(
   "screenshare-video-broadcast-button"
 );
-const screenshareVideoEnabledButton = document.getElementById(
-  "screenshare-video-enabled-button"
+const screenshareSourceEnabledButton = document.getElementById(
+  "screenshare-source-enabled-button"
 );
 
 invariant(localScreenshareVideo instanceof HTMLVideoElement);
 invariant(remoteScreenshareVideo instanceof HTMLVideoElement);
 invariant(screenshareAudioBroadcastButton instanceof HTMLButtonElement);
-invariant(screenshareAudioEnabledButton instanceof HTMLButtonElement);
 invariant(screenshareVideoBroadcastButton instanceof HTMLButtonElement);
-invariant(screenshareVideoEnabledButton instanceof HTMLButtonElement);
+invariant(screenshareSourceEnabledButton instanceof HTMLButtonElement);
 
 const screenshare = getScreenshare();
 
@@ -175,11 +171,11 @@ screenshareVideoBroadcastButton.onclick = () => {
   screenshare.video.toggleBroadcasting();
 };
 
-screenshare.video.isSourceEnabled$.subscribe((isSourceEnabled) => {
-  screenshareVideoEnabledButton.innerText = `screenshare video is${isSourceEnabled ? " " : " not "}enabled`;
+screenshare.isSourceEnabled$.subscribe((isSourceEnabled) => {
+  screenshareSourceEnabledButton.innerText = `screenshare souce is${isSourceEnabled ? " " : " not "}enabled`;
 });
 
-screenshareVideoEnabledButton.onclick = () => {
+screenshareSourceEnabledButton.onclick = () => {
   screenshare.toggleIsSourceEnabled();
 };
 
@@ -189,14 +185,6 @@ screenshare.audio.isBroadcasting$.subscribe((isBroadcasting) => {
 
 screenshareAudioBroadcastButton.onclick = () => {
   screenshare.audio.toggleBroadcasting();
-};
-
-screenshare.audio.isSourceEnabled$.subscribe((isSourceEnabled) => {
-  screenshareAudioEnabledButton.innerText = `screenshare audio is${isSourceEnabled ? " " : " not "}enabled`;
-});
-
-screenshareAudioEnabledButton.onclick = () => {
-  screenshare.toggleIsSourceEnabled();
 };
 
 // Push and pull tracks

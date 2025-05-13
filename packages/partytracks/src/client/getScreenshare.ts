@@ -124,6 +124,8 @@ export const getScreenshare = (
   delete audio.disableSource;
   // biome-ignore lint/performance/noDelete: <explanation>
   delete audio.enableSource;
+  // biome-ignore lint/performance/noDelete: <explanation>
+  delete audio.isSourceEnabled$;
 
   const videoSourceTrack$ = screenshareSource$.pipe(
     map((ms) => ms.getVideoTracks()[0])
@@ -147,30 +149,41 @@ export const getScreenshare = (
   delete video.disableSource;
   // biome-ignore lint/performance/noDelete: <explanation>
   delete video.enableSource;
+  // biome-ignore lint/performance/noDelete: <explanation>
+  delete video.isSourceEnabled$;
 
   const disableSource = () => {
-    audioApi.disableSource();
-    videoApi.disableSource();
+    isSourceEnabled$.next(false);
+    videoApi.stopBroadcasting();
+    audioApi.stopBroadcasting();
   };
 
   const enableSource = () => {
-    audioApi.enableSource();
-    videoApi.enableSource();
+    isSourceEnabled$.next(true);
   };
 
   const toggleIsSourceEnabled = () => {
-    audioApi.toggleIsSourceEnabled();
-    videoApi.toggleIsSourceEnabled();
+    if (isSourceEnabled$.value) {
+      disableSource();
+    } else {
+      enableSource();
+    }
   };
 
   return {
     audio: audio as Omit<
       BroadcastTrack,
-      "enableSource" | "disableSource" | "toggleIsSourceEnabled"
+      | "enableSource"
+      | "disableSource"
+      | "toggleIsSourceEnabled"
+      | "isSourceEnabled$"
     >,
     video: video as Omit<
       BroadcastTrack,
-      "enableSource" | "disableSource" | "toggleIsSourceEnabled"
+      | "enableSource"
+      | "disableSource"
+      | "toggleIsSourceEnabled"
+      | "isSourceEnabled$"
     >,
     disableSource,
     enableSource,
