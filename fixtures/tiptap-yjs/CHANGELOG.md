@@ -1,5 +1,12 @@
 # @partyserver/fixture-tiptap-yjs
 
+## 0.0.8
+
+### Patch Changes
+
+- Updated dependencies [[`d2335e8`](https://github.com/cloudflare/partykit/commit/d2335e80e96f15717ec0705cf768c2181081527c)]:
+  - y-partyserver@0.0.44
+
 ## 0.0.7
 
 ### Patch Changes

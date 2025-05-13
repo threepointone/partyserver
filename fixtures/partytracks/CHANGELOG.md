@@ -1,5 +1,15 @@
 # @partyserver/fixture-partytracks
 
+## 0.0.13
+
+### Patch Changes
+
+- [#216](https://github.com/cloudflare/partykit/pull/216) [`fb6adc2`](https://github.com/cloudflare/partykit/commit/fb6adc2af78b3d1027e3c145f41c9ab916b92013) Thanks [@third774](https://github.com/third774)! - - Add getMic, getCamera, and createAudioSink utils.
+  - Lock sessions to their initiator via a cookie w/ JWT.
+  - Fixed a bug where toggling a device off and on rapidly could leave it in a "stuck on" state.
+- Updated dependencies [[`964a1c4`](https://github.com/cloudflare/partykit/commit/964a1c491b3206bf82dcd63f12a328477baa9896), [`fb6adc2`](https://github.com/cloudflare/partykit/commit/fb6adc2af78b3d1027e3c145f41c9ab916b92013), [`9c9d9df`](https://github.com/cloudflare/partykit/commit/9c9d9dfcbac565e017852a1773dbbe79117b924d)]:
+  - partytracks@0.0.39
+
 ## 0.0.12
 
 ### Patch Changes
