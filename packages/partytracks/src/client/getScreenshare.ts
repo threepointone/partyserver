@@ -10,12 +10,20 @@ interface GetScreenshareOptions {
   Defaults to false.
   */
   activateSource?: boolean;
+  /**
+  Whether or not tracks should be retained even if there are no
+  active subscribers to the content source. (For example, if isBroadcasting$
+  is false, and localMonitorTrack$ has no subscribers)
+  */
   retainIdleTracks?: boolean;
   audio?:
     | boolean
     | {
         constraints?: MediaTrackConstraints;
         options?: {
+          /**
+          Whether or not the track should be broadcasting to start
+          */
           broadcasting?: boolean;
         };
       };
@@ -24,6 +32,9 @@ interface GetScreenshareOptions {
     | {
         constraints?: MediaTrackConstraints;
         options?: {
+          /**
+          Whether or not the track should be broadcasting to start
+          */
           broadcasting?: boolean;
         };
       };

@@ -237,7 +237,8 @@ export interface BroadcastTrack {
    */
   isBroadcasting$: Observable<boolean>;
   /**
-   Starts sending content from the source.
+   Starts sending content from the source. Will call enableSource()
+   if it's not already enabled.
    */
   startBroadcasting: () => void;
   /**
@@ -276,7 +277,8 @@ export interface BroadcastTrack {
    */
   enableSource: () => void;
   /**
-   Sets isSourceEnabled to false.
+   Sets isSourceEnabled to false. Will also call stopBroadcasting() if
+   it is broadcasting.
    */
   disableSource: () => void;
   /**
@@ -284,7 +286,8 @@ export interface BroadcastTrack {
    */
   toggleIsSourceEnabled: () => void;
   /**
-   Emits errors encountered when acquiring source.
+   Emits errors encountered when acquiring source. Most likely to either be
+   DevicesExhaustedError (a partytracks custom error) or NotAllowedError.
    */
   error$: Observable<Error>;
 }
