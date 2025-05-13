@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { devices$, PartyTracks, resilientTrack$ } from "partytracks/client";
-import { useObservableAsValue, useOnEmit } from "partytracks/react";
+import { useObservableAsValue, useObservable } from "partytracks/react";
 import { map } from "rxjs";
 
 import type { ComponentProps, ComponentRef } from "react";
@@ -91,7 +91,7 @@ function Button(props: ComponentProps<"button">) {
 
 function Video(props: { videoTrack$: Observable<MediaStreamTrack | null> }) {
   const ref = useRef<ComponentRef<"video">>(null);
-  useOnEmit(props.videoTrack$, (track) => {
+  useObservable(props.videoTrack$, (track) => {
     if (!ref.current) return;
     if (track) {
       const mediaStream = new MediaStream();
@@ -109,7 +109,7 @@ function Video(props: { videoTrack$: Observable<MediaStreamTrack | null> }) {
 
 function Audio(props: { audioTrack$: Observable<MediaStreamTrack | null> }) {
   const ref = useRef<ComponentRef<"audio">>(null);
-  useOnEmit(props.audioTrack$, (track) => {
+  useObservable(props.audioTrack$, (track) => {
     if (!ref.current) return;
     if (track) {
       const mediaStream = new MediaStream();
