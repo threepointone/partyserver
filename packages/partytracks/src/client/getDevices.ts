@@ -121,16 +121,16 @@ export interface MediaDevice extends BroadcastTrack {
    */
   devices$: Observable<MediaDeviceInfo[]>;
   /**
-   The active device, if one has been acquired, otherwise the default.
-   Use this to show your user which device is active in your device
-   selection UI.
+   The active device, if one has been acquired, otherwise the preferred
+   device, otherwise the default device. Use this to show your user which
+   device is active in your device selection UI.
    */
   activeDevice$: Observable<MediaDeviceInfo>;
   /**
    Sets the user's preferred device. Once set, this is persisted to
    localStorage so that the preference can be remembered. When the
    preferred device is unavailable, all other availalble devices will
-   be tried. If a preferred device *becomes* available, it will switch
+   be tried. If the preferred device *becomes* available, it will switch
    to the preferred device.
    */
   setPreferredDevice: (device: MediaDeviceInfo) => void;
