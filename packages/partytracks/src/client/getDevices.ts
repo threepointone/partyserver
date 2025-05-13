@@ -9,6 +9,7 @@ import type { Observable } from "rxjs";
 import { blackCanvasTrack$ } from "./blackCanvasTrack$";
 import { createDeviceManager } from "./deviceManager";
 import { makeBroadcastTrack, type BroadcastTrack } from "./makeBroadcastTrack";
+import type { SafePermissionState } from "./permission$";
 
 interface GetDeviceOptions {
   kind: "audioinput" | "videoinput";
@@ -112,7 +113,7 @@ export interface MediaDevice extends BroadcastTrack {
   /**
    * The permission state of the device.
    */
-  permissionState$: Observable<PermissionState>;
+  permissionState$: Observable<SafePermissionState>;
   /**
    A list of available devices. Use this to create your device
    selection options.

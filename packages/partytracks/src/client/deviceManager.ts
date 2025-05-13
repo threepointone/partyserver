@@ -9,14 +9,14 @@ import {
   shareReplay
 } from "rxjs";
 import type { Observable } from "rxjs";
-import { permission$ } from "./permission$";
+import { permission$, type SafePermissionState } from "./permission$";
 
 function deviceMatch(deviceA: MediaDeviceInfo, deviceB: MediaDeviceInfo) {
   return deviceA.kind === deviceB.kind && deviceA.label === deviceB.label;
 }
 
 interface DeviceManager {
-  permissionState$: Observable<PermissionState>;
+  permissionState$: Observable<SafePermissionState>;
   devices$: Observable<MediaDeviceInfo[]>;
   activeDevice$: Observable<MediaDeviceInfo>;
   setPreferredDevice: (device: MediaDeviceInfo) => void;
