@@ -1,5 +1,11 @@
 # y-partyserver
 
+## 0.0.44
+
+### Patch Changes
+
+- [#167](https://github.com/cloudflare/partykit/pull/167) [`d2335e8`](https://github.com/cloudflare/partykit/commit/d2335e80e96f15717ec0705cf768c2181081527c) Thanks [@waynetee](https://github.com/waynetee)! - Fix y-partyserver chunking
+
 ## 0.0.43
 
 ### Patch Changes
