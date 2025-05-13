@@ -220,12 +220,6 @@ pulledVideoTrack$.subscribe((track) => {
   remoteVideo.srcObject = remoteMediaStream;
 });
 
-// screenshare.video.localMonitorTrack$.subscribe((track) => {
-//   const localScreenshareVideoStream = new MediaStream();
-//   localScreenshareVideoStream.addTrack(track);
-//   localScreenshareVideo.srcObject = localScreenshareVideoStream;
-// });
-
 pulledScreenshareVideoTrack$.subscribe((track) => {
   const remoteScreenshareVideoStream = new MediaStream();
   remoteScreenshareVideoStream.addTrack(track);
@@ -238,5 +232,6 @@ const pulledScreenshareAudioTrackSinkSubscription = audioSink.attach(
   pulledScreenshareAudioTrack$
 );
 
-// Remove track and unsubscribe by calling:
+// Remove a pushed/pulled track by calling unsubscribe():
+// videoTrackMetadata$.unsubscribe()
 // pulledTrackSinkSubscription.unsubscribe();
