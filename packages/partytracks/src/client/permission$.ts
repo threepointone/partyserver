@@ -13,17 +13,15 @@ import type { Observable } from "rxjs";
 
 export type SafePermissionState = PermissionState | "unknown";
 
-export const permission$ = (name: string): Observable<SafePermissionState> => {
+export const permission$ = (
+  name: "camera" | "microphone"
+): Observable<SafePermissionState> => {
   return concat(
     defer(() =>
-      from(
-        navigator.permissions
-          .query({ name: name as any })
-          .then((ps) => ps.state)
-      )
+      from(navigator.permissions.query({ name }).then((ps) => ps.state))
     ),
     defer(() =>
-      from(navigator.permissions.query({ name: name as any })).pipe(
+      from(navigator.permissions.query({ name })).pipe(
         switchMap((permissionStatus) =>
           combineLatest([
             of(permissionStatus),
