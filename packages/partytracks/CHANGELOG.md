@@ -1,5 +1,13 @@
 # partytracks
 
+## 0.0.40
+
+### Patch Changes
+
+- [#225](https://github.com/cloudflare/partykit/pull/225) [`9eec05e`](https://github.com/cloudflare/partykit/commit/9eec05eee9e80c57bf9799a5234ec513d35b389b) Thanks [@third774](https://github.com/third774)! - Hoist timeout out of setup and clear so there can only be one timeout at a time
+
+- [#225](https://github.com/cloudflare/partykit/pull/225) [`4d441ac`](https://github.com/cloudflare/partykit/commit/4d441aceae8bc52a65ed6fce61129dcc77d47443) Thanks [@third774](https://github.com/third774)! - Bail early when closing tracks if peerConnection is already closed
+
 ## 0.0.39
 
 ### Patch Changes
