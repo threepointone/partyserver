@@ -630,6 +630,9 @@ export class PartyTracks {
     }
     this.closeTrackDispatcher.doBulkRequest({ mid }, (mids) =>
       this.taskScheduler.schedule(async () => {
+        // No need to renegotiate and close track if the peerConnection
+        // is already closed.
+        if (peerConnection.connectionState === "closed") return;
         transceiver.stop();
         // create an offer
         const offer = await peerConnection.createOffer();
