@@ -18,7 +18,7 @@ ISC
 
 ## partytracks 🎶
 
-A utility library for [Cloudflare Calls](https://developers.cloudflare.com/calls/) built with RxJS Observables.
+A utility library for [Cloudflare Realtime SFU](https://developers.cloudflare.com/realtime/introduction/) built with RxJS Observables.
 
 ### Example
 
@@ -80,7 +80,7 @@ setTimeout(() => {
 #### Server code:
 
 In your server, you need to have a path that proxies all requests over to
-the Cloudflare Calls API and provides your app id and token. In a worker,
+the Cloudflare Realtime SFU API and provides your app id and token. In a worker,
 it will look something like this:
 
 ```ts
