@@ -10,6 +10,7 @@ import { blackCanvasTrack$ } from "./blackCanvasTrack$";
 import { createDeviceManager } from "./deviceManager";
 import { makeBroadcastTrack, type BroadcastTrack } from "./makeBroadcastTrack";
 import type { SafePermissionState } from "./permission$";
+import type { Prettify } from "../ts-utils";
 
 interface GetDeviceOptions {
   kind: "audioinput" | "videoinput";
@@ -26,16 +27,10 @@ interface MediaOptions {
   */
   broadcasting?: boolean;
   /**
-  This option keeps the device active even when not broadcasting, so long
-  as the device is enabled. This should almost certainly ALWAYS be off for
-  video since users expect the camera light to be off for re-assurance.
-  For audio, if the localMonitorTrack is subscribed to the idle track is
-  already retained. But consumers should not HAVE to implement the "talking
-  while muted" notifications in order to benefit from the instant unmute
-  that comes with keeping the track active even while muted.
+  Keeps the track source active regardless of whether there are any subscribers
+  to either localMonitorTrack$ or broadcastTrack$.
 
-  All that to say: if you want the mic to be released when stopBroadcasting
-  is called, set this to false, and do not subscribe to the localMonitorTrack.
+  Defaults to true for mic and false for camera.
   */
   retainIdleTrack?: boolean;
   /**
@@ -50,9 +45,9 @@ interface MediaOptions {
   activateSource?: boolean;
 }
 
-interface MediaDeviceOptions
-  extends MediaOptions,
-    Omit<ResilientTrackOptions, "kind" | "devicePriority$"> {}
+export type MediaDeviceOptions = Prettify<
+  MediaOptions & Omit<ResilientTrackOptions, "kind" | "devicePriority$">
+>;
 
 const getDevice = ({
   kind,

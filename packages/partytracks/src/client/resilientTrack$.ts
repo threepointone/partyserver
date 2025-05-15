@@ -18,6 +18,7 @@ import { logger } from "./logging";
 import { trackIsHealthy } from "./trackIsHealthy";
 
 import type { Subscriber } from "rxjs";
+import type { Prettify } from "../ts-utils";
 
 export class DevicesExhaustedError extends Error {
   constructor(message?: string) {
@@ -55,8 +56,24 @@ export const devices$ = defer(() =>
 
 export interface ResilientTrackOptions {
   kind: "audioinput" | "videoinput";
-  constraints?: MediaTrackConstraints;
+  /**
+  An Observable of devices in prioritized order. Each device will be tried
+  until a healthy track is acquired. Only provide this if you don't want
+  to use the library's default device management API.
+  */
   devicePriority$?: Observable<MediaDeviceInfo[]>;
+  /**
+  Constraints for the device. This is passed into
+  navigator.mediaDevices.getUserMedia(). deviceId and groupId are excluded
+  because _all_ devices will be tried eventually if the preferred device
+  is not available.
+  */
+  constraints?: Omit<MediaTrackConstraints, "deviceId" | "groupId">;
+  /**
+  A callback to be notified when an individual device fails to produce
+  a healthy track. Useful for potentially surfacing messages to the user, or
+  for optionally deprioritizing the device in the future.
+  */
   onDeviceFailure?: (device: MediaDeviceInfo) => void;
 }
 
