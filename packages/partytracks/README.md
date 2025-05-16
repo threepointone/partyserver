@@ -2,6 +2,12 @@
 
 Audio/video handling for realtime apps using Observables for WebRTC using [Cloudflare Realtime SFU](https://developers.cloudflare.com/realtime/introduction/).
 
+## Installation
+
+```shell
+npm install partytracks
+```
+
 ## Features
 
 - **Observable-based API** - Better handling of WebRTC complexities
@@ -132,6 +138,76 @@ function SomeComponent({ value }) {
 ```
 
 ## API Reference
+
+### PartyTracks
+
+The `PartyTracks` class handles all WebRTC negotiations through `push` and `pull` methods.
+
+```ts
+class PartyTracks {
+  constructor(config?: PartyTracksConfig);
+  /**
+     Pushes a track to the Realtime SFU. If the sourceTrack$ emits a new
+     track after the initial one, the new track will replace the old one
+     on the transceiver. Same with sendEncodings$, the initial values will
+     be applied, and subsequent emissions will be applied.
+  
+     Additionally, if the peerConnection is disrupted and session$ emits
+     a new peerConnection/sessionId combo, the track will be re-pushed,
+     and will emit new TrackMetadata
+     */
+  push(
+    sourceTrack$: Observable<MediaStreamTrack>,
+    options?: {
+      sendEncodings$?: Observable<RTCRtpEncodingParameters[]>;
+    }
+  ): Observable<TrackMetadata>;
+
+  /**
+     Pulls a track from the Realtime SFU. If trackData$ emits new TrackMetadata
+     or if the peerConnection is disrupted and session$ emits a new
+     peerConnection/sessionId combo, the track will be re-pulled, and will emit
+     a new MediaStreamTrack.
+    */
+  pull(
+    trackData$: Observable<TrackMetadata>,
+    options?: {
+      simulcast?: {
+        preferredRid$: Observable<string | undefined>;
+      };
+    }
+  ): Observable<MediaStreamTrack>;
+
+  /**
+     An observable of the active peerConnection. If the active peerConnection
+     is disrupted, a new one will be created and emitted
+     */
+  peerConnection$: Observable<RTCPeerConnection>;
+
+  /**
+     An observable of the active peerConnection and its associated sessionId.
+     This flows from the peerConnection$, and will emit with the new peerConnection
+     and a new sessionId when the peerConnection changes.
+     */
+  session$: Observable<{
+    peerConnection: RTCPeerConnection;
+    sessionId: string;
+  }>;
+
+  /**
+     Emits transceivers each time they are added  to the peerConnection.
+     */
+  transceiver$: Observable<RTCRtpTransceiver>;
+  /**
+     An observable of the peerConnection's connectionState.
+     */
+  peerConnectionState$: Observable<RTCPeerConnectionState>;
+  /**
+     Useful for logging/debugging purposes.
+     */
+  history: History<ApiHistoryEntry>;
+}
+```
 
 ### `getMic` and `getCamera`
 
@@ -503,5 +579,7 @@ const audioTrackMetadata$ = of({
   // track metadata...
 });
 const pulledAudioTrack$ = partyTracks.pull(audioTrackMetadata$);
+// No need to "detatch", unsubscribing from pulledTrackSinkSubscription
+// will do the appropriate cleanup.
 const pulledTrackSinkSubscription = audioSink.attach(pulledAudioTrack$);
 ```

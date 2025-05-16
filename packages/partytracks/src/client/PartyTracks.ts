@@ -58,22 +58,40 @@ export type ApiHistoryEntry =
     };
 
 export class PartyTracks {
+  /**
+   Useful for logging/debugging purposes.
+   */
   history: History<ApiHistoryEntry>;
+  /**
+   An observable of the active peerConnection. If the active peerConnection
+   is disrupted, a new one will be created and emitted
+   */
   peerConnection$: Observable<RTCPeerConnection>;
+  /**
+   An observable of the active peerConnection and its associated sessionId.
+   This flows from the peerConnection$, and will emit with the new peerConnection
+   and a new sessionId when the peerConnection changes.
+   */
   session$: Observable<{
     peerConnection: RTCPeerConnection;
     sessionId: string;
   }>;
   #transceiver$: Subject<RTCRtpTransceiver> = new ReplaySubject();
+  /**
+   Emits transceivers each time they are added  to the peerConnection.
+   */
   transceiver$: Observable<RTCRtpTransceiver> =
     this.#transceiver$.asObservable();
   sessionError$: Observable<string>;
+  /**
+   An observable of the peerConnection's connectionState.
+   */
   peerConnectionState$: Observable<RTCPeerConnectionState>;
-  config: PartyTracksConfig;
+  #config: PartyTracksConfig;
   #params: URLSearchParams;
 
   constructor(config: PartyTracksConfig = {}) {
-    this.config = {
+    this.#config = {
       prefix: "/partytracks",
       maxApiHistory: 100,
       ...config
@@ -150,7 +168,7 @@ export class PartyTracks {
     this.session$ = this.peerConnection$.pipe(
       // TODO: Convert the promise based session creation here
       // into an observable that will close the session in cleanup
-      switchMap((pc) => from(this.createSession(pc))),
+      switchMap((pc) => from(this.#createSession(pc))),
       retryWithBackoff(),
       // we want new subscribers to receive the session right away
       shareReplay({
@@ -178,15 +196,15 @@ export class PartyTracks {
     );
   }
 
-  taskScheduler = new FIFOScheduler();
-  pushTrackDispatcher = new BulkRequestDispatcher<
+  #taskScheduler = new FIFOScheduler();
+  #pushTrackDispatcher = new BulkRequestDispatcher<
     {
       trackName: string;
       transceiver: RTCRtpTransceiver;
     },
     { tracks: TrackMetadata[] }
   >(32);
-  pullTrackDispatcher = new BulkRequestDispatcher<
+  #pullTrackDispatcher = new BulkRequestDispatcher<
     TrackMetadata,
     {
       trackMap: Map<
@@ -195,14 +213,14 @@ export class PartyTracks {
       >;
     }
   >(32);
-  closeTrackDispatcher = new BulkRequestDispatcher<{ mid: string }, unknown>(
+  #closeTrackDispatcher = new BulkRequestDispatcher<{ mid: string }, unknown>(
     32
   );
 
-  async createSession(peerConnection: RTCPeerConnection) {
+  async #createSession(peerConnection: RTCPeerConnection) {
     logger.debug("🆕 creating new session");
-    const response = await this.fetchWithRecordedHistory(
-      `${this.config.prefix}/sessions/new?${this.#params}`,
+    const response = await this.#fetchWithRecordedHistory(
+      `${this.#config.prefix}/sessions/new?${this.#params}`,
       { method: "POST" }
     );
     if (response.status > 400) {
@@ -219,7 +237,7 @@ export class PartyTracks {
     }
   }
 
-  async fetchWithRecordedHistory(path: string, requestInit?: RequestInit) {
+  async #fetchWithRecordedHistory(path: string, requestInit?: RequestInit) {
     this.history.log({
       endpoint: path,
       method: requestInit?.method ?? "get",
@@ -230,7 +248,7 @@ export class PartyTracks {
           : undefined
     });
     const headers = new Headers(requestInit?.headers);
-    const additionalHeaders = this.config.headers;
+    const additionalHeaders = this.#config.headers;
 
     if (additionalHeaders) {
       additionalHeaders.forEach((value, key) => {
@@ -265,9 +283,9 @@ export class PartyTracks {
   ): Observable<TrackMetadata> {
     return new Observable<TrackMetadata>((subscriber) => {
       logger.debug("📤 pushing track ", trackName);
-      this.pushTrackDispatcher
+      this.#pushTrackDispatcher
         .doBulkRequest({ trackName, transceiver }, (tracks) =>
-          this.taskScheduler.schedule(async () => {
+          this.#taskScheduler.schedule(async () => {
             // create an offer
             const offer = await peerConnection.createOffer();
             // And set the offer as the local description
@@ -284,8 +302,8 @@ export class PartyTracks {
                 location: "local"
               }))
             };
-            const response = await this.fetchWithRecordedHistory(
-              `${this.config.prefix}/sessions/${sessionId}/tracks/new?${this.#params}`,
+            const response = await this.#fetchWithRecordedHistory(
+              `${this.#config.prefix}/sessions/${sessionId}/tracks/new?${this.#params}`,
               {
                 method: "POST",
                 body: JSON.stringify(requestBody)
@@ -330,6 +348,16 @@ export class PartyTracks {
     }).pipe(retryWithBackoff());
   }
 
+  /**
+   Pushes a track to the Realtime SFU. If the sourceTrack$ emits a new
+   track after the initial one, the new track will replace the old one
+   on the transceiver. Same with sendEncodings$, the initial values will
+   be applied, and subsequent emissions will be applied.
+
+   Additionally, if the peerConnection is disrupted and session$ emits
+   a new peerConnection/sessionId combo, the track will be re-pushed,
+   and will emit new TrackMetadata
+   */
   push(
     sourceTrack$: Observable<MediaStreamTrack>,
     options: {
@@ -438,12 +466,12 @@ export class PartyTracks {
       trackMetadata: TrackMetadata;
     }>((subscriber) => {
       logger.debug("📥 pulling track ", trackMetadata.trackName);
-      this.pullTrackDispatcher
+      this.#pullTrackDispatcher
         .doBulkRequest(trackMetadata, (tracks) =>
-          this.taskScheduler.schedule(async () => {
+          this.#taskScheduler.schedule(async () => {
             const newTrackResponse: TracksResponse =
-              await this.fetchWithRecordedHistory(
-                `${this.config.prefix}/sessions/${sessionId}/tracks/new?${this.#params}`,
+              await this.#fetchWithRecordedHistory(
+                `${this.#config.prefix}/sessions/${sessionId}/tracks/new?${this.#params}`,
                 {
                   method: "POST",
                   body: JSON.stringify({
@@ -485,18 +513,19 @@ export class PartyTracks {
               const answer = await peerConnection.createAnswer();
               await peerConnection.setLocalDescription(answer);
 
-              const renegotiationResponse = await this.fetchWithRecordedHistory(
-                `${this.config.prefix}/sessions/${sessionId}/renegotiate?${this.#params}`,
-                {
-                  method: "PUT",
-                  body: JSON.stringify({
-                    sessionDescription: {
-                      type: "answer",
-                      sdp: peerConnection.currentLocalDescription?.sdp
-                    }
-                  })
-                }
-              ).then((res) => res.json() as Promise<RenegotiationResponse>);
+              const renegotiationResponse =
+                await this.#fetchWithRecordedHistory(
+                  `${this.#config.prefix}/sessions/${sessionId}/renegotiate?${this.#params}`,
+                  {
+                    method: "PUT",
+                    body: JSON.stringify({
+                      sessionDescription: {
+                        type: "answer",
+                        sdp: peerConnection.currentLocalDescription?.sdp
+                      }
+                    })
+                  }
+                ).then((res) => res.json() as Promise<RenegotiationResponse>);
               if (renegotiationResponse.errorCode) {
                 throw new Error(renegotiationResponse.errorDescription);
               } else {
@@ -535,6 +564,12 @@ export class PartyTracks {
     }).pipe(retryWithBackoff());
   }
 
+  /**
+   Pulls a track from the Realtime SFU. If trackData$ emits new TrackMetadata
+   or if the peerConnection is disrupted and session$ emits a new
+   peerConnection/sessionId combo, the track will be re-pulled, and will emit
+   a new MediaStreamTrack.
+  */
   pull(
     trackData$: Observable<TrackMetadata>,
     options: {
@@ -604,8 +639,8 @@ export class PartyTracks {
               }
             ]
           };
-          this.fetchWithRecordedHistory(
-            `${this.config.prefix}/sessions/${sessionId}/tracks/update?${this.#params}`,
+          this.#fetchWithRecordedHistory(
+            `${this.#config.prefix}/sessions/${sessionId}/tracks/update?${this.#params}`,
             { method: "PUT", body: JSON.stringify(request) }
           );
         }
@@ -628,8 +663,8 @@ export class PartyTracks {
     ) {
       return;
     }
-    this.closeTrackDispatcher.doBulkRequest({ mid }, (mids) =>
-      this.taskScheduler.schedule(async () => {
+    this.#closeTrackDispatcher.doBulkRequest({ mid }, (mids) =>
+      this.#taskScheduler.schedule(async () => {
         // No need to renegotiate and close track if the peerConnection
         // is already closed.
         if (peerConnection.connectionState === "closed") return;
@@ -646,8 +681,8 @@ export class PartyTracks {
           },
           force: false
         };
-        const response = await this.fetchWithRecordedHistory(
-          `${this.config.prefix}/sessions/${sessionId}/tracks/close?${this.#params}`,
+        const response = await this.#fetchWithRecordedHistory(
+          `${this.#config.prefix}/sessions/${sessionId}/tracks/close?${this.#params}`,
           {
             method: "PUT",
             body: JSON.stringify(requestBody)
