@@ -6,7 +6,3 @@ RPC (Remote Procedure Call) system for PartyServer. Enables typesafe function ca
 
 - **Typesafe RPC** - Function calls from client to server
 - **Bidirectional** - Supports server-to-client RPC calls
-
-## License
-
-ISC

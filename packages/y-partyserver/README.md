@@ -2,10 +2,6 @@
 
 Yjs backend for PartyServer.
 
-## License
-
-ISC
-
 [//]: # "keep in sync with packages/y-partyserver/README.md"
 [//]: # "keep in sync with docs/reference/y-partyserver.md"
 

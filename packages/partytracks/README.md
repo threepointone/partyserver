@@ -18,10 +18,6 @@ npm install partytracks
 
 A promise-based API (push a track, get a promise of metadata) seems simpler but proved to be a leaky abstraction when things go wrong. Sometimes a webcam is unplugged, or your peer connection drops when switching networks. Observables allow all of the logic of replacing/repairing tracks and connections to be contained within the library, allowing your application code to not be concerned with the details of WebRTC.
 
-## License
-
-ISC
-
 ## Usage
 
 ### Client code:

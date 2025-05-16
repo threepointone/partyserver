@@ -6,7 +6,3 @@ One Durable Object per user model for PartyServer. Designed for managing user-sp
 
 - **Per-User State** - One Durable Object instance per user
 - **Session Management** - Handles user session data
-
-## License
-
-ISC

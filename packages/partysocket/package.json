@@ -61,7 +61,7 @@
     "directory": "packages/partysocket"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "event-target-polyfill": "^0.0.4"
   },
