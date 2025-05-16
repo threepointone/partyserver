@@ -14,7 +14,3 @@ Autonomous agents powered by Durable Objects. Extends PartySync for state synchr
 
 - [Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)
 - [Agents Architecture](https://huyenchip.com/2025/01/07/agents.html)
-
-## License
-
-ISC

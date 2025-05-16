@@ -2,10 +2,6 @@
 
 Sophisticated scheduler for durable tasks, built on Durable Object Alarms.
 
-## License
-
-ISC
-
 - schedule tasks by time, delay, or cron expression
 - schedule multiple tasks on the same object
 - query tasks by description or id (or by time range?)
