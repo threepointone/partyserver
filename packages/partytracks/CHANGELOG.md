@@ -1,5 +1,13 @@
 # partytracks
 
+## 0.0.41
+
+### Patch Changes
+
+- [#227](https://github.com/cloudflare/partykit/pull/227) [`960716b`](https://github.com/cloudflare/partykit/commit/960716b2f78fded0f702149dfefffec228be7f33) Thanks [@third774](https://github.com/third774)! - Documentation improvements
+
+- [#227](https://github.com/cloudflare/partykit/pull/227) [`ae55a28`](https://github.com/cloudflare/partykit/commit/ae55a28e09fb8118e34b050ff6f9068944105ac8) Thanks [@third774](https://github.com/third774)! - Clean up PartyTracks public API and improve docs
+
 ## 0.0.40
 
 ### Patch Changes
