@@ -6,6 +6,7 @@ export {
 } from "./resilientTrack$";
 export { screenshare$ } from "./screenshare$";
 export { getScreenshare } from "./getScreenshare.ts";
+export type { Screenshare } from "./getScreenshare.ts";
 export { setLogLevel } from "./logging";
 export type { PartyTracksConfig, ApiHistoryEntry } from "./PartyTracks";
 export type { TrackMetadata } from "./callsTypes";
