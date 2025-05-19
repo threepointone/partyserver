@@ -1,5 +1,12 @@
 # partytracks
 
+## 0.0.42
+
+### Patch Changes
+
+- [#232](https://github.com/cloudflare/partykit/pull/232) [`81d1053`](https://github.com/cloudflare/partykit/commit/81d105369685c13a1fd2de928e8ccc13f95bc990) Thanks [@third774](https://github.com/third774)! - - Convert isBroadcasting$ from a BehaviorSubject to an Observable
+  - Export Screenshare types
+
 ## 0.0.41
 
 ### Patch Changes
