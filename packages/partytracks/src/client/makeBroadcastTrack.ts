@@ -189,7 +189,7 @@ export const makeBroadcastTrack = ({
     isSourceEnabled$: isSourceEnabled$.asObservable(),
     addTransform,
     removeTransform,
-    isBroadcasting$,
+    isBroadcasting$: isBroadcasting$.asObservable(),
     startBroadcasting,
     stopBroadcasting,
     toggleBroadcasting,
