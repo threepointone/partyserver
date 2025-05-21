@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.43
+
+### Patch Changes
+
+- [#235](https://github.com/cloudflare/partykit/pull/235) [`a9ce9bd`](https://github.com/cloudflare/partykit/commit/a9ce9bd8e9439d96dfafe51329dcfe623a6ca444) Thanks [@third774](https://github.com/third774)! - Fix audio context issues
+
 ## 0.0.42
 
 ### Patch Changes
