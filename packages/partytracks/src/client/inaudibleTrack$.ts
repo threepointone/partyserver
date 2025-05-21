@@ -1,8 +1,23 @@
 import { Observable, shareReplay } from "rxjs";
 
+const userGestureEvents = [
+  "click",
+  "contextmenu",
+  "auxclick",
+  "dblclick",
+  "mousedown",
+  "mouseup",
+  "pointerup",
+  "touchend",
+  "keydown",
+  "keyup"
+];
+
+let audioContextStartedPreviously = false;
+
 export const inaudibleAudioTrack$ = new Observable<MediaStreamTrack>(
   (subscriber) => {
-    const audioContext = new window.AudioContext();
+    const audioContext = new AudioContext();
 
     const oscillator = audioContext.createOscillator();
     oscillator.type = "triangle";
@@ -20,24 +35,58 @@ export const inaudibleAudioTrack$ = new Observable<MediaStreamTrack>(
 
     const track = destination.stream.getAudioTracks()[0];
 
-    const start = () => {
+    let oscillatorStarted = false;
+    const ensureOscillatorStarted = () => {
+      if (oscillatorStarted) return;
       oscillator.start();
-      subscriber.next(track);
-      document.removeEventListener("click", start, { capture: true });
-      document.removeEventListener("keydown", start, { capture: true });
+      oscillatorStarted = true;
     };
-    document.addEventListener("click", start, { capture: true, once: true });
-    document.addEventListener("keydown", start, { capture: true, once: true });
 
-    if (audioContext.state === "running") {
-      start();
+    const stateChangeHandler = () => {
+      if (audioContext.state === "running") {
+        audioContextStartedPreviously = true;
+        ensureOscillatorStarted();
+        subscriber.next(track);
+      }
+      if (
+        audioContext.state === "suspended" ||
+        (audioContext.state as string) === "interrupted"
+      ) {
+        resumeAudioContext();
+      }
+    };
+
+    audioContext.addEventListener("statechange", stateChangeHandler);
+
+    const resumeAudioContext = () => {
+      audioContext.resume().then(() => {
+        cleanUpUserGestureListeners();
+      });
+    };
+
+    const cleanUpUserGestureListeners = () => {
+      userGestureEvents.forEach((gesture) => {
+        document.removeEventListener(gesture, resumeAudioContext, {
+          capture: true
+        });
+      });
+    };
+
+    if (audioContextStartedPreviously) {
+      resumeAudioContext();
+    } else {
+      userGestureEvents.forEach((gesture) => {
+        document.addEventListener(gesture, resumeAudioContext, {
+          capture: true
+        });
+      });
     }
 
     return () => {
       track.stop();
       audioContext.close();
-      document.removeEventListener("click", start, { capture: true });
-      document.removeEventListener("keydown", start, { capture: true });
+      audioContext.removeEventListener("statechange", stateChangeHandler);
+      cleanUpUserGestureListeners();
     };
   }
 ).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
