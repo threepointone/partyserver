@@ -34,6 +34,7 @@ export const inaudibleAudioTrack$ = new Observable<MediaStreamTrack>(
     gainNode.connect(destination);
 
     const track = destination.stream.getAudioTracks()[0];
+    subscriber.next(track);
 
     let oscillatorStarted = false;
     const ensureOscillatorStarted = () => {
@@ -46,7 +47,6 @@ export const inaudibleAudioTrack$ = new Observable<MediaStreamTrack>(
       if (audioContext.state === "running") {
         audioContextStartedPreviously = true;
         ensureOscillatorStarted();
-        subscriber.next(track);
       }
       if (
         audioContext.state === "suspended" ||

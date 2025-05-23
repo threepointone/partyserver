@@ -325,12 +325,19 @@ export class PartyTracks {
         .then(({ tracks }) => {
           const trackData = tracks.find((t) => t.mid === transceiver.mid);
           if (trackData) {
-            subscriber.next({
-              ...trackData,
-              sessionId,
-              location: "remote"
+            // we wait for the transceiver to start sending data before we emit
+            // the track metadata to ensure that the track will be able to be
+            // pulled before making the metadata available to anyone else.
+            const cancelWait = waitForTransceiverToSendData(transceiver, () => {
+              subscriber.next({
+                ...trackData,
+                sessionId,
+                location: "remote"
+              });
             });
+
             subscriber.add(() => {
+              cancelWait();
               if (transceiver.mid) {
                 logger.debug("🔚 Closing pushed track ", trackName);
                 this.#closeTrackInBulk(
@@ -713,6 +720,54 @@ async function resolveTransceiver(
 
     peerConnection.addEventListener("track", handler);
   });
+}
+
+function waitForTransceiverToSendData(
+  transceiver: RTCRtpTransceiver,
+  onDataSent: () => void
+): () => void {
+  let delay = 1; // Start at 5ms
+  let checks = 0;
+  const maxDelay = 100; // Max delay of 100ms
+  let timeoutId: number | undefined;
+  let cancelled = false;
+
+  const checkStats = async () => {
+    if (cancelled) return;
+    checks++;
+
+    try {
+      const stats = await transceiver.sender.getStats();
+      let dataFound = false;
+      stats.forEach((stat) => {
+        if (stat.type === "outbound-rtp" && stat.bytesSent > 0) {
+          dataFound = true;
+        }
+      });
+
+      if (dataFound && !cancelled) {
+        onDataSent();
+        return;
+      } else if (dataFound) {
+        return;
+      }
+    } catch (error) {
+      // Stats might not be available yet, continue checking
+    }
+
+    delay = Math.min(delay * 1.1, maxDelay); // Exponential backoff with max cap
+    timeoutId = window.setTimeout(checkStats, delay);
+  };
+
+  checkStats();
+
+  // Return cleanup function
+  return () => {
+    cancelled = true;
+    if (timeoutId !== undefined) {
+      clearTimeout(timeoutId);
+    }
+  };
 }
 
 async function signalingStateIsStable(peerConnection: RTCPeerConnection) {
