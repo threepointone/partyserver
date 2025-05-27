@@ -4,7 +4,6 @@ import type { Observable } from "rxjs";
 import { blackCanvasTrack$ } from "./blackCanvasTrack$";
 import { screenshare$ } from "./screenshare$";
 import { makeBroadcastTrack, type BroadcastTrack } from "./makeBroadcastTrack";
-import type { Prettify } from "../ts-utils";
 
 interface ScreenshareOptions {
   /**
@@ -107,11 +106,15 @@ export const getScreenshare = (
     options.activateSource ?? defaultOptions.activateSource
   );
 
+  const audioIsBroadcasting$ = new BehaviorSubject(
+    audioBroadcastOptions.broadcasting
+  );
   const audioApi = makeBroadcastTrack({
     contentTrack$: audioSourceTrack$,
     fallbackTrack$: inaudibleAudioTrack$,
     ...defaultOptions,
     retainIdleTrack: options.retainIdleTracks,
+    isBroadcasting$: audioIsBroadcasting$,
     isSourceEnabled$,
     ...audioBroadcastOptions
   });
@@ -133,10 +136,14 @@ export const getScreenshare = (
     map((ms) => ms.getVideoTracks()[0])
   );
 
+  const videoIsBroadcasting$ = new BehaviorSubject(
+    videoBroadcastOptions.broadcasting
+  );
   const videoApi = makeBroadcastTrack({
     contentTrack$: videoSourceTrack$,
     fallbackTrack$: blackCanvasTrack$,
     retainIdleTrack: options.retainIdleTracks,
+    isBroadcasting$: videoIsBroadcasting$,
     isSourceEnabled$,
     ...videoBroadcastOptions
   });
@@ -172,6 +179,24 @@ export const getScreenshare = (
     }
   };
 
+  const startBroadcasting = () => {
+    audioApi.startBroadcasting();
+    videoApi.startBroadcasting();
+  };
+
+  const stopBroadcasting = () => {
+    audioApi.stopBroadcasting();
+    videoApi.stopBroadcasting();
+  };
+
+  const toggleBroadcasting = () => {
+    if (audioIsBroadcasting$.value || videoIsBroadcasting$.value) {
+      stopBroadcasting();
+    } else {
+      startBroadcasting();
+    }
+  };
+
   return {
     audio: audio as Omit<
       BroadcastTrack,
@@ -190,7 +215,10 @@ export const getScreenshare = (
     disableSource,
     enableSource,
     toggleIsSourceEnabled,
-    isSourceEnabled$
+    isSourceEnabled$,
+    startBroadcasting,
+    stopBroadcasting,
+    toggleBroadcasting
   };
 };
 
@@ -219,6 +247,19 @@ export interface Screenshare {
    Toggles isSourceEnabled.
    */
   toggleIsSourceEnabled: () => void;
+  /**
+   Starts broadcasting both video and audio tracks.
+   */
+  startBroadcasting: () => void;
+  /**
+   Stops broadcasting both video and audio tracks.
+   */
+  stopBroadcasting: () => void;
+  /**
+   Toggles broadcasting both video and audio tracks. If either is
+   broadcasting, it will call stopBroadcasting on both.
+   */
+  toggleBroadcasting: () => void;
 }
 
 export interface ScreenshareBroadcastTrack {
