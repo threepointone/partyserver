@@ -18,6 +18,7 @@ export interface MakeBroadcastTrackOptions {
   Default: false
   */
   broadcasting?: boolean;
+  isBroadcasting$?: BehaviorSubject<boolean>;
   /**
   This option keeps the source active even when not broadcasting, so long
   as the source is enabled. This should almost certainly ALWAYS be off for
@@ -65,7 +66,8 @@ export const makeBroadcastTrack = ({
   fallbackTrack$,
   contentTrack$,
   transformations = [(track: MediaStreamTrack) => of(track)],
-  isSourceEnabled$ = new BehaviorSubject(true)
+  isSourceEnabled$ = new BehaviorSubject(true),
+  isBroadcasting$ = new BehaviorSubject(broadcasting)
 }: MakeBroadcastTrackOptions): BroadcastTrack => {
   const transformationMiddleware$ = new BehaviorSubject<
     ((track: MediaStreamTrack) => Observable<MediaStreamTrack>)[]
@@ -88,7 +90,6 @@ export const makeBroadcastTrack = ({
     }
   };
 
-  const isBroadcasting$ = new BehaviorSubject(broadcasting);
   const startBroadcasting = () => {
     enableSource();
     if (!isBroadcasting$.value) {
