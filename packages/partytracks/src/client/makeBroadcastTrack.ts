@@ -162,10 +162,13 @@ export const makeBroadcastTrack = ({
 
   const broadcastTrack$ = combineLatest([
     isSourceEnabled$,
-    isBroadcasting$
+    isBroadcasting$,
+    // unwrapping and re-wrapping the fallbackTrack to keep it active so
+    // that we don't recreate it each time isBroadcasting is toggled
+    fallbackTrack$
   ]).pipe(
-    handoffMap(([enabled, isBroadcasting]) =>
-      enabled && isBroadcasting ? enabledContent$ : fallbackTrack$
+    handoffMap(([enabled, isBroadcasting, fallbackTrack]) =>
+      enabled && isBroadcasting ? enabledContent$ : of(fallbackTrack)
     ),
     shareReplay({
       refCount: true,
