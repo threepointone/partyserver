@@ -1,6 +1,6 @@
 {
   "name": "partytracks",
-  "version": "0.0.43",
+  "version": "0.0.44",
   "scripts": {
     "check:test": "(cd tests; vitest --no-watch)",
     "prebuild": "rm -rf dist",
