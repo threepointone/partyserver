@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.45
+
+### Patch Changes
+
+- [#240](https://github.com/cloudflare/partykit/pull/240) [`187371d`](https://github.com/cloudflare/partykit/commit/187371d44baf227a420d8168568efdda1265a958) Thanks [@third774](https://github.com/third774)! - Fixed issues with screensharing API
+
 ## 0.0.44
 
 ### Patch Changes
