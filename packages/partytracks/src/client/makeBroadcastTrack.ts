@@ -9,7 +9,6 @@ import {
   tap
 } from "rxjs";
 import type { Observable } from "rxjs";
-import { handoffMap } from "./handoffMap";
 
 export interface MakeBroadcastTrackOptions {
   /**
@@ -18,7 +17,7 @@ export interface MakeBroadcastTrackOptions {
   Default: false
   */
   broadcasting?: boolean;
-  isBroadcasting$?: BehaviorSubject<boolean>;
+  shouldBroadcast$?: BehaviorSubject<boolean>;
   /**
   This option keeps the source active even when not broadcasting, so long
   as the source is enabled. This should almost certainly ALWAYS be off for
@@ -67,8 +66,9 @@ export const makeBroadcastTrack = ({
   contentTrack$,
   transformations = [(track: MediaStreamTrack) => of(track)],
   isSourceEnabled$ = new BehaviorSubject(true),
-  isBroadcasting$ = new BehaviorSubject(broadcasting)
+  shouldBroadcast$ = new BehaviorSubject(broadcasting)
 }: MakeBroadcastTrackOptions): BroadcastTrack => {
+  const isBroadcasting$ = new BehaviorSubject(false);
   const transformationMiddleware$ = new BehaviorSubject<
     ((track: MediaStreamTrack) => Observable<MediaStreamTrack>)[]
   >(transformations);
@@ -92,15 +92,15 @@ export const makeBroadcastTrack = ({
 
   const startBroadcasting = () => {
     enableSource();
-    if (!isBroadcasting$.value) {
-      isBroadcasting$.next(true);
+    if (!shouldBroadcast$.value) {
+      shouldBroadcast$.next(true);
     }
   };
   const stopBroadcasting = () => {
-    if (isBroadcasting$.value) isBroadcasting$.next(false);
+    if (shouldBroadcast$.value) shouldBroadcast$.next(false);
   };
   const toggleBroadcasting = () => {
-    if (isBroadcasting$.value) {
+    if (shouldBroadcast$.value) {
       stopBroadcasting();
     } else {
       startBroadcasting();
@@ -163,13 +163,15 @@ export const makeBroadcastTrack = ({
 
   const broadcastTrack$ = combineLatest([
     isSourceEnabled$,
-    isBroadcasting$,
+    shouldBroadcast$,
     // unwrapping and re-wrapping the fallbackTrack to keep it active so
     // that we don't recreate it each time isBroadcasting is toggled
     fallbackTrack$
   ]).pipe(
-    handoffMap(([enabled, isBroadcasting, fallbackTrack]) =>
-      enabled && isBroadcasting ? enabledContent$ : of(fallbackTrack)
+    switchMap(([enabled, isBroadcasting, fallbackTrack]) =>
+      enabled && isBroadcasting
+        ? enabledContent$.pipe(tap(() => isBroadcasting$.next(true)))
+        : of(fallbackTrack).pipe(tap(() => isBroadcasting$.next(false)))
     ),
     shareReplay({
       refCount: true,
@@ -178,7 +180,7 @@ export const makeBroadcastTrack = ({
   );
 
   const localMonitorTrack$ = isSourceEnabled$.pipe(
-    handoffMap((enabled) => (enabled ? enabledContent$ : fallbackTrack$)),
+    switchMap((enabled) => (enabled ? enabledContent$ : fallbackTrack$)),
     shareReplay({
       refCount: true,
       bufferSize: 1
