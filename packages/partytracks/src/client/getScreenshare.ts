@@ -106,7 +106,7 @@ export const getScreenshare = (
     options.activateSource ?? defaultOptions.activateSource
   );
 
-  const audioIsBroadcasting$ = new BehaviorSubject(
+  const audioShouldBroadcast$ = new BehaviorSubject(
     audioBroadcastOptions.broadcasting
   );
   const audioApi = makeBroadcastTrack({
@@ -114,7 +114,7 @@ export const getScreenshare = (
     fallbackTrack$: inaudibleAudioTrack$,
     ...defaultOptions,
     retainIdleTrack: options.retainIdleTracks,
-    isBroadcasting$: audioIsBroadcasting$,
+    shouldBroadcast$: audioShouldBroadcast$,
     isSourceEnabled$,
     ...audioBroadcastOptions
   });
@@ -136,14 +136,14 @@ export const getScreenshare = (
     map((ms) => ms.getVideoTracks()[0])
   );
 
-  const videoIsBroadcasting$ = new BehaviorSubject(
+  const videoShouldBroadcast$ = new BehaviorSubject(
     videoBroadcastOptions.broadcasting
   );
   const videoApi = makeBroadcastTrack({
     contentTrack$: videoSourceTrack$,
     fallbackTrack$: blackCanvasTrack$,
     retainIdleTrack: options.retainIdleTracks,
-    isBroadcasting$: videoIsBroadcasting$,
+    shouldBroadcast$: videoShouldBroadcast$,
     isSourceEnabled$,
     ...videoBroadcastOptions
   });
@@ -190,7 +190,7 @@ export const getScreenshare = (
   };
 
   const toggleBroadcasting = () => {
-    if (audioIsBroadcasting$.value || videoIsBroadcasting$.value) {
+    if (audioShouldBroadcast$.value || videoShouldBroadcast$.value) {
       stopBroadcasting();
     } else {
       startBroadcasting();
