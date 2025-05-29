@@ -1,11 +1,9 @@
 import {
   catchError,
   combineLatest,
-  delay,
   concat,
   distinctUntilChanged,
   filter,
-  from,
   fromEvent,
   map,
   Observable,
@@ -16,7 +14,8 @@ import {
   switchMap,
   take,
   tap,
-  withLatestFrom
+  withLatestFrom,
+  forkJoin
 } from "rxjs";
 import invariant from "tiny-invariant";
 
@@ -31,6 +30,7 @@ import type {
 } from "./callsTypes";
 import type { Subject } from "rxjs";
 import { retryWithBackoff } from "./rxjs-helpers";
+import { fromFetch } from "./fromFetch";
 
 export interface PartyTracksConfig {
   apiExtraParams?: string;
@@ -96,85 +96,19 @@ export class PartyTracks {
       maxApiHistory: 100,
       ...config
     };
+
     this.#params = new URLSearchParams(config.apiExtraParams);
     this.history = new History<ApiHistoryEntry>(config.maxApiHistory);
-    this.peerConnection$ = new Observable<RTCPeerConnection>((subscriber) => {
-      let peerConnection: RTCPeerConnection;
-      let iceTimeout = -1;
-      const setup = () => {
-        clearTimeout(iceTimeout);
-        peerConnection?.close();
-        peerConnection = new RTCPeerConnection({
-          iceServers: config.iceServers ?? [
-            { urls: ["stun:stun.cloudflare.com:3478"] }
-          ],
-          bundlePolicy: "max-bundle"
-        });
-        subscriber.add(() => peerConnection.close());
-        peerConnection.addEventListener("connectionstatechange", () => {
-          if (
-            peerConnection.connectionState === "failed" ||
-            peerConnection.connectionState === "closed"
-          ) {
-            logger.debug(
-              `💥 Peer connectionState is ${peerConnection.connectionState}`
-            );
-            subscriber.next(setup());
-          }
-        });
+    this.session$ = makePeerConnectionSessionCombo({
+      fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+        this.#fetchWithRecordedHistory(input, init),
+      params: this.#params,
+      iceServers: this.#config.iceServers,
+      prefix: this.#config.prefix ?? "/partytracks"
+    });
 
-        peerConnection.addEventListener("iceconnectionstatechange", () => {
-          clearTimeout(iceTimeout);
-          if (
-            peerConnection.iceConnectionState === "failed" ||
-            peerConnection.iceConnectionState === "closed"
-          ) {
-            logger.debug(
-              `💥 Peer iceConnectionState is ${peerConnection.iceConnectionState}`
-            );
-            subscriber.next(setup());
-          } else if (peerConnection.iceConnectionState === "disconnected") {
-            // TODO: we should start to inspect the connection stats from here on for
-            // any other signs of trouble to guide what to do next (instead of just hoping
-            // for the best like we do here for now)
-            const timeoutSeconds = 7;
-            iceTimeout = window.setTimeout(() => {
-              if (peerConnection.iceConnectionState === "connected") return;
-              logger.debug(
-                `💥 Peer iceConnectionState was ${peerConnection.iceConnectionState} for more than ${timeoutSeconds} seconds`
-              );
-              subscriber.next(setup());
-            }, timeoutSeconds * 1000);
-          }
-        });
-
-        return peerConnection;
-      };
-
-      subscriber.next(setup());
-
-      return () => {
-        peerConnection.close();
-      };
-    }).pipe(
-      // delay(0) for React StrictMode
-      delay(0),
-      shareReplay({
-        bufferSize: 1,
-        refCount: true
-      })
-    );
-
-    this.session$ = this.peerConnection$.pipe(
-      // TODO: Convert the promise based session creation here
-      // into an observable that will close the session in cleanup
-      switchMap((pc) => from(this.#createSession(pc))),
-      retryWithBackoff(),
-      // we want new subscribers to receive the session right away
-      shareReplay({
-        bufferSize: 1,
-        refCount: true
-      })
+    this.peerConnection$ = this.session$.pipe(
+      map(({ peerConnection }) => peerConnection)
     );
 
     this.sessionError$ = this.session$.pipe(
@@ -217,29 +151,12 @@ export class PartyTracks {
     32
   );
 
-  async #createSession(peerConnection: RTCPeerConnection) {
-    logger.debug("🆕 creating new session");
-    const response = await this.#fetchWithRecordedHistory(
-      `${this.#config.prefix}/sessions/new?${this.#params}`,
-      { method: "POST" }
-    );
-    if (response.status > 400) {
-      throw new Error("Error creating Calls session");
-    }
-
-    try {
-      const { sessionId } = (await response.clone().json()) as {
-        sessionId: string;
-      };
-      return { peerConnection, sessionId };
-    } catch (error) {
-      throw new Error(`${response.status}: ${await response.text()}`);
-    }
-  }
-
-  async #fetchWithRecordedHistory(path: string, requestInit?: RequestInit) {
+  async #fetchWithRecordedHistory(
+    path: RequestInfo | URL,
+    requestInit?: RequestInit
+  ) {
     this.history.log({
-      endpoint: path,
+      endpoint: path.toString(),
       method: requestInit?.method ?? "get",
       type: "request",
       body:
@@ -268,7 +185,7 @@ export class PartyTracks {
     }
     const responseBody = await response.clone().json();
     this.history.log({
-      endpoint: path,
+      endpoint: path.toString(),
       type: "response",
       body: responseBody
     });
@@ -553,7 +470,8 @@ export class PartyTracks {
                 subscriber.add(() => {
                   logger.debug(
                     "🔚 Closing pulled track ",
-                    trackMetadata.trackName
+                    trackMetadata.trackName,
+                    peerConnection
                   );
                   this.#closeTrackInBulk(
                     peerConnection,
@@ -606,11 +524,7 @@ export class PartyTracks {
               : trackData
           );
         }
-      ),
-      shareReplay({
-        refCount: true,
-        bufferSize: 1
-      })
+      )
     );
 
     const subsequentPreferredRid$ = concat(
@@ -652,7 +566,11 @@ export class PartyTracks {
           );
         }
       ),
-      map(([{ track }]) => track)
+      map(([{ track }]) => track),
+      shareReplay({
+        refCount: true,
+        bufferSize: 1
+      })
     );
   }
 
@@ -668,13 +586,17 @@ export class PartyTracks {
       peerConnection.connectionState !== "connected" ||
       transceiver === undefined
     ) {
+      logger.log("Bailing a closing track because connection is closed");
       return;
     }
     this.#closeTrackDispatcher.doBulkRequest({ mid }, (mids) =>
       this.#taskScheduler.schedule(async () => {
         // No need to renegotiate and close track if the peerConnection
         // is already closed.
-        if (peerConnection.connectionState === "closed") return;
+        if (peerConnection.connectionState === "closed") {
+          logger.log("Bailing a closing track because connection is closed");
+          return;
+        }
         transceiver.stop();
         // create an offer
         const offer = await peerConnection.createOffer();
@@ -799,4 +721,101 @@ async function signalingStateIsStable(peerConnection: RTCPeerConnection) {
 
     await connected;
   }
+}
+
+function makePeerConnectionSessionCombo(options: {
+  iceServers?: RTCIceServer[];
+  prefix: string;
+  fetch: typeof fetch;
+  params: URLSearchParams;
+}): Observable<{
+  peerConnection: RTCPeerConnection;
+  sessionId: string;
+}> {
+  return forkJoin({
+    sessionId: fromFetch(`${options.prefix}/sessions/new?${options.params}`, {
+      method: "POST",
+      fetcher: options.fetch,
+      selector: (res) => res.json().then(({ sessionId }) => sessionId)
+    }),
+    iceServers: options.iceServers
+      ? of(options.iceServers)
+      : fromFetch(`${options.prefix}/generate-ice-servers`, {
+          selector: (res) =>
+            res.json().then(({ iceServers }) => iceServers as RTCIceServer[])
+        })
+  }).pipe(
+    switchMap(
+      ({ sessionId, iceServers }) =>
+        new Observable<{
+          sessionId: string;
+          peerConnection: RTCPeerConnection;
+        }>((subscriber) => {
+          let iceTimeout = -1;
+          const peerConnection = new RTCPeerConnection({
+            iceServers,
+            bundlePolicy: "max-bundle"
+          });
+
+          const reconnect = (message: string) => {
+            logger.log(`💥 ${message}`);
+            // emitting error will trigger new sessionId, new ice server
+            // credentials and a new peerConnection to be made
+            subscriber.error(new Error(message));
+          };
+
+          subscriber.add(() => peerConnection.close());
+          peerConnection.addEventListener("connectionstatechange", () => {
+            logger.log(
+              "PeerConnection connectionstatechange: ",
+              peerConnection.connectionState
+            );
+            if (
+              peerConnection.connectionState === "failed" ||
+              peerConnection.connectionState === "closed"
+            ) {
+              reconnect(
+                `PeerConnection connectionState ${peerConnection.connectionState}`
+              );
+            }
+          });
+
+          peerConnection.addEventListener("iceconnectionstatechange", () => {
+            logger.log(
+              "PeerConnection iceconnectionstatechange: ",
+              peerConnection.iceConnectionState
+            );
+            clearTimeout(iceTimeout);
+            if (
+              peerConnection.iceConnectionState === "failed" ||
+              peerConnection.iceConnectionState === "closed"
+            ) {
+              reconnect(
+                `💥 Peer iceConnectionState is ${peerConnection.iceConnectionState}`
+              );
+            } else if (peerConnection.iceConnectionState === "disconnected") {
+              // TODO: we should start to inspect the connection stats from here on for
+              // any other signs of trouble to guide what to do next (instead of just hoping
+              // for the best like we do here for now)
+              const timeoutSeconds = 7;
+              iceTimeout = window.setTimeout(() => {
+                if (peerConnection.iceConnectionState === "connected") return;
+                reconnect(
+                  `💥 Peer iceConnectionState was ${peerConnection.iceConnectionState} for more than ${timeoutSeconds} seconds`
+                );
+              }, timeoutSeconds * 1000);
+            }
+          });
+
+          subscriber.next({ peerConnection, sessionId });
+        })
+    ),
+    retryWithBackoff({
+      backoffFactor: 1.1
+    }),
+    shareReplay({
+      refCount: true,
+      bufferSize: 1
+    })
+  );
 }

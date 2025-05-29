@@ -82,7 +82,7 @@ setTimeout(() => {
 ### Server code:
 
 In your server, you need to have a path that proxies all requests over to
-the Cloudflare Realtime SFU API and provides your app id and token. In a worker,
+the Cloudflare Realtime SFU API and provides your app id and token. Create your SFU App in the [Cloudflare Dashboard](https://dash.cloudflare.com/?to=/:account/realtime/sfu/create). In a worker,
 it will look something like this:
 
 ```ts
@@ -90,22 +90,53 @@ import { Hono } from "hono";
 import { routePartyTracksRequest } from "partytracks/server";
 
 type Bindings = {
-  CALLS_APP_ID: string;
-  CALLS_APP_TOKEN: string;
+  // SFU is required
+  SFU_APP_ID: string;
+  SFU_APP_TOKEN: string;
+  // TURN is optional, but highly recommended. See the next section!
+  TURN_SERVER_APP_ID?: string;
+  TURN_SERVER_APP_TOKEN?: string;
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
 
 app.all("/partytracks/*", (c) =>
   routePartyTracksRequest({
-    appId: c.env.CALLS_APP_ID,
-    token: c.env.CALLS_APP_TOKEN,
-    request: c.req.raw
+    appId: c.env.SFU_APP_ID,
+    token: c.env.SFU_APP_TOKEN,
+    turnServerAppId: c.env.TURN_SERVER_APP_ID,
+    turnServerAppToken: c.env.TURN_SERVER_APP_TOKEN
+    request: c.req.raw,
   })
 );
 
 export default app;
 ```
+
+### TURN Server Configuration
+
+For enhanced NAT traversal capabilities, you can configure a TURN server with your partytracks setup. TURN (Traversal Using Relays around NAT) helps establish connections when direct peer-to-peer connections aren't possible due to restrictive NAT or firewall configurations.
+
+To enable TURN server support:
+
+1. **Create TURN credentials** at the [Cloudflare Dashboard](https://dash.cloudflare.com/?to=/:account/realtime/turn/create)
+2. **Add the optional TURN configuration** to your `routePartyTracksRequest` call:
+
+```ts
+routePartyTracksRequest({
+  appId: c.env.CALLS_APP_ID,
+  token: c.env.CALLS_APP_TOKEN,
+  request: c.req.raw,
+  // TURN server configuration
+  turnServerAppId: c.env.TURN_SERVER_APP_ID,
+  turnServerAppToken: c.env.TURN_SERVER_APP_TOKEN,
+  turnServerCredentialTTL: 86400 // Optional: credential lifetime in seconds (default: 24 hours)
+});
+```
+
+When TURN server credentials are provided, the `/partytracks/generate-ice-servers` endpoint will return TURN server configurations for improved connectivity. Without TURN credentials, only STUN servers are provided for basic NAT traversal.
+
+Learn more about TURN and when you might need it in the [Cloudflare TURN documentation](https://developers.cloudflare.com/realtime/turn/what-is-turn/).
 
 ### React utils
 

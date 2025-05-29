@@ -44,7 +44,7 @@
   ],
   "author": "Kevin Kipp <kkipp@cloudflare.com>",
   "license": "ISC",
-  "description": "Integrate Cloudflare Calls into your PartyServer app",
+  "description": "Integrate Cloudflare Realtime into your PartyServer app",
   "dependencies": {
     "cookie": "^1.0.2",
     "jose": "^6.0.10",

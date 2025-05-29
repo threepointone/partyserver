@@ -9,11 +9,13 @@ const unauthorizedResponse = () =>
 
 interface Config {
   /**
-   * Cloudflare Calls App ID. Can be created here https://dash.cloudflare.com/?to=/:account/calls/create-sfu-application
+   * Cloudflare Realtime SFU App ID. Get it here:
+   * https://dash.cloudflare.com/?to=/:account/realtime/sfu/create
    */
   appId: string;
   /**
-   * Cloudflare Calls App Token. Can be created here https://dash.cloudflare.com/?to=/:account/calls/create-sfu-application
+   * Cloudflare Realtime SFU App Token. Get it here:
+   * https://dash.cloudflare.com/?to=/:account/realtime/sfu/create
    */
   token: string;
   /**
@@ -22,9 +24,9 @@ interface Config {
    */
   prefix?: string;
   /**
-   * The base URL for the Cloudflare Calls API
+   * The base URL for the Cloudflare Realtime API
    */
-  callsApiBaseUrl?: string;
+  realtimeApiBaseUrl?: string;
   /**
    * The original request
    */
@@ -35,15 +37,35 @@ interface Config {
    * On by default. Disabl
    */
   lockSessionToInitiator?: boolean;
+  /**
+   * TURN Server App ID. Get it here:
+   * http://dash.cloudflare.com/?to=/:account/realtime/turn/create
+   * What is TURN? https://developers.cloudflare.com/realtime/turn/what-is-turn/
+   */
+  turnServerAppId?: string;
+  /**
+   * TURN Server App Token. Get it here:
+   * http://dash.cloudflare.com/?to=/:account/realtime/turn/create
+   * What is TURN? https://developers.cloudflare.com/realtime/turn/what-is-turn/
+   */
+  turnServerAppToken?: string;
+  /*
+   * How long the generated credentials should be valid.
+   * Defaults to 86400 seconds, which is 24 hours.
+   */
+  turnServerCredentialTTL?: number;
 }
 
 export const routePartyTracksRequest = async ({
   appId,
   token,
-  callsApiBaseUrl = `https://rtc.live.cloudflare.com/v1/apps/${appId}`,
+  realtimeApiBaseUrl = "https://rtc.live.cloudflare.com/v1",
   prefix = "/partytracks",
   request,
-  lockSessionToInitiator = process.env.NODE_ENV === "production"
+  lockSessionToInitiator = process.env.NODE_ENV === "production",
+  turnServerAppToken,
+  turnServerAppId,
+  turnServerCredentialTTL: ttl
 }: Config) => {
   const { headers, body, url, method } = request;
   const previousUrl = new URL(url);
@@ -55,7 +77,7 @@ export const routePartyTracksRequest = async ({
   // Forward headers while adding auth
   const newHeaders = new Headers(headers);
   newHeaders.set("Authorization", `Bearer ${token}`);
-  const callsInit: RequestInit = {
+  const realtimeInit: RequestInit = {
     headers: newHeaders,
     method
   };
@@ -68,23 +90,59 @@ export const routePartyTracksRequest = async ({
       "Content-Length header is not a number"
     );
     if (parsedContentLength > 0 || headers.has("Transfer-Encoding")) {
-      callsInit.body = body;
+      realtimeInit.body = body;
     }
   }
 
-  const callsUrl = new URL(callsApiBaseUrl);
-  callsUrl.pathname = previousUrl.pathname.replace(prefix, callsUrl.pathname);
-  callsUrl.search = previousUrl.search;
+  if (previousUrl.pathname === `${prefix}/generate-ice-servers`) {
+    if (turnServerAppToken && turnServerAppId) {
+      return fetch(
+        `${realtimeApiBaseUrl}/turn/keys/${turnServerAppId}/credentials/generate-ice-servers`,
+        {
+          method: "POST",
+          body: JSON.stringify({ ttl }),
+          headers: {
+            Authorization: `Bearer ${turnServerAppToken}`
+          }
+        }
+      );
+    } else {
+      return new Response(
+        JSON.stringify({
+          iceServers: [
+            {
+              urls: [
+                "stun:stun.cloudflare.com:3478",
+                "stun:stun.cloudflare.com:53"
+              ]
+            }
+          ]
+        }),
+        {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
+    }
+  }
+
+  const realtimeUrl = new URL(`${realtimeApiBaseUrl}/apps/${appId}`);
+  realtimeUrl.pathname = previousUrl.pathname.replace(
+    prefix,
+    realtimeUrl.pathname
+  );
+  realtimeUrl.search = previousUrl.search;
 
   if (!lockSessionToInitiator) {
-    return fetch(callsUrl, callsInit);
+    return fetch(realtimeUrl, realtimeInit);
   }
 
   const isCreatingNewSession =
     previousUrl.pathname === `${prefix}/sessions/new`;
 
   if (isCreatingNewSession) {
-    const createdSessionResponse = await fetch(callsUrl, callsInit);
+    const createdSessionResponse = await fetch(realtimeUrl, realtimeInit);
     const { sessionId } = await createdSessionResponse.clone().json();
     const jwt = await new jose.SignJWT({
       sessionId
@@ -123,5 +181,5 @@ export const routePartyTracksRequest = async ({
   } catch (e) {
     return unauthorizedResponse();
   }
-  return fetch(callsUrl, callsInit);
+  return fetch(realtimeUrl, realtimeInit);
 };
