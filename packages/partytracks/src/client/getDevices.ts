@@ -60,7 +60,6 @@ const getDevice = ({
     transformations,
     retainIdleTrack,
     onDeviceFailure,
-    constraints,
     broadcasting,
     ...resilientTrackOptions
   }: MediaDeviceOptions = {}): MediaDevice => {
