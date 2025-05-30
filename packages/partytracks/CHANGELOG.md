@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.47
+
+### Patch Changes
+
+- [#242](https://github.com/cloudflare/partykit/pull/242) [`c714bc8`](https://github.com/cloudflare/partykit/commit/c714bc88a12a216bb9c588f08d0a7a0db877eae2) Thanks [@third774](https://github.com/third774)! - Add easy TURN server support
+
 ## 0.0.46
 
 ### Patch Changes
