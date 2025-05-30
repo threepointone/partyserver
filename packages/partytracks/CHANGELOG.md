@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.46
+
+### Patch Changes
+
+- [#243](https://github.com/cloudflare/partykit/pull/243) [`8ad157e`](https://github.com/cloudflare/partykit/commit/8ad157e3c06cfb230d2f6198c268d9fed8fd08d6) Thanks [@third774](https://github.com/third774)! - Fix forwarding constraints for mic and camera
+
 ## 0.0.45
 
 ### Patch Changes
