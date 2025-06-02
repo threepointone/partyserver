@@ -21,7 +21,7 @@ export class ToDos extends SyncServer<
   Env,
   { todos: { record: TodoRecord; action: TodoAction } }
 > {
-  sql(sql: string, ...values: (string | number | null)[]) {
+  sql2(sql: string, ...values: (string | number | null)[]) {
     if (
       ["insert", "update", "delete"].includes(
         sql.slice(0, sql.indexOf(" ")).toLowerCase()
@@ -34,7 +34,7 @@ export class ToDos extends SyncServer<
   }
 
   onStart() {
-    this.sql(`CREATE TABLE IF NOT EXISTS todos (
+    this.sql2(`CREATE TABLE IF NOT EXISTS todos (
       id TEXT PRIMARY KEY NOT NULL UNIQUE, 
       text TEXT NOT NULL, 
       completed INTEGER NOT NULL, 
@@ -53,7 +53,7 @@ export class ToDos extends SyncServer<
       case "create": {
         const { id, text, completed } = action.payload;
         return [
-          ...this.sql(
+          ...this.sql2(
             "INSERT INTO todos (id, text, completed) VALUES (?, ?, ?) RETURNING *",
             id,
             text,
@@ -66,7 +66,7 @@ export class ToDos extends SyncServer<
         const { id, text, completed } = action.payload;
 
         return [
-          ...this.sql(
+          ...this.sql2(
             "UPDATE todos SET text = ?, completed = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? RETURNING *",
             text,
             completed,
@@ -78,7 +78,7 @@ export class ToDos extends SyncServer<
         const { id } = action.payload;
         assert(id, "id is required");
         return [
-          ...this.sql(
+          ...this.sql2(
             "UPDATE todos SET deleted_at = CURRENT_TIMESTAMP WHERE id = ? RETURNING *",
             id
           ).raw()
@@ -90,7 +90,7 @@ export class ToDos extends SyncServer<
   async onAlarm() {
     // actually delete any todos that have been
     // marked as deleted more than 24 hours ago
-    this.sql(
+    this.sql2(
       "DELETE FROM todos WHERE deleted_at < ?",
       Date.now() - 24 * 60 * 60 * 1000
     );
