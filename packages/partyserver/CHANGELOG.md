@@ -1,5 +1,11 @@
 # partyflare
 
+## 0.0.72
+
+### Patch Changes
+
+- [#246](https://github.com/cloudflare/partykit/pull/246) [`a462739`](https://github.com/cloudflare/partykit/commit/a4627392628058702dcbb8c5d5acbea35b95be09) Thanks [@threepointone](https://github.com/threepointone)! - add .sql helper
+
 ## 0.0.71
 
 ### Patch Changes

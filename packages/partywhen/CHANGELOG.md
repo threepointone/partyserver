@@ -1,5 +1,12 @@
 # partywhen
 
+## 0.0.16
+
+### Patch Changes
+
+- Updated dependencies [[`a462739`](https://github.com/cloudflare/partykit/commit/a4627392628058702dcbb8c5d5acbea35b95be09)]:
+  - partyserver@0.0.72
+
 ## 0.0.15
 
 ### Patch Changes
