@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.49
+
+### Patch Changes
+
+- [#250](https://github.com/cloudflare/partykit/pull/250) [`60d9aae`](https://github.com/cloudflare/partykit/commit/60d9aae9d8f0a351ab9960fe06d1cbf0ead6e49a) Thanks [@third774](https://github.com/third774)! - Update readme
+
 ## 0.0.48
 
 ### Patch Changes
