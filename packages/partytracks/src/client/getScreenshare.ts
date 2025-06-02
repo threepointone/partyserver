@@ -1,5 +1,12 @@
 import { inaudibleAudioTrack$ } from "./inaudibleTrack$";
-import { map, switchMap, of, BehaviorSubject } from "rxjs";
+import {
+  map,
+  switchMap,
+  of,
+  BehaviorSubject,
+  combineLatest,
+  distinctUntilChanged
+} from "rxjs";
 import type { Observable } from "rxjs";
 import { blackCanvasTrack$ } from "./blackCanvasTrack$";
 import { screenshare$ } from "./screenshare$";
@@ -197,6 +204,17 @@ export const getScreenshare = (
     }
   };
 
+  const isBroadcasting$ = combineLatest([
+    audioApi.isBroadcasting$,
+    videoApi.isBroadcasting$
+  ]).pipe(
+    map(
+      ([audioIsBroadcasting, videoIsBroadcasting]) =>
+        audioIsBroadcasting || videoIsBroadcasting
+    ),
+    distinctUntilChanged()
+  );
+
   return {
     audio: audio as Omit<
       BroadcastTrack,
@@ -218,7 +236,8 @@ export const getScreenshare = (
     isSourceEnabled$,
     startBroadcasting,
     stopBroadcasting,
-    toggleBroadcasting
+    toggleBroadcasting,
+    isBroadcasting$
   };
 };
 
@@ -260,6 +279,13 @@ export interface Screenshare {
    broadcasting, it will call stopBroadcasting on both.
    */
   toggleBroadcasting: () => void;
+  /**
+   True if either audio or video is broadcasting. For granular state
+   check the individual tracks:
+   screenshare.audio.isBroadcasting$
+   screenshare.video.isBroadcasting$
+   */
+  isBroadcasting$: Observable<boolean>;
 }
 
 export interface ScreenshareBroadcastTrack {
