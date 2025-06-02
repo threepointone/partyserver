@@ -9,29 +9,19 @@ import {
 } from "partytracks/client";
 import invariant from "tiny-invariant";
 
-const localVideo = document.getElementById("local-video");
-const remoteVideo = document.getElementById("remote-video");
-const audio = document.getElementById("audio");
-const micBroadcastButton = document.getElementById("mic-broadcast-button");
-const micEnabledButton = document.getElementById("mic-enabled-button");
-const cameraBroadcastButton = document.getElementById(
-  "camera-broadcast-button"
-);
-const cameraEnabledButton = document.getElementById("camera-enabled-button");
-const micSelect = document.getElementById("mic-select");
-const cameraSelect = document.getElementById("camera-select");
-invariant(localVideo instanceof HTMLVideoElement);
-invariant(remoteVideo instanceof HTMLVideoElement);
-invariant(audio instanceof HTMLAudioElement);
-invariant(micBroadcastButton instanceof HTMLButtonElement);
-invariant(micEnabledButton instanceof HTMLButtonElement);
-invariant(cameraBroadcastButton instanceof HTMLButtonElement);
-invariant(cameraEnabledButton instanceof HTMLButtonElement);
-invariant(micSelect instanceof HTMLSelectElement);
-invariant(cameraSelect instanceof HTMLSelectElement);
+const partyTracks = new PartyTracks();
 
 // MIC SETUP
 // =====================================================================
+
+const audio = document.getElementById("audio");
+const micBroadcastButton = document.getElementById("mic-broadcast-button");
+const micEnabledButton = document.getElementById("mic-enabled-button");
+const micSelect = document.getElementById("mic-select");
+invariant(audio instanceof HTMLAudioElement);
+invariant(micBroadcastButton instanceof HTMLButtonElement);
+invariant(micEnabledButton instanceof HTMLButtonElement);
+invariant(micSelect instanceof HTMLSelectElement);
 
 const mic = getMic();
 mic.error$.subscribe(console.error);
@@ -88,8 +78,34 @@ micSelect.onchange = (e) => {
 //   /* ... */
 // });
 
+const audioTrackMetadata$ = partyTracks.push(mic.broadcastTrack$);
+
+// Send track metadata to other users. Something like:
+// audioTrackMetadata$.subscribe((metadata) => {
+//   websocket.send(
+//     JSON.stringify({
+//       type: "UserMicTrackUpdate",
+//       userId: "user a",
+//       metadata
+//     })
+//   );
+// });
+
 // CAMERA SETUP
 // =====================================================================
+
+const cameraBroadcastButton = document.getElementById(
+  "camera-broadcast-button"
+);
+const cameraEnabledButton = document.getElementById("camera-enabled-button");
+const cameraSelect = document.getElementById("camera-select");
+const localVideo = document.getElementById("local-video");
+const remoteVideo = document.getElementById("remote-video");
+invariant(localVideo instanceof HTMLVideoElement);
+invariant(remoteVideo instanceof HTMLVideoElement);
+invariant(cameraBroadcastButton instanceof HTMLButtonElement);
+invariant(cameraEnabledButton instanceof HTMLButtonElement);
+invariant(cameraSelect instanceof HTMLSelectElement);
 
 const camera = getCamera();
 
@@ -136,6 +152,8 @@ cameraSelect.onchange = (e) => {
   camera.setPreferredDevice(JSON.parse(option.dataset.mediaDeviceInfo));
 };
 
+const videoTrackMetadata$ = partyTracks.push(camera.broadcastTrack$);
+
 // Screenshare Setup
 // =====================================================================
 
@@ -145,11 +163,8 @@ const localScreenshareVideo = document.getElementById(
 const remoteScreenshareVideo = document.getElementById(
   "remote-screenshare-video"
 );
-const screenshareAudioBroadcastButton = document.getElementById(
-  "screenshare-audio-broadcast-button"
-);
-const screenshareVideoBroadcastButton = document.getElementById(
-  "screenshare-video-broadcast-button"
+const screenshareBroadcastButton = document.getElementById(
+  "screenshare-broadcast-button"
 );
 const screenshareSourceEnabledButton = document.getElementById(
   "screenshare-source-enabled-button"
@@ -157,18 +172,17 @@ const screenshareSourceEnabledButton = document.getElementById(
 
 invariant(localScreenshareVideo instanceof HTMLVideoElement);
 invariant(remoteScreenshareVideo instanceof HTMLVideoElement);
-invariant(screenshareAudioBroadcastButton instanceof HTMLButtonElement);
-invariant(screenshareVideoBroadcastButton instanceof HTMLButtonElement);
+invariant(screenshareBroadcastButton instanceof HTMLButtonElement);
 invariant(screenshareSourceEnabledButton instanceof HTMLButtonElement);
 
 const screenshare = getScreenshare();
 
-screenshare.video.isBroadcasting$.subscribe((isBroadcasting) => {
-  screenshareVideoBroadcastButton.innerText = `screenshare video is${isBroadcasting ? " " : " not "}broadcasting`;
+screenshare.isBroadcasting$.subscribe((isBroadcasting) => {
+  screenshareBroadcastButton.innerText = `screenshare is${isBroadcasting ? " " : " not "}broadcasting`;
 });
 
-screenshareVideoBroadcastButton.onclick = () => {
-  screenshare.video.toggleBroadcasting();
+screenshareBroadcastButton.onclick = () => {
+  screenshare.toggleBroadcasting();
 };
 
 screenshare.isSourceEnabled$.subscribe((isSourceEnabled) => {
@@ -179,26 +193,27 @@ screenshareSourceEnabledButton.onclick = () => {
   screenshare.toggleIsSourceEnabled();
 };
 
-screenshare.audio.isBroadcasting$.subscribe((isBroadcasting) => {
-  screenshareAudioBroadcastButton.innerText = `screenshare audio is${isBroadcasting ? " " : " not "}broadcasting`;
-});
-
-screenshareAudioBroadcastButton.onclick = () => {
-  screenshare.audio.toggleBroadcasting();
-};
-
-// Push and pull tracks
-// =====================================================================
-
-const partyTracks = new PartyTracks();
-const audioTrackMetadata$ = partyTracks.push(mic.broadcastTrack$);
-const videoTrackMetadata$ = partyTracks.push(camera.broadcastTrack$);
 const screenshareVideoTrackMetadata$ = partyTracks.push(
   screenshare.video.broadcastTrack$
 );
 const screenshareAudioTrackMetadata$ = partyTracks.push(
   screenshare.audio.broadcastTrack$
 );
+
+// Pulling tracks
+// =====================================================================
+// On another machine...
+//
+// The easiest way to create an observable is by wrapping in of()
+// import { of } from "rxjs"
+// const audioTrackMetadata$ = of({
+//   "trackName": "...",
+//   "sessionId": "...",
+//   "location": "remote"
+// })
+
+audioTrackMetadata$.subscribe(console.log);
+
 const pulledAudioTrack$ = partyTracks.pull(audioTrackMetadata$);
 const pulledVideoTrack$ = partyTracks.pull(videoTrackMetadata$);
 const pulledScreenshareVideoTrack$ = partyTracks.pull(
@@ -233,5 +248,7 @@ const pulledScreenshareAudioTrackSinkSubscription = audioSink.attach(
 );
 
 // Remove a pushed/pulled track by calling unsubscribe():
-// videoTrackMetadata$.unsubscribe()
-// pulledTrackSinkSubscription.unsubscribe();
+// videoTrackMetadata$.unsubscribe() stops pushing when all subscribers are gone
+// pulledVideoTrack.unsubscribe() stops pulling when all subscribers are gone
+// pulledTrackSinkSubscription.unsubscribe() stops pulling when all subscribers are gone
+// and also removes the track from the audio attached audio sink

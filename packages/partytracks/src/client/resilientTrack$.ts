@@ -18,7 +18,6 @@ import { logger } from "./logging";
 import { trackIsHealthy } from "./trackIsHealthy";
 
 import type { Subscriber } from "rxjs";
-import type { Prettify } from "../ts-utils";
 
 export class DevicesExhaustedError extends Error {
   constructor(message?: string) {
