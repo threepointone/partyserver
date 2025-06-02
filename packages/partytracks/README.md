@@ -23,7 +23,8 @@ A promise-based API (push a track, get a promise of metadata) seems simpler but 
 ### Client code:
 
 ```js
-import "./styles.css";
+// needed to smooth out cross browser behavior inconsistencies
+import "webrtc-adapter";
 
 import {
   PartyTracks,
