@@ -1,5 +1,11 @@
 # partytracks
 
+## 0.0.48
+
+### Patch Changes
+
+- [#248](https://github.com/cloudflare/partykit/pull/248) [`bec21c8`](https://github.com/cloudflare/partykit/commit/bec21c81c4985787f9311df8912e0bd6b10e698e) Thanks [@third774](https://github.com/third774)! - Add isBroadcasting$ API to top level screenshare API
+
 ## 0.0.47
 
 ### Patch Changes
