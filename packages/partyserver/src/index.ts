@@ -229,6 +229,33 @@ export class Server<Env = unknown> extends DurableObject<Env> {
     ? new HibernatingConnectionManager(this.ctx)
     : new InMemoryConnectionManager();
 
+  /**
+   * Execute SQL queries against the Server's database
+   * @template T Type of the returned rows
+   * @param strings SQL query template strings
+   * @param values Values to be inserted into the query
+   * @returns Array of query results
+   */
+  sql<T = Record<string, string | number | boolean | null>>(
+    strings: TemplateStringsArray,
+    ...values: (string | number | boolean | null)[]
+  ) {
+    let query = "";
+    try {
+      // Construct the SQL query with placeholders
+      query = strings.reduce(
+        (acc, str, i) => acc + str + (i < values.length ? "?" : ""),
+        ""
+      );
+
+      // Execute the SQL query with the provided values
+      return [...this.ctx.storage.sql.exec(query, ...values)] as T[];
+    } catch (e) {
+      console.error(`failed to execute sql query: ${query}`, e);
+      throw this.onException(e);
+    }
+  }
+
   // biome-ignore lint/complexity/noUselessConstructor: <explanation>
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
@@ -588,6 +615,20 @@ Did you try connecting directly to this Durable Object? Try using getServerByNam
     );
 
     return new Response("Not implemented", { status: 404 });
+  }
+
+  /**
+   * Called when an exception occurs.
+   * @param error - The error that occurred.
+   */
+  onException(error: unknown): void | Promise<void> {
+    console.error(
+      `Exception in ${this.#ParentClass.name}:${this.name}:`,
+      error
+    );
+    console.info(
+      `Implement onException on ${this.#ParentClass.name} to handle this error.`
+    );
   }
 
   onAlarm(): void | Promise<void> {
